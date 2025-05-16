@@ -45,11 +45,11 @@
             class="flex-grow min-w-0 text-[#1d1c1b] bg-transparent focus:outline-none placeholder-[#646362] py-4"/>
 
           <button
-            type="submit"
-            class="w-14 h-14 flex items-center justify-center rounded-full bg-[#0505050a] hover:bg-[#1d1c1b] text-[#1d1c1b] hover:text-white flex-shrink-0 font-semibold text-sm ml-1 cursor-pointer"
-            aria-label="OK"
-          >
-            GO
+            type="submit" class="w-14 h-14 flex items-center justify-center flex-shrink-0 ml-1 cursor-pointer relative group" aria-label="GO" >
+            <div class="absolute inset-0 rounded-full bg-[#1d1c1b]  transform scale-90 group-hover:scale-100 transition-transform duration-100 ease-in-out" ></div>
+            <span class="relative z-10 font-semibold text-sm text-white">
+              GO
+            </span>
           </button>
         </form>
       </div>

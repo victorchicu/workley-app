@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "cv-app": {
+    "ceevy-app": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/cv-app",
+            "outputPath": "dist/ceevy-app",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -64,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "cv-app:build:production"
+              "buildTarget": "ceevy-app:build:production"
             },
             "development": {
-              "buildTarget": "cv-app:build:development"
+              "buildTarget": "ceevy-app:build:development"
             }
           },
           "defaultConfiguration": "development"

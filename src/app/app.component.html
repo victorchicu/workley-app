@@ -1,11 +1,15 @@
-<div class="min-h-screen bg-[#f8f7f6] text-slate-800 flex flex-col font-sans">
+<div class="min-h-screen text-slate-800 flex flex-col font-sans">
 
   <nav class="w-full px-4 py-3 flex justify-between items-center">
-    <a [routerLink]="['/']" class="flex items-center text-2xl font-bold text-[#1d1c1b] opacity-80 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300">
-      Ceevy
-    </a>
+    <span>
+       <a [routerLink]="['/']"
+          class="flex items-center text-2xl font-bold text-[#1d1c1b] opacity-80 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300">
+         From Link
+      </a>
+    </span>
     <div class="flex items-center space-x-2 sm:space-x-3">
-      <button type="button" class="relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300 px-4 py-2 text-base font-medium text-[#1d1c1b] cursor-pointer">
+      <button type="button"
+              class="relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300 px-4 py-2 text-base font-medium text-[#1d1c1b] cursor-pointer">
         Sign In
       </button>
       <button type="button" class="px-4 py-2 text-base font-medium text-white bg-[#1d1c1b] rounded-2xl cursor-pointer">
@@ -19,10 +23,11 @@
       <div class="relative">
         <div class="absolute bottom-full left-0 right-0 mb-4 text-center">
           <h1 class="text-2xl md:text-3xl font-medium text-[#1d1c1b] mb-1 sm:mb-2">
-            Welcome to Ceevy.
+            Welcome to From Link.
           </h1>
           <p class="text-lg md:text-xl text-[#646362]">
-            Turn your LinkedIn into a job-winning resume — effortlessly.
+            Turn your <a href="https://linkedin.com" class="underline" target="_blank"
+                         rel="nofollow noopener noreferrer">LinkedIn</a> into a job-winning resume — effortlessly.
           </p>
         </div>
 

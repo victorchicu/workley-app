@@ -4,35 +4,26 @@
     <span>
        <a [routerLink]="['/']"
           class="flex items-center text-2xl font-bold text-[#1d1c1b] opacity-80 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300">
-         From Link
+         A way to go
       </a>
     </span>
-    <div class="flex items-center space-x-2 sm:space-x-3">
-      <button type="button"
-              class="relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300 px-4 py-2 text-base font-medium text-[#1d1c1b] cursor-pointer">
-        Sign In
-      </button>
-      <button type="button" class="px-4 py-2 text-base font-medium text-white bg-[#1d1c1b] rounded-2xl cursor-pointer">
-        Sign Up
-      </button>
-    </div>
   </nav>
 
   <main class="flex-grow flex flex-col items-center justify-center p-4">
     <div class="w-full max-w-2xl">
       <div class="relative">
-        <div class="absolute bottom-full left-0 right-0 mb-4 text-center">
+        <div class="absolute bottom-full left-0 right-0 mb-8 text-center">
           <h1 class="text-2xl md:text-3xl font-medium text-[#1d1c1b] mb-1 sm:mb-2">
-            Welcome to From Link.
+            Welcome, and nice to meet you.
           </h1>
           <p class="text-lg md:text-xl text-[#646362]">
             Turn your <a href="https://linkedin.com" class="underline" target="_blank"
-                         rel="nofollow noopener noreferrer">LinkedIn</a> into a job-winning resume — effortlessly.
+                         rel="nofollow noopener noreferrer">LinkedIn</a> profile into a resume.
           </p>
         </div>
 
-        <form (submit)="generate()"
-              class="relative flex items-center w-full bg-white p-1.5 sm:p-2 rounded-full shadow-lg border border-[rgba(5,5,5,0.0625)]">
+        <form (submit)="go()"
+              class="relative flex items-center w-full bg-white p-0.5 sm:p-1 rounded-full shadow-md border border-[rgba(5,5,5,0.0625)]">
           <div
             class="w-14 h-14 flex items-center justify-center text-[rgba(5,5,5,0.0625)] hover:text-[#1d1c1b] rounded-full opacity-50 flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30px" height="30px">
@@ -53,7 +44,7 @@
             class="w-14 h-14 flex items-center justify-center flex-shrink-0 ml-1 cursor-pointer relative group"
             aria-label="GO">
             <div
-              class="absolute inset-0 rounded-full bg-[#1d1c1b]  transform scale-90 group-hover:scale-100 transition-transform duration-100 ease-in-out"></div>
+              class="absolute inset-0 rounded-full bg-[#1d1c1b]  transform scale-80 group-hover:scale-90 transition-transform duration-100 ease-in-out"></div>
             <span class="relative z-10 font-semibold text-sm text-white">
               GO
             </span>

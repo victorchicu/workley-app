@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ceevy-app": {
+    "awaytogo-app": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/ceevy-app",
+            "outputPath": "dist/awaytogo-app",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -64,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ceevy-app:build:production"
+              "buildTarget": "awaytogo-app:build:production"
             },
             "development": {
-              "buildTarget": "ceevy-app:build:development"
+              "buildTarget": "awaytogo-app:build:development"
             }
           },
           "defaultConfiguration": "development"

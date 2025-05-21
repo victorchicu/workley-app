@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {FormsModule} from '@angular/forms';
+import {Title} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,12 @@ import {FormsModule} from '@angular/forms';
 export class AppComponent {
   link: string = '';
 
-  generate(): void {
+
+  constructor(private readonly title: Title) {
+    title.setTitle('LinkedIn Resume Builder | Free LinkedIn Resume Builder | LinkedIn to Resume in one click | Free LinkedIn Resume in one click');
+  }
+
+  go(): void {
     if (this.link.trim()) {
 
     }

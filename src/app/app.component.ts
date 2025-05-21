@@ -14,7 +14,7 @@ export class AppComponent {
 
 
   constructor(private readonly title: Title) {
-    title.setTitle('LinkedIn Resume Builder | Free LinkedIn Resume Builder | LinkedIn to Resume in one click | Free LinkedIn Resume in one click');
+    title.setTitle('LinkedIn Resume Builder | LinkedIn to Resume in one click');
   }
 
   go(): void {

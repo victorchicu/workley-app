@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {Title} from '@angular/platform-browser';
@@ -10,35 +10,39 @@ import {NgIf} from '@angular/common';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   link: string = '';
 
   showWarning: boolean = false;
   warningMessage: string = '';
+  private warningTimerId: any = null;
 
   constructor(private readonly title: Title) {
     title.setTitle('LinkedIn Resume Builder | LinkedIn to Resume in one click');
   }
 
   go(): void {
-    if (this.link.trim()) {
-      // Simulate a service unavailability scenario
-      // In a real app, this would be based on an API error response
-      this.warningMessage = "The Service is Unavailable. We are under heavy load, please try again later.";
-      this.showWarning = true;
-      // Optional: Automatically hide the warning after some time
-      setTimeout(() => {
-        this.hideWarning();
-      }, 7000); // Hides after 5 seconds
-    } else {
-      // Handle empty link case if needed, e.g., show a different message or do nothing
-      this.warningMessage = "Please enter a LinkedIn profile link.";
-      this.showWarning = true;
-    }
+    this.clearTimeout()
+    this.warningMessage = "We're currently experiencing high traffic and our service is temporarily unavailable. Please try again in a few moments.";
+    this.showWarning = true;
+    setTimeout(() => {
+      this.hideWarning();
+    }, 7000);
   }
 
   hideWarning(): void {
+    this.clearTimeout();
     this.showWarning = false;
     this.warningMessage = '';
+  }
+
+  ngOnDestroy(): void {
+    this.clearTimeout();
+  }
+
+  private clearTimeout() {
+    if (this.warningTimerId) {
+      clearTimeout(this.warningTimerId);
+    }
   }
 }

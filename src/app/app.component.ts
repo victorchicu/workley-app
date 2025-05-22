@@ -4,6 +4,8 @@ import {FormsModule} from '@angular/forms';
 import {Title} from '@angular/platform-browser';
 import {NgIf} from '@angular/common';
 
+declare var gtag: Function;
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule, RouterLink, NgIf],
@@ -23,6 +25,15 @@ export class AppComponent implements OnDestroy {
 
   go(): void {
     this.clearTimeout()
+
+    if (typeof gtag === 'function') {
+      gtag('event', 'go_button_click', {
+        'event_category': 'UserInteraction',
+        'event_label':'Link Submitted',
+        'link_provided': this.link,
+      });
+    }
+
     this.warningMessage = "We're currently experiencing high traffic and our service is temporarily unavailable. Please try again in a few moments.";
     this.showWarning = true;
     setTimeout(() => {

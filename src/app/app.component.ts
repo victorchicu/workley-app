@@ -2,8 +2,8 @@ import {Component, Inject, OnDestroy, PLATFORM_ID, ViewChild} from '@angular/cor
 import {RouterLink} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {Title} from '@angular/platform-browser';
-import {ToastComponent} from './toast/toast.component';
-import {AnalyticsService} from './insight/analytics.service';
+import {ToastComponent} from './components/toast/toast.component';
+import {AnalyticsService} from './analytics/analytics.service';
 
 @Component({
   selector: 'app-root',

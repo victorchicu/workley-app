@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  gtmId: 'G-C49GE39BZH'
+  gtmId: 'GTM-NTXR6P4X'
 };

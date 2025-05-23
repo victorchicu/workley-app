@@ -1,10 +1,10 @@
-import {TrackerProvider} from '../tracker-provider';
+import {AnalyticsProvider} from './analytics-provider';
 import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ConsoleTrackerProvider implements TrackerProvider {
+export class ConsoleAnalyticsProvider implements AnalyticsProvider {
 
   trackEvent(event: string, params: { [p: string]: any }): void {
     console.log(event, params);

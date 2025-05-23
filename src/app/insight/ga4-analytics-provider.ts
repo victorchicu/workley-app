@@ -1,13 +1,13 @@
-import {TrackerProvider} from '../tracker-provider';
+import {AnalyticsProvider} from './analytics-provider';
 import {Injectable} from '@angular/core';
-import {environment} from '../../../environments/environment';
+import {environment} from '../../environments/environment';
 
 declare var dataLayer: any[];
 
 @Injectable({
   providedIn: 'root'
 })
-export class GtmTrackerProvider implements TrackerProvider {
+export class Ga4AnalyticsProvider implements AnalyticsProvider {
 
   trackEvent(event: string, params: { [p: string]: any }): void {
     if (typeof dataLayer !== 'undefined' && Array.isArray(dataLayer)) {

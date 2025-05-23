@@ -4,24 +4,24 @@ import {provideRouter} from '@angular/router';
 import {routes} from './app.routes';
 import {provideClientHydration, withEventReplay} from '@angular/platform-browser';
 import {environment} from '../environments/environment';
-import {TRACKER_PROVIDER_TOKEN} from './tracker/tracker-provider-token';
-import {GtmTrackerProvider} from './tracker/impl/gtm-tracker-provider.service';
-import {ConsoleTrackerProvider} from './tracker/impl/console-tracker-provider';
+import {ANALYTICS_PROVIDER_TOKEN} from './insight/analytics-provider-token';
+import {Ga4AnalyticsProvider} from './insight/ga4-analytics-provider';
+import {ConsoleAnalyticsProvider} from './insight/console-analytics-provider';
 import {isPlatformBrowser} from '@angular/common';
 
-function provideEventTracker() {
+function provideAnalytics() {
   return {
-    provide: TRACKER_PROVIDER_TOKEN,
-    useFactory: (): GtmTrackerProvider | ConsoleTrackerProvider => {
+    provide: ANALYTICS_PROVIDER_TOKEN,
+    useFactory: (): Ga4AnalyticsProvider | ConsoleAnalyticsProvider => {
       const platformId: Object = inject(PLATFORM_ID);
       if (isPlatformBrowser(platformId)) {
-        if (environment.production) {
-          const gtmTrackerProvider = inject(GtmTrackerProvider);
-          gtmTrackerProvider.addGtmToDom()
-          return gtmTrackerProvider;
+        if (!environment.production) {
+          const ga4AnalyticsProvider = inject(Ga4AnalyticsProvider);
+          ga4AnalyticsProvider.addGtmToDom()
+          return ga4AnalyticsProvider;
         }
       }
-      return inject(ConsoleTrackerProvider);
+      return inject(ConsoleAnalyticsProvider);
     }
   };
 }
@@ -31,6 +31,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideEventTracker(),
+    provideAnalytics(),
   ]
 };

@@ -1,59 +1,34 @@
-import {Component, OnDestroy} from '@angular/core';
-import {RouterLink, RouterOutlet} from '@angular/router';
+import {Component, Inject, OnDestroy, PLATFORM_ID, ViewChild} from '@angular/core';
+import {RouterLink} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {Title} from '@angular/platform-browser';
-import {NgIf} from '@angular/common';
-
-declare var gtag: Function;
+import {ToastComponent} from './toast/toast.component';
+import {TrackerService} from './tracker/tracker.service';
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, RouterLink, NgIf],
+  imports: [FormsModule, RouterLink, ToastComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent {
   link: string = '';
+  @ViewChild(ToastComponent) toastComponent!: ToastComponent;
 
-  showWarning: boolean = false;
-  warningMessage: string = '';
-  private warningTimerId: any = null;
-
-  constructor(private readonly title: Title) {
+  constructor(title: Title, private trackerService: TrackerService) {
     title.setTitle('LinkedIn Resume Builder | LinkedIn to Resume in one click');
   }
 
   go(): void {
-    this.clearTimeout()
-
-    if (typeof gtag === 'function') {
-      gtag('event', 'go_button_click', {
-        'event_category': 'UserInteraction',
-        'event_label':'Link Submitted',
-        'link_provided': this.link,
-      });
-    }
-
-    this.warningMessage = "We're currently experiencing high traffic and our service is temporarily unavailable. Please try again in a few moments.";
-    this.showWarning = true;
-    setTimeout(() => {
-      this.hideWarning();
-    }, 7000);
+    this.toastComponent.show("We're currently experiencing high traffic and our service is temporarily unavailable. Please try again later.", 7000)
+    this.trackerService.trackEvent("GO_BUTTON_CLICKED", { "link": this.link });
+    this.scrollToToast();
   }
 
-  hideWarning(): void {
-    this.clearTimeout();
-    this.showWarning = false;
-    this.warningMessage = '';
-  }
-
-  ngOnDestroy(): void {
-    this.clearTimeout();
-  }
-
-  private clearTimeout() {
-    if (this.warningTimerId) {
-      clearTimeout(this.warningTimerId);
+  scrollToToast(): void {
+    const element = document.getElementById('toastSection');
+    if (element) {
+      element.scrollIntoView({behavior: 'smooth', block: 'start'});
     }
   }
 }

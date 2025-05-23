@@ -15,7 +15,7 @@ function provideEventTracker() {
     useFactory: (): GtmTrackerProvider | ConsoleTrackerProvider => {
       const platformId: Object = inject(PLATFORM_ID);
       if (isPlatformBrowser(platformId)) {
-        if (!environment.production) {
+        if (environment.production) {
           const gtmTrackerProvider = inject(GtmTrackerProvider);
           gtmTrackerProvider.addGtmToDom()
           return gtmTrackerProvider;

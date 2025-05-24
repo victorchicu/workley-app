@@ -21,18 +21,13 @@ export class ToastComponent implements OnDestroy {
 
   constructor() {}
 
-  /**
-   * Shows the toast message.
-   * @param message The message to display.
-   * @param duration The duration in milliseconds for the toast to be visible.
-   */
   public show(message: string, duration: number): void {
     this.isVisible = true;
     this.toastMessage = message;
     this.toastDuration = duration;
     this.currentProgress = 0;
 
-    this.clearTimers(); // Clear any existing timers before starting new ones
+    this.clearTimers();
 
     if (this.toastDuration > 0) {
       this.toastTimeoutId = setTimeout(() => {
@@ -55,10 +50,6 @@ export class ToastComponent implements OnDestroy {
     }
   }
 
-  /**
-   * Hides the toast message.
-   * Can be called by the dismiss button or internally by the timeout.
-   */
   public hide(): void {
     if (!this.isVisible) {
       return; // Already hidden or in the process of hiding
@@ -90,6 +81,6 @@ export class ToastComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.clearTimers(); // Ensure all timers are cleared when component is destroyed
+    this.clearTimers();
   }
 }

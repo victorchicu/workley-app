@@ -1,0 +1,124 @@
+<div class="flex flex-col w-full h-full p-2 sm:p-4">
+  <div class="flex-grow overflow-y-auto mb-4 bg-white shadow-lg rounded-lg p-4 sm:p-6">
+    <h2 class="text-xl sm:text-2xl font-semibold text-[#1d1c1b] mb-4 border-b pb-2">
+      Your AI Generated Resume Draft
+    </h2>
+
+    <div *ngIf="isLoading" class="text-center py-10">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-t-2 border-[#1d1c1b] mx-auto"></div>
+      <p class="mt-3 text-[#646362]">Generating your resume, please wait...</p>
+    </div>
+
+    <div *ngIf="!isLoading && error" class="text-center py-10">
+      <p class="text-red-600 font-medium">Oops! Something went wrong.</p>
+      <p class="text-red-500 mt-1">{{ error }}</p>
+      <p class="mt-4 text-sm text-[#646362]">
+        Please check the URL in the form below and try again, or try a different LinkedIn profile.
+      </p>
+    </div>
+
+    <div *ngIf="!isLoading && !resumeData && !error && !initialProfileId" class="text-center py-10">
+      <p class="text-lg text-[#646362]">Enter a LinkedIn profile URL below to generate your resume draft.</p>
+    </div>
+
+    <div *ngIf="!isLoading && resumeData" class="prose max-w-none">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="md:col-span-1">
+          <h3 class="text-2xl font-bold text-[#1d1c1b]">{{ resumeData.name }}</h3>
+          <p class="text-lg text-[#3a3a3a]">{{ resumeData.title }}</p>
+        </div>
+        <div class="md:col-span-2 text-sm md:text-right">
+          <p *ngIf="resumeData.email">{{ resumeData.email }}</p>
+          <p *ngIf="resumeData.phone">{{ resumeData.phone }}</p>
+          <p *ngIf="resumeData.linkedin">
+            <a [href]="'https://' + resumeData.linkedin" target="_blank" class="text-blue-600 hover:underline">{{ resumeData.linkedin }}</a>
+          </p>
+        </div>
+      </div>
+
+      <section *ngIf="resumeData.summary">
+        <h4 class="section-title">Summary</h4>
+        <p>{{ resumeData.summary }}</p>
+      </section>
+
+      <section *ngIf="resumeData.experience?.length">
+        <h4 class="section-title">Experience</h4>
+        <div *ngFor="let exp of resumeData.experience" class="mb-3">
+          <h5 class="font-semibold">{{ exp.role }} at {{ exp.company }}</h5>
+          <p class="text-xs text-gray-500">{{ exp.duration }}</p>
+          <p class="text-sm">{{ exp.description }}</p>
+        </div>
+      </section>
+
+      <section *ngIf="resumeData.education?.length">
+        <h4 class="section-title">Education</h4>
+        <div *ngFor="let edu of resumeData.education" class="mb-2">
+          <h5 class="font-semibold">{{ edu.degree }}</h5>
+          <p class="text-sm">{{ edu.institution }} ({{ edu.year }})</p>
+        </div>
+      </section>
+
+      <section *ngIf="resumeData.skills?.length">
+        <h4 class="section-title">Skills</h4>
+        <ul class="list-disc list-inside">
+          <li *ngFor="let skill of resumeData.skills">{{ skill }}</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <div class="mt-auto pt-4 pb-1 border-t border-gray-200">
+    <form (submit)="submitOrUpdateResume()"
+          class="relative flex items-center w-full bg-white p-0.5 sm:p-1 rounded-full shadow-xl border border-[rgba(5,5,5,0.08)]">
+      <div
+        class="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-[rgba(5,5,5,0.0625)] hover:text-[#1d1c1b] rounded-full opacity-60 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="28px" height="28px" class="sm:w-[30px] sm:h-[30px]">
+          <path fill="currentColor"
+                d="M24,4H6C4.895,4,4,4.895,4,6v18c0,1.105,0.895,2,2,2h18c1.105,0,2-0.895,2-2V6C26,4.895,25.105,4,24,4z M10.954,22h-2.95 v-9.492h2.95V22z M9.449,11.151c-0.951,0-1.72-0.771-1.72-1.72c0-0.949,0.77-1.719,1.72-1.719c0.948,0,1.719,0.771,1.719,1.719 C11.168,10.38,10.397,11.151,9.449,11.151z M22.004,22h-2.948v-4.616c0-1.101-0.02-2.517-1.533-2.517 c-1.535,0-1.771,1.199-1.771,2.437V22h-2.948v-9.492h2.83v1.297h0.04c0.394-0.746,1.356-1.533,2.791-1.533 c2.987,0,3.539,1.966,3.539,4.522V22z"/>
+        </svg>
+      </div>
+
+      <input
+        type="text"
+        [(ngModel)]="currentLinkInForm"
+        name="linkedin-profile-link-draft"
+        placeholder="linkedin.com/in/your-id (edit or enter new)"
+        class="flex-grow min-w-0 text-[#1d1c1b] bg-transparent focus:outline-none placeholder-[#646362] py-3 sm:py-4 text-sm sm:text-base"
+        required />
+
+      <button
+        type="submit"
+        class="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center flex-shrink-0 ml-1 cursor-pointer relative group"
+        [attr.aria-label]="initialProfileId ? 'Update Draft' : 'Generate Draft'"
+        [disabled]="isLoading"
+      >
+        <div
+          class="absolute inset-0 rounded-full bg-[#1d1c1b] transform scale-80 group-hover:scale-90 transition-transform duration-100 ease-in-out"
+          [class.opacity-50]="isLoading"
+        ></div>
+        <span class="relative z-10 font-semibold text-xs sm:text-sm text-white">
+          {{ isLoading ? '...' : (initialProfileId ? 'UPDATE' : 'GO') }}
+        </span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .prose .section-title {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 600; /* font-semibold */
+    color: #2c2b2a; /* darker shade */
+    margin-top: 1.5rem; /* mt-6 */
+    margin-bottom: 0.75rem; /* mb-3 */
+    border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+    padding-bottom: 0.5rem; /* pb-2 */
+  }
+  .prose section {
+    margin-bottom: 1.5rem; /* mb-6 */
+  }
+  .prose h5 {
+    font-size: 1rem; /* text-base */
+    /* font-weight: 600; /* font-semibold -> already there */
+  }
+</style>

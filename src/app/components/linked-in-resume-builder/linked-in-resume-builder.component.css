@@ -1,0 +1,39 @@
+.expanded-input {
+  /* Removed shadow to prevent flickering */
+}
+
+.input-container {
+  transition: all 0.2s ease-out;
+}
+
+.input-container.has-error {
+  border-radius: 1.5rem 1.5rem 0 0 !important;
+  border-bottom-color: transparent !important;
+}
+
+.error-dropdown {
+  border-radius: 0 0 1.5rem 1.5rem;
+  margin-top: -1px;
+  z-index: 10;
+}
+
+/* Prevent cursor pointer on error items */
+.error-item {
+  cursor: default;
+}
+
+/* Optional: Add subtle animation for error dropdown appearance */
+.error-dropdown {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

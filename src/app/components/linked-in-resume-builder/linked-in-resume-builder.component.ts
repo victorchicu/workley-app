@@ -1,8 +1,7 @@
-import {Component, ElementRef, HostListener, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {NgClass, NgForOf, NgIf} from '@angular/common';
-import {Router} from '@angular/router';
-import {AnalyticsService} from '../../analytics/analytics.service';
+import {isPlatformBrowser, NgClass, NgForOf, NgIf} from '@angular/common';
+import {Router, RouterLink} from '@angular/router';
 
 interface ValidationError {
   message: string;
@@ -26,117 +25,124 @@ export class LinkedInResumeBuilderComponent {
   @ViewChild('linkedInInput') linkedInInput!: ElementRef;
 
   url: string = '';
-  validationError: string | null = null;
   multipleErrors: ValidationError[] | null = null;
-  private linkedInProfileRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+[a-zA-Z0-9_-]*)\/?$/;
+  private linkedinUrlPattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
+  private linkedinProfilePattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+[a-zA-Z0-9_-]*)\/?$/;
 
-  constructor(private router: Router, private analyticsService: AnalyticsService) {
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
   }
 
-  isValidLinkedInUrl(url: string): boolean {
-    const pattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
-    return pattern.test(url);
-  }
-
-  showSingleError(message: string): void {
-    this.validationError = message;
-    this.multipleErrors = null;
-  }
-
-  showMultipleErrors(errors: ValidationError[]): void {
+  showDropdown(errors: ValidationError[]): void {
     this.multipleErrors = errors;
-    this.validationError = 'Multiple validation errors';
   }
 
-  clearErrors(): void {
-    this.validationError = null;
+  clearDropdown(): void {
     this.multipleErrors = null;
   }
 
   onInputChange(): void {
-    // Clear errors when user starts typing
     if (this.url.trim()) {
-      this.clearErrors();
+      this.clearDropdown();
     }
   }
 
   handlePaste(event: ClipboardEvent): void {
-    // Your paste handling logic
-    const pastedText = event.clipboardData?.getData('text');
-    if (pastedText) {
-      // Process pasted text if needed
-      console.log('Pasted:', pastedText);
-    }
+    event.preventDefault();
+    const pastedText = event.clipboardData?.getData('text/plain') || '';
+    let sanitizedText = pastedText
+      .replace(/^https?:\/\//i, '').replace(/^www\./i, '');
+    const inputElement = this.linkedInInput.nativeElement;
+    const start = inputElement.selectionStart || 0, end = inputElement.selectionEnd || 0;
+    const currentValue = this.url || '';
+    this.url = currentValue.substring(0, start) + sanitizedText + currentValue.substring(end);
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    // Clear errors when clicking outside the form
     const target = event.target as HTMLElement;
     if (!target.closest('form')) {
-      this.clearErrors();
+      this.clearDropdown();
     }
   }
 
-  extractLinkedInProfile(url: string): string | null {
-    const match: RegExpMatchArray | null = url.match(this.linkedInProfileRegex);
+  isValidLinkedInUrl(url: string): boolean {
+    return this.linkedinUrlPattern.test(url);
+  }
+
+  extractLinkedInProfileFromUrl(url: string): string | null {
+    const match: RegExpMatchArray | null = url.match(this.linkedinProfilePattern);
     if (match && match[3]) {
       return match[3];
     }
     return null;
   }
 
-  submitLinkedInProfile(): void {
+  submitLinkedInProfileUrl(): void {
     if (!this.url.trim()) {
-      this.showSingleError('Please provide your LinkedIn profile page URL.');
+      this.showDropdown([{
+        type: 'error',
+        message: 'Please provide your LinkedIn profile page URL.',
+        hint: 'Example: linkedin.com/in/your-name'
+      }]);
       return;
     }
 
     if (!this.isValidLinkedInUrl(this.url)) {
-      // Show multiple errors for invalid URL
-      this.showMultipleErrors([
-        {
-          message: 'This is not a LinkedIn profile page URL.',
-          hint: 'Here is the LinkedIn profile URL format: linkedin.com/in/your-name',
-          type: 'error'
-        },
-      ]);
+      this.showDropdown([{
+        type: 'error',
+        message: 'This is not a LinkedIn profile page URL.',
+        hint: 'Example: linkedin.com/in/your-name',
+      }]);
       return;
     }
 
-    this.clearErrors();
+    this.clearDropdown();
 
     console.log('Valid LinkedIn URL:', this.url);
 
-    const profileId: string | null = this.extractLinkedInProfile(this.url);
+    const profileId: string | null = this.extractLinkedInProfileFromUrl(this.url);
 
-    if (profileId) {
-      this.analyticsService.trackEvent("submit_linkedin_profile_attempt", {"url": this.url});
-      this.router.navigate(['/resume-draft', profileId])
-        .then(navigated => {
-          if (navigated) {
-            console.log(`Navigated to /resume-draft with profileId: ${profileId}`);
-            this.analyticsService.trackEvent("submit_linkedin_profile_success", {"url": this.url});
-          } else {
-            console.warn(`Navigation to /resume-draft for ${profileId} was not successful (navigated=false). This might be due to a route guard or other navigation issue.`);
-            this.validationError = "Could not proceed with the provided URL. Please ensure it's correct and try again.";
-            this.analyticsService.trackEvent("submit_linkedin_profile_navigation_failed", {
-              "url": this.url,
-              "reason": "navigation_returned_false"
-            });
-          }
-        })
-        .catch(err => {
-          console.error(`Error navigating to /resume-draft for ${profileId}:`, err);
-          this.validationError = 'An error occurred while processing your request. Please try again later.';
-          this.analyticsService.trackEvent("submit_linkedin_profile_error", {
-            "url": this.url,
-            "error": err.message || err
+    if (isPlatformBrowser(this.platformId)) {
+      if (profileId) {
+        // this.analyticsService.trackEvent("submit_linkedin_profile_attempt", {"url": this.url});
+        this.router.navigate(['/resume-draft', profileId])
+          .then(navigated => {
+            if (navigated) {
+              console.log(`Navigated to /resume-draft with profileId: ${profileId}`);
+              // this.analyticsService.trackEvent("submit_linkedin_profile_success", {"url": this.url});
+            } else {
+              console.warn(`Navigation to /resume-draft for ${profileId} was not successful (navigated=false). This might be due to a route guard or other navigation issue.`);
+              this.showDropdown([{
+                type: 'error',
+                message: "Could not proceed with the provided URL.",
+                hint: 'Please ensure it\'s correct and try again.'
+              }])
+              // this.analyticsService.trackEvent("submit_linkedin_profile_navigation_failed", {
+              //   "url": this.url,
+              //   "reason": "navigation_returned_false"
+              // });
+            }
+          })
+          .catch(err => {
+            console.error(`Error navigating to /resume-draft for ${profileId}:`, err);
+            this.showDropdown([{
+              type: 'error',
+              message: "An error occurred while processing your request.",
+              hint: 'Please try again later.'
+            }])
+            // this.analyticsService.trackEvent("submit_linkedin_profile_error", {
+            //   "url": this.url,
+            //   "error": err.message || err
+            // });
           });
-        });
-    } else {
-      this.validationError = 'Could not identify a profile ID from the URL. Please check the format (e.g., linkedin.com/in/your-name).';
-      this.analyticsService.trackEvent("submit_linkedin_profile_invalid_id_extraction", {"url": this.url});
+      } else {
+        this.showDropdown([{
+          type: 'error',
+          message: "Could not identify a profile ID from the URL.",
+          hint: 'Please check the format (e.g., linkedin.com/in/your-name)'
+        }])
+        // this.analyticsService.trackEvent("submit_linkedin_profile_invalid_id_extraction", {"url": this.url});
+      }
     }
   }
 }

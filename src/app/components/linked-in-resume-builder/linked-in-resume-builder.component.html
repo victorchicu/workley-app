@@ -1,7 +1,7 @@
 <div class="absolute bottom-full left-0 right-0 mb-8 text-center">
   <h1 class="text-3xl md:text-4xl  text-[#1d1c1b]">
     <span class="flex justify-center items-center mr-10">
-       <svg fill="#1d1c1b" width="96px" height="9-px" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path d="M583 698q8-5 14-11 10-9 18-18 16-19 28-40 35-61 35-129 1-93-61-190-34-53-82-90-41-31-92-51-40-16-85-24-31-5-62-6l-25 1 17 2q20 4 43 12 31 11 60 28 37 22 70 51 39 34 70 78-8-3-17-6l-9-3q-12-3-26-5-18-2-38-2-24 0-47 4-28 5-54 15-29 13-56 32-30 22-55 53-28 34-51 78-46 88-39 187 4 71 35 141 15 35 29 56l-6-16q-7-20-11-43-6-32-6-66 0-43 9-86 10-51 33-100 1 9 3 18 4 20 12 38 4 9 8 17 32 64 91 102 82 54 206 48 62-2 119-26 47-19 90-53 33-27 62-62 21-25 37-51l12-21-11 12q-14 16-31 32-26 21-55 38-37 22-78 35-49 16-104 21zm-137-36q-39 0-71.5-19T323 591.5t-19-71 19-71.5 51.5-52 71-19 71 19 51.5 52 19 71.5-19 71-51.5 51.5-70.5 19z"/></svg>
+       <svg fill="#1d1c1b" width="96px" height="96px" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path d="M583 698q8-5 14-11 10-9 18-18 16-19 28-40 35-61 35-129 1-93-61-190-34-53-82-90-41-31-92-51-40-16-85-24-31-5-62-6l-25 1 17 2q20 4 43 12 31 11 60 28 37 22 70 51 39 34 70 78-8-3-17-6l-9-3q-12-3-26-5-18-2-38-2-24 0-47 4-28 5-54 15-29 13-56 32-30 22-55 53-28 34-51 78-46 88-39 187 4 71 35 141 15 35 29 56l-6-16q-7-20-11-43-6-32-6-66 0-43 9-86 10-51 33-100 1 9 3 18 4 20 12 38 4 9 8 17 32 64 91 102 82 54 206 48 62-2 119-26 47-19 90-53 33-27 62-62 21-25 37-51l12-21-11 12q-14 16-31 32-26 21-55 38-37 22-78 35-49 16-104 21zm-137-36q-39 0-71.5-19T323 591.5t-19-71 19-71.5 51.5-52 71-19 71 19 51.5 52 19 71.5-19 71-51.5 51.5-70.5 19z"/></svg>
       <span class="font-extrabold">A way to go</span>
     </span>
     <p class="text-xl md:text-2xl text-[#646362] opacity-80">
@@ -11,7 +11,7 @@
 </div>
 
 <div class="relative">
-  <form (submit)="submitLinkedInProfileUrl()" class="relative">
+  <form (submit)="submitLinkedInProfile()" class="relative">
     <div [ngClass]="{
       'has-error': multipleErrors,
       'expanded-input': multipleErrors
@@ -29,7 +29,7 @@
         type="text"
         [(ngModel)]="url"
         (ngModelChange)="onInputChange()"
-        (paste)="handlePaste($event)"
+        (paste)="handleClipboardPaste($event)"
         name="linkedin-profile-link"
         placeholder="linkedin.com/in/your-name"
         autocomplete="off"
@@ -52,13 +52,6 @@
         <div class="space-y-2">
           <div *ngFor="let error of multipleErrors; let i = index"
                class="error-item flex items-start gap-3 p-2 rounded-lg transition-colors">
-            <div class="flex-shrink-0 w-5 h-5 mt-0.5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                   [ngClass]="error.type === 'warning' ? 'text-yellow-500' : 'text-red-500'">
-                <path *ngIf="error.type !== 'warning'" fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                <path *ngIf="error.type === 'warning'" fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-            </div>
             <div class="flex-grow">
               <p class="text-md font-medium text-[#1d1c1b]">{{ error.message }}</p>
               <p class="text-sm text-[#646362] mt-0.5">{{ error.hint }}</p>

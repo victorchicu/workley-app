@@ -32,21 +32,21 @@ export class LinkedInResumeBuilderComponent {
   constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
   }
 
-  showDropdown(errors: ValidationError[]): void {
+  expandInput(errors: ValidationError[]): void {
     this.multipleErrors = errors;
-  }
-
-  clearDropdown(): void {
-    this.multipleErrors = null;
   }
 
   onInputChange(): void {
     if (this.url.trim()) {
-      this.clearDropdown();
+      this.clearInputElements();
     }
   }
 
-  handlePaste(event: ClipboardEvent): void {
+  clearInputElements(): void {
+    this.multipleErrors = null;
+  }
+
+  handleClipboardPaste(event: ClipboardEvent): void {
     event.preventDefault();
     const pastedText = event.clipboardData?.getData('text/plain') || '';
     let sanitizedText = pastedText
@@ -61,11 +61,11 @@ export class LinkedInResumeBuilderComponent {
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (!target.closest('form')) {
-      this.clearDropdown();
+      this.clearInputElements();
     }
   }
 
-  isValidLinkedInUrl(url: string): boolean {
+  testLinkedInUrlValidity(url: string): boolean {
     return this.linkedinUrlPattern.test(url);
   }
 
@@ -77,9 +77,9 @@ export class LinkedInResumeBuilderComponent {
     return null;
   }
 
-  submitLinkedInProfileUrl(): void {
+  submitLinkedInProfile(): void {
     if (!this.url.trim()) {
-      this.showDropdown([{
+      this.expandInput([{
         type: 'error',
         message: 'Please provide your LinkedIn profile page URL.',
         hint: 'Example: linkedin.com/in/your-name'
@@ -87,8 +87,8 @@ export class LinkedInResumeBuilderComponent {
       return;
     }
 
-    if (!this.isValidLinkedInUrl(this.url)) {
-      this.showDropdown([{
+    if (!this.testLinkedInUrlValidity(this.url)) {
+      this.expandInput([{
         type: 'error',
         message: 'This is not a LinkedIn profile page URL.',
         hint: 'Example: linkedin.com/in/your-name',
@@ -96,7 +96,7 @@ export class LinkedInResumeBuilderComponent {
       return;
     }
 
-    this.clearDropdown();
+    this.clearInputElements();
 
     console.log('Valid LinkedIn URL:', this.url);
 
@@ -112,7 +112,7 @@ export class LinkedInResumeBuilderComponent {
               // this.analyticsService.trackEvent("submit_linkedin_profile_success", {"url": this.url});
             } else {
               console.warn(`Navigation to /resume-draft for ${profileId} was not successful (navigated=false). This might be due to a route guard or other navigation issue.`);
-              this.showDropdown([{
+              this.expandInput([{
                 type: 'error',
                 message: "Could not proceed with the provided URL.",
                 hint: 'Please ensure it\'s correct and try again.'
@@ -125,7 +125,7 @@ export class LinkedInResumeBuilderComponent {
           })
           .catch(err => {
             console.error(`Error navigating to /resume-draft for ${profileId}:`, err);
-            this.showDropdown([{
+            this.expandInput([{
               type: 'error',
               message: "An error occurred while processing your request.",
               hint: 'Please try again later.'
@@ -136,7 +136,7 @@ export class LinkedInResumeBuilderComponent {
             // });
           });
       } else {
-        this.showDropdown([{
+        this.expandInput([{
           type: 'error',
           message: "Could not identify a profile ID from the URL.",
           hint: 'Please check the format (e.g., linkedin.com/in/your-name)'

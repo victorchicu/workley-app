@@ -5,7 +5,7 @@ import {NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, finalize, throwError} from 'rxjs';
 
-interface ResumeData {
+interface ResumeDto {
   name: string;
   title: string;
   email?: string;
@@ -37,18 +37,18 @@ interface ResumeData {
   styleUrl: './linked-in-resume-profile-draft.component.css'
 })
 export class LinkedInResumeProfileDraftComponent implements OnInit {
+  error: string | null = null;
+  isLoading: boolean = false;
+  resumeDto: ResumeDto | null = null;
+  decodedProfileId: string | null = null;
+
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
 
-  decodedProfileId: string | null = null;
-  resumeData: ResumeData | null = null;
-  isLoading: boolean = false;
-  error: string | null = null;
-
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
-      const profileIdFromRoute = params.get('profileId');
+      const profileIdFromRoute: string | null = params.get('profileId');
       if (profileIdFromRoute) {
         this.decodedProfileId = decodeURIComponent(profileIdFromRoute);
         this.fetchResumeByProfileId(this.decodedProfileId);
@@ -61,18 +61,14 @@ export class LinkedInResumeProfileDraftComponent implements OnInit {
 
   fetchResumeByProfileId(profileId: string): void {
     if (!profileId || profileId.trim() === '') {
-      this.error = 'LinkedIn URL is required to generate a draft.';
-      this.resumeData = null;
+      this.error = 'Malformed profile ID. Please check the URL and try again.';
+      this.resumeDto = null;
       this.isLoading = false;
       return;
     }
 
-    this.isLoading = true;
-    this.error = null;
-    this.resumeData = null;
-
     // Real API call
-    this.http.get<ResumeData>(`/api/resumes/${encodeURIComponent(profileId)}/draft`)
+    this.http.get<ResumeDto>(`/api/resumes/${encodeURIComponent(profileId)}/draft`)
       .pipe(
         catchError((error: HttpErrorResponse) => {
           console.error('API Error:', error);
@@ -99,13 +95,13 @@ export class LinkedInResumeProfileDraftComponent implements OnInit {
         })
       )
       .subscribe({
-        next: (data: ResumeData) => {
-          this.resumeData = data;
+        next: (data: ResumeDto) => {
+          this.resumeDto = data;
           this.error = null;
         },
         error: () => {
           // Error already handled in catchError
-          this.resumeData = null;
+          this.resumeDto = null;
         }
       });
   }

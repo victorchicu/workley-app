@@ -1,17 +1,17 @@
 import { Routes } from '@angular/router';
-import {LinkedInResumeBuilderComponent} from './components/linked-in-resume-builder/linked-in-resume-builder.component';
-import {LinkedInResumeDraftComponent} from './components/linked-in-resume-draft/linked-in-resume-draft.component';
+import {LinkedInResumeInputFormComponent} from './components/linked-in-resume-input-form/linked-in-resume-input-form.component';
+import {LinkedInResumeProfileDraftComponent} from './components/linked-in-resume-profile-draft/linked-in-resume-profile-draft.component';
 import {NotFoundComponent} from './components/not-found/not-found.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: LinkedInResumeBuilderComponent,
+    component: LinkedInResumeInputFormComponent,
     title: 'LinkedIn Resume Builder | LinkedIn to Resume in one click'
   },
   {
-    path: 'resume-draft/:profileId',
-    component: LinkedInResumeDraftComponent,
+    path: 'resumes/:profileId/draft',
+    component: LinkedInResumeProfileDraftComponent,
     title: 'LinkedIn Resume Builder | Draft Resume'
   },
   {

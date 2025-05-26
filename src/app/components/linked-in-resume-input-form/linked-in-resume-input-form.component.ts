@@ -18,10 +18,10 @@ interface ValidationError {
     NgClass,
     NgForOf
   ],
-  templateUrl: './linked-in-resume-builder.component.html',
-  styleUrl: './linked-in-resume-builder.component.css'
+  templateUrl: './linked-in-resume-input-form.component.html',
+  styleUrl: './linked-in-resume-input-form.component.css'
 })
-export class LinkedInResumeBuilderComponent {
+export class LinkedInResumeInputFormComponent {
   @ViewChild('linkedInInput') linkedInInput!: ElementRef;
 
   url: string = '';
@@ -57,14 +57,6 @@ export class LinkedInResumeBuilderComponent {
     this.url = currentValue.substring(0, start) + sanitizedText + currentValue.substring(end);
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('form')) {
-      this.clearInputElements();
-    }
-  }
-
   testLinkedInUrlValidity(url: string): boolean {
     return this.linkedinUrlPattern.test(url);
   }
@@ -82,7 +74,7 @@ export class LinkedInResumeBuilderComponent {
       this.expandInput([{
         type: 'error',
         message: 'Please provide your LinkedIn profile page URL.',
-        hint: 'Example: linkedin.com/in/your-name'
+        hint: 'Make sure the URL is correct and try again. Example: linkedin.com/in/your-name'
       }]);
       return;
     }
@@ -91,58 +83,64 @@ export class LinkedInResumeBuilderComponent {
       this.expandInput([{
         type: 'error',
         message: 'This is not a LinkedIn profile page URL.',
-        hint: 'Example: linkedin.com/in/your-name',
+        hint: 'Make sure the URL is correct and try again. Example: linkedin.com/in/your-name',
       }]);
       return;
     }
 
     this.clearInputElements();
 
-    console.log('Valid LinkedIn URL:', this.url);
-
     const profileId: string | null = this.extractLinkedInProfileFromUrl(this.url);
 
+    if (!profileId) {
+      this.expandInput([{
+        type: 'error',
+        message: 'Can\'t extract a LinkedIn profile ID from the provided URL.',
+        hint: 'Make sure the URL is correct and try again. Example: linkedin.com/in/your-name',
+      }]);
+      return;
+    }
+
     if (isPlatformBrowser(this.platformId)) {
-      if (profileId) {
-        // this.analyticsService.trackEvent("submit_linkedin_profile_attempt", {"url": this.url});
-        this.router.navigate(['/resume-draft', profileId])
-          .then(navigated => {
-            if (navigated) {
-              console.log(`Navigated to /resume-draft with profileId: ${profileId}`);
-              // this.analyticsService.trackEvent("submit_linkedin_profile_success", {"url": this.url});
-            } else {
-              console.warn(`Navigation to /resume-draft for ${profileId} was not successful (navigated=false). This might be due to a route guard or other navigation issue.`);
-              this.expandInput([{
-                type: 'error',
-                message: "Could not proceed with the provided URL.",
-                hint: 'Please ensure it\'s correct and try again.'
-              }])
-              // this.analyticsService.trackEvent("submit_linkedin_profile_navigation_failed", {
-              //   "url": this.url,
-              //   "reason": "navigation_returned_false"
-              // });
-            }
-          })
-          .catch(err => {
-            console.error(`Error navigating to /resume-draft for ${profileId}:`, err);
+      // this.analyticsService.trackEvent("submit_linkedin_profile_attempt", {"url": this.url});
+      this.router.navigate(['/resumes', encodeURIComponent(profileId), "draft"])
+        .then(navigated => {
+          if (navigated) {
+            console.log(`Navigated to /resumes/${profileId}/draft`);
+            // this.analyticsService.trackEvent("submit_linkedin_profile_success", {"url": this.url});
+          } else {
+            console.warn(`Navigation to /resumes/${profileId}/draft was not successful (navigated=false). This might be due to a route guard or other navigation issue.`);
             this.expandInput([{
               type: 'error',
-              message: "An error occurred while processing your request.",
-              hint: 'Please try again later.'
+              message: "Could not proceed with the provided URL.",
+              hint: 'Make sure the URL is correct and try again. Example: linkedin.com/in/your-name'
             }])
-            // this.analyticsService.trackEvent("submit_linkedin_profile_error", {
+            // this.analyticsService.trackEvent("submit_linkedin_profile_navigation_failed", {
             //   "url": this.url,
-            //   "error": err.message || err
+            //   "reason": "navigation_returned_false"
             // });
-          });
-      } else {
-        this.expandInput([{
-          type: 'error',
-          message: "Could not identify a profile ID from the URL.",
-          hint: 'Please check the format (e.g., linkedin.com/in/your-name)'
-        }])
-        // this.analyticsService.trackEvent("submit_linkedin_profile_invalid_id_extraction", {"url": this.url});
-      }
+          }
+        })
+        .catch(err => {
+          console.error(`Error navigating to /resumes/${profileId}/draft:`, err);
+          this.expandInput([{
+            type: 'error',
+            message: "An error occurred while processing your request.",
+            hint: 'Please try again later.'
+          }])
+          // this.analyticsService.trackEvent("submit_linkedin_profile_error", {
+          //   "url": this.url,
+          //   "error": err.message || err
+          // });
+        });
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('form')) {
+      this.clearInputElements();
     }
   }
 }

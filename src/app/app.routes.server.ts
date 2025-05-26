@@ -1,8 +1,8 @@
-import { RenderMode, ServerRoute } from '@angular/ssr';
+import {RenderMode, ServerRoute} from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
-    path: 'resume-draft/:profileId',
+    path: 'resumes/:profileId/draft',
     renderMode: RenderMode.Server
   },
   {

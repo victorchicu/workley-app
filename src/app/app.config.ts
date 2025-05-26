@@ -8,6 +8,7 @@ import {ANALYTICS_PROVIDER_TOKEN} from './analytics/analytics-provider-token';
 import {Ga4AnalyticsProvider} from './analytics/ga4-analytics-provider';
 import {ConsoleAnalyticsProvider} from './analytics/console-analytics-provider';
 import {isPlatformBrowser} from '@angular/common';
+import {provideHttpClient, withFetch} from '@angular/common/http';
 
 function provideAnalytics() {
   return {
@@ -31,7 +32,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
-    provideClientHydration(withEventReplay()),
     provideAnalytics(),
+    provideHttpClient(withFetch()),
+    provideClientHydration(withEventReplay())
   ]
 };

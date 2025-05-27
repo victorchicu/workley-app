@@ -3,16 +3,16 @@
 }
 
 .input-container {
-  transition: all 0.2s ease-out;
+  transition: all 0.1s ease-out;
 }
 
 .input-container.has-error {
-  border-radius: 1.5rem 1.5rem 0 0 !important;
+  border-radius: 2.2rem 2.2rem 0 0 !important;
   border-bottom-color: transparent !important;
 }
 
 .error-dropdown {
-  border-radius: 0 0 1.5rem 1.5rem;
+  border-radius: 0 0 2.2rem 2.2rem;
   margin-top: -1px;
   z-index: 10;
 }
@@ -24,7 +24,7 @@
 
 /* Optional: Add subtle animation for error dropdown appearance */
 .error-dropdown {
-  animation: slideDown 0.2s ease-out;
+  animation: slideDown 0.1s ease-out;
 }
 
 @keyframes slideDown {

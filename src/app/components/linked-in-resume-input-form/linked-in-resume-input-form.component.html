@@ -16,7 +16,7 @@
       'has-error': multipleErrors,
       'expanded-input': multipleErrors
     }"
-         class="input-container relative flex items-center w-full bg-white p-0.5 sm:p-1 rounded-3xl border border-[rgba(5,5,5,0.0625)] transition-all duration-200">
+         class="input-container relative flex items-center w-full bg-white p-0.5 sm:p-1 rounded-full border border-[rgba(5,5,5,0.0625)] transition-all duration-200">
 
       <div class="w-14 h-14 flex items-center justify-center text-[rgba(5,5,5,0.0625)] hover:text-[#1d1c1b] opacity-50 flex-shrink-0">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30px" height="30px">
@@ -48,10 +48,10 @@
 
     <div *ngIf="multipleErrors" class="error-dropdown absolute left-0 right-0 bg-white border border-[rgba(5,5,5,0.0625)] border-t-0 px-4">
       <hr class="border-[#eeeeee]">
-      <div class="error-dropdown rounded-md px-4 py-3">
+      <div class="error-dropdown rounded-full px-4">
         <div class="space-y-2">
           <div *ngFor="let error of multipleErrors; let i = index"
-               class="error-item flex items-start gap-3 p-2 rounded-lg transition-colors">
+               class="error-item flex items-start gap-3 p-2 rounded-full transition-colors">
             <div class="flex-grow">
               <p class="text-md font-medium text-[#1d1c1b]">{{ error.message }}</p>
               <p class="text-sm text-[#646362] mt-0.5">{{ error.hint }}</p>

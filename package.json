@@ -1,12 +1,12 @@
 {
-  "name": "awaytogo-app",
+  "name": "zumely-app",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "build": "ng build  --configuration production && ngx-sitemap ./dist/awaytogo-app/browser https://awaytogo.app",
-    "build:development": "ng build --configuration development && ngx-sitemap ./dist/awaytogo-app/browser https://awaytogo.app",
+    "build": "ng build  --configuration production && ngx-sitemap ./dist/zumely-app/browser https://zumely.app",
+    "build:development": "ng build --configuration development && ngx-sitemap ./dist/zumely-app/browser https://zumely.app",
     "watch": "ng build --watch --configuration development",
-    "start": "node dist/awaytogo-app/server/server.mjs",
+    "start": "node dist/zumely-app/server/server.mjs",
     "start:development": "ng serve --proxy-config proxy.config.json --configuration development"
   },
   "private": true,

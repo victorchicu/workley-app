@@ -10,66 +10,36 @@ interface ValidationError {
 }
 
 @Component({
-  selector: 'app-linked-in-resume-builder',
+  selector: 'app-resume-builder',
   standalone: true,
   imports: [
-    FormsModule,
-    NgIf,
     NgClass,
-    NgForOf
+    FormsModule,
   ],
-  templateUrl: './linked-in-resume-input-form.component.html',
-  styleUrl: './linked-in-resume-input-form.component.css'
+  templateUrl: './resume-builder.component.html',
+  styleUrl: './resume-builder.component.css'
 })
-export class LinkedInResumeInputFormComponent {
-  @ViewChild('linkedInInput') linkedInInput!: ElementRef;
+export class ResumeBuilderComponent {
+  @ViewChild('linkInput') linkedInInput!: ElementRef;
 
   url: string = '';
   multipleErrors: ValidationError[] | null = null;
-  private linkedinUrlPattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
-  private linkedinProfilePattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+[a-zA-Z0-9_-]*)\/?$/;
+  private urlPattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
+  private urlProfilePattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+[a-zA-Z0-9_-]*)\/?$/;
 
   constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
   }
 
-  expandInput(errors: ValidationError[]): void {
-    this.multipleErrors = errors;
-  }
-
-  onInputChange(): void {
-    if (this.url.trim()) {
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('form')) {
       this.clearInputElements();
     }
   }
 
-  clearInputElements(): void {
-    this.multipleErrors = null;
-  }
 
-  handleClipboardPaste(event: ClipboardEvent): void {
-    event.preventDefault();
-    const pastedText = event.clipboardData?.getData('text/plain') || '';
-    let sanitizedText = pastedText
-      .replace(/^https?:\/\//i, '').replace(/^www\./i, '');
-    const inputElement = this.linkedInInput.nativeElement;
-    const start = inputElement.selectionStart || 0, end = inputElement.selectionEnd || 0;
-    const currentValue = this.url || '';
-    this.url = currentValue.substring(0, start) + sanitizedText + currentValue.substring(end);
-  }
-
-  testLinkedInUrlValidity(url: string): boolean {
-    return this.linkedinUrlPattern.test(url);
-  }
-
-  extractLinkedInProfileFromUrl(url: string): string | null {
-    const match: RegExpMatchArray | null = url.match(this.linkedinProfilePattern);
-    if (match && match[3]) {
-      return match[3];
-    }
-    return null;
-  }
-
-  submitLinkedInProfile(): void {
+  submitLink(): void {
     if (!this.url.trim()) {
       this.expandInput([{
         type: 'error',
@@ -79,7 +49,7 @@ export class LinkedInResumeInputFormComponent {
       return;
     }
 
-    if (!this.testLinkedInUrlValidity(this.url)) {
+    if (!this.testLink(this.url)) {
       this.expandInput([{
         type: 'error',
         message: 'This is not a LinkedIn profile page URL.',
@@ -136,11 +106,40 @@ export class LinkedInResumeInputFormComponent {
     }
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('form')) {
+  expandInput(errors: ValidationError[]): void {
+    this.multipleErrors = errors;
+  }
+
+  onInputChange(): void {
+    if (this.url.trim()) {
       this.clearInputElements();
     }
+  }
+
+  clearInputElements(): void {
+    this.multipleErrors = null;
+  }
+
+  handleClipboardPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const pastedText = event.clipboardData?.getData('text/plain') || '';
+    let sanitizedText = pastedText
+      .replace(/^https?:\/\//i, '').replace(/^www\./i, '');
+    const inputElement = this.linkedInInput.nativeElement;
+    const start = inputElement.selectionStart || 0, end = inputElement.selectionEnd || 0;
+    const currentValue = this.url || '';
+    this.url = currentValue.substring(0, start) + sanitizedText + currentValue.substring(end);
+  }
+
+  testLink(url: string): boolean {
+    return this.urlPattern.test(url);
+  }
+
+  extractLinkedInProfileFromUrl(url: string): string | null {
+    const match: RegExpMatchArray | null = url.match(this.urlProfilePattern);
+    if (match && match[3]) {
+      return match[3];
+    }
+    return null;
   }
 }

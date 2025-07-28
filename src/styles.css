@@ -2,6 +2,10 @@
 
 @import "tailwindcss";
 
+@theme {
+  --color-neutral-250: oklch(0.68 0.004 0);
+}
+
 /** {*/
 /*  font-family: "Inter", "Roboto", "Open Sans", "Arial", sans-serif !important;*/
 /*  font-weight: 400;*/

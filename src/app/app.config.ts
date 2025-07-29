@@ -4,9 +4,9 @@ import {provideRouter, withComponentInputBinding, withViewTransitions} from '@an
 import {routes} from './app.routes';
 import {provideClientHydration, withEventReplay} from '@angular/platform-browser';
 import {environment} from '../environments/environment';
-import {ANALYTICS_PROVIDER_TOKEN} from './analytics/analytics-provider-token';
-import {Ga4AnalyticsProvider} from './analytics/ga4-analytics-provider';
-import {ConsoleAnalyticsProvider} from './analytics/console-analytics-provider';
+import {ANALYTICS_PROVIDER_TOKEN} from './core/analytics/analytics-provider-token';
+import {Ga4AnalyticsProvider} from './core/analytics/ga4-analytics-provider';
+import {ConsoleAnalyticsProvider} from './core/analytics/console-analytics-provider';
 import {isPlatformBrowser} from '@angular/common';
 import {provideHttpClient, withFetch} from '@angular/common/http';
 

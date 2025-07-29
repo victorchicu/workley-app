@@ -7,7 +7,7 @@ module.exports = {
     extend: {
       colors: {
         neutral: {
-          250: '#DCDCDC', // Custom neutral-250 color (~midpoint between neutral-200 and neutral-300)
+          250: '#DCDCDC'
         },
       },
     },

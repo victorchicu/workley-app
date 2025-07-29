@@ -1,32 +1,5 @@
 <div class="min-h-screen text-[#1d1c1b] flex flex-col font-sans relative">
-  <nav class="w-full px-4 py-3 flex justify-between items-center">
-    <div class="flex items-center">
-      <span>
-         <a [routerLink]="['/']"
-            class="flex items-center text-2xl font-bold text-[#1d1c1b] opacity-90 hover:opacity-100 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-100">
-            <svg width="48" height="48" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-              <g transform="translate(150, 150)">
-                <path d="M 0,-80 L 69.28,40 L -69.28,40 Z" fill="none" stroke="#000000" stroke-width="16" stroke-linejoin="miter"/>
-                <path d="M 0,80 L -69.28,-40 L 69.28,-40 Z" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="miter" stroke-dasharray="15,8"/>
-                <g transform="scale(1.1)">
-                  <path d="M -30,0 Q 0,-20 30,0 Q 0,20 -30,0 Z" fill="none" stroke="#000000" stroke-width="3"/>
-                  <circle cx="0" cy="0" r="12" fill="none" stroke="#000000" stroke-width="2"/>
-                  <circle cx="0" cy="0" r="5" fill="#000000"/>
-                  <circle cx="3" cy="-3" r="2" fill="#ffffff"/>
-                </g>
-              </g>
-            </svg>
-        </a>
-      </span>
-    </div>
-  </nav>
-  <main class="flex-grow flex flex-col items-center justify-center">
-    <div class="w-full max-w-2xl">
-      <div class="relative">
-        <router-outlet/>
-      </div>
-    </div>
-  </main>
-  <footer class="py-4">
-  </footer>
+  <app-header/>
+  <app-main/>
+  <app-footer/>
 </div>

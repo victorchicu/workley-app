@@ -2,14 +2,16 @@ import {Component, ElementRef, HostListener, input, ViewChild} from '@angular/co
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgClass} from '@angular/common';
 import {TooltipDirective} from '../../../../core/directives/tooltip.directive';
+import {ImportButtonComponent} from './import-button/import-button.component';
+import {UploadButtonComponent} from './upload-button/upload-button.component';
 
-export interface ImportControl {
+export interface ImportFromControl {
   url: FormControl<string | null>;
 }
 
-export type ImportFormGroup = FormGroup<ImportControl>;
+export type ImportFromGroup = FormGroup<ImportFromControl>;
 
-export interface ImportValue {
+export interface ImportFromValue {
   url: string;
 }
 
@@ -18,20 +20,20 @@ export interface ImportValue {
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    NgClass,
-    TooltipDirective
+    ImportButtonComponent,
+    UploadButtonComponent
   ],
   templateUrl: './import-from.component.html',
   styleUrl: './import-from.component.css'
 })
 export class ImportFromComponent {
 
-  importForm: ImportFormGroup;
+  importFrom: ImportFromGroup;
   private readonly LINKED_IN_URL_PATTERN = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
   private readonly LINKED_IN_PROFILE_URL_PATTERN = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+[a-zA-Z0-9_-]*)\/?$/;
 
   constructor(private readonly formBuilder: FormBuilder) {
-    this.importForm = this.formBuilder.nonNullable.group({
+    this.importFrom = this.formBuilder.nonNullable.group({
       url: new FormControl<string>('', {
         validators: [Validators.required,
           Validators.minLength(29),
@@ -50,11 +52,10 @@ export class ImportFromComponent {
   }
 
   handleImportForm(): void {
-    console.log("Handle import form: ", this.importForm)
-    if (this.importForm.valid) {
-      const importValue: ImportValue = this.importForm.value as ImportValue
-      console.log("Import value: ", importValue)
-      this.importForm.reset()
+    if (this.importFrom.valid) {
+      console.log("Handle import form: ", this.importFrom)
+      const importValue: ImportFromValue = this.importFrom.value as ImportFromValue
+      this.importFrom.reset()
     }
   }
 }

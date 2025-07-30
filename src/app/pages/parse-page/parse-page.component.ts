@@ -11,6 +11,7 @@ interface ValidationError {
 
 @Component({
   selector: 'app-parse-page',
+  standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,

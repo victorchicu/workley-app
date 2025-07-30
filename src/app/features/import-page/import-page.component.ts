@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HeadlineH1Component} from './components/headline-h1/headline-h1.component';
-import {LinkedInImportFormComponent} from './components/linked-in-import-form/linked-in-import-form.component';
+import {ImportFromComponent} from './components/import-from/import-from.component';
 
 @Component({
   selector: 'app-import-page',
@@ -10,7 +10,7 @@ import {LinkedInImportFormComponent} from './components/linked-in-import-form/li
     FormsModule,
     ReactiveFormsModule,
     HeadlineH1Component,
-    LinkedInImportFormComponent
+    ImportFromComponent
   ],
   templateUrl: './import-page.component.html',
   styleUrl: './import-page.component.css',

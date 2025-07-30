@@ -14,17 +14,17 @@ export interface ImportValue {
 }
 
 @Component({
-  selector: 'app-linked-in-import-form',
+  selector: 'app-import-from',
   standalone: true,
   imports: [
     ReactiveFormsModule,
     NgClass,
     TooltipDirective
   ],
-  templateUrl: './linked-in-import-form.component.html',
-  styleUrl: './linked-in-import-form.component.css'
+  templateUrl: './import-from.component.html',
+  styleUrl: './import-from.component.css'
 })
-export class LinkedInImportFormComponent {
+export class ImportFromComponent {
 
   @ViewChild('textInput') textInputRef!: ElementRef;
   importForm: ImportFormGroup;

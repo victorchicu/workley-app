@@ -10,7 +10,10 @@ import {HeaderComponent} from './shared/components/header/header.component';
   standalone: true,
   imports: [FormsModule, FooterComponent, MainComponent, HeaderComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
+  host: {
+    class: 'h-screen grid grid-rows-[auto_1fr_auto] font-inter relative'
+  }
 })
 export class AppComponent {
 

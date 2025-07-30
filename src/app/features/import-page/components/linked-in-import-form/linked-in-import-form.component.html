@@ -1,0 +1,47 @@
+<div class="relative w-full max-w-2xl mx-auto px-4">
+  <form [formGroup]="importForm" (ngSubmit)="handleImportForm()"
+        class="relative flex flex-col w-full bg-white rounded-3xl border border-neutral-200 shadow-sm shadow-neutral-300/50">
+    <div class="flex items-start w-full mb-2 px-4 pt-4">
+      <input
+        #textInput
+        name="linkedin-profile-link"
+        placeholder="linkedin.com/in/johndoe"
+        autocomplete="off"
+        class="flex-grow min-w-0 text-neutral-800 bg-transparent focus:outline-none placeholder-neutral-400 resize-none overflow-y-auto p-0"
+        style="field-sizing: content;"
+      >
+    </div>
+
+    <div class="flex items-center justify-between mt-auto px-2 pb-2">
+      <button
+        type="button"
+        class="relative flex items-center justify-center w-10 h-10 text-neutral-600 hover:text-neutral-800 bg-white hover:bg-neutral-50 rounded-full border border-neutral-200 cursor-pointer"
+        tooltipText="Upload PDF"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+        </svg>
+      </button>
+      <button
+        type="submit"
+        class="relative w-10 h-10 flex items-center justify-center text-neutral-600 hover:text-neutral-800 bg-white hover:bg-neutral-50 rounded-full border border-neutral-200 cursor-pointer group"
+        [ngClass]="{
+            'bg-neutral-900': importForm.value.url && importForm.value.url.length > 0,
+            'bg-neutral-200': !importForm.value.url || importForm.value.url.length === 0
+          }"
+        aria-label="Submit"
+        (click)="handleImportForm()"
+      >
+        <svg class="w-5 h-5 transition-colors duration-100"
+             [ngClass]="{
+                 'text-white': importForm.value.url && importForm.value.url.length > 0,
+                 'text-neutral-700': !importForm.value.url || importForm.value.url.length === 0
+               }"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+      </button>
+    </div>
+  </form>
+</div>

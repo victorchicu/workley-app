@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, input, ViewChild} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgClass} from '@angular/common';
 import {TooltipDirective} from '../../../../core/directives/tooltip.directive';
@@ -26,7 +26,6 @@ export interface ImportValue {
 })
 export class ImportFromComponent {
 
-  @ViewChild('textInput') textInputRef!: ElementRef;
   importForm: ImportFormGroup;
   private readonly LINKED_IN_URL_PATTERN = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
   private readonly LINKED_IN_PROFILE_URL_PATTERN = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+[a-zA-Z0-9_-]*)\/?$/;
@@ -55,6 +54,7 @@ export class ImportFromComponent {
     if (this.importForm.valid) {
       const importValue: ImportValue = this.importForm.value as ImportValue
       console.log("Import value: ", importValue)
+      this.importForm.reset()
     }
   }
 }

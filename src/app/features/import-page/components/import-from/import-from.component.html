@@ -1,5 +1,5 @@
 <div class="relative w-full max-w-2xl mx-auto">
-  <form [formGroup]="importFrom" (ngSubmit)="handleImportForm()"
+  <form [formGroup]="form" (ngSubmit)="handleImport()"
         class="relative flex flex-col w-full bg-white rounded-3xl border border-neutral-200 shadow-sm shadow-neutral-300/50">
     <div class="flex items-start w-full mb-2 px-4 pt-4">
       <input
@@ -13,7 +13,8 @@
 
     <div class="flex items-center justify-between mt-auto px-2 pb-2">
       <app-upload-button/>
-      <app-import-button [importForm]="importFrom"/>
+      <!-- I think it's not ok to manipulate CSS attributes through the import form fields -->
+      <app-import-button [form]="form"/>
     </div>
   </form>
 </div>

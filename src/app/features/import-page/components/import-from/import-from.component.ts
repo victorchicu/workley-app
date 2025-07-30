@@ -5,13 +5,13 @@ import {TooltipDirective} from '../../../../core/directives/tooltip.directive';
 import {ImportButtonComponent} from './import-button/import-button.component';
 import {UploadButtonComponent} from './upload-button/upload-button.component';
 
-export interface ImportFromControl {
+export interface ImportFormControl {
   url: FormControl<string | null>;
 }
 
-export type ImportFromGroup = FormGroup<ImportFromControl>;
+export type ImportFormGroup = FormGroup<ImportFormControl>;
 
-export interface ImportFromValue {
+export interface ImportFormValue {
   url: string;
 }
 
@@ -28,12 +28,12 @@ export interface ImportFromValue {
 })
 export class ImportFromComponent {
 
-  importFrom: ImportFromGroup;
+  form: ImportFormGroup;
   private readonly LINKED_IN_URL_PATTERN = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
   private readonly LINKED_IN_PROFILE_URL_PATTERN = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+[a-zA-Z0-9_-]*)\/?$/;
 
   constructor(private readonly formBuilder: FormBuilder) {
-    this.importFrom = this.formBuilder.nonNullable.group({
+    this.form = this.formBuilder.nonNullable.group({
       url: new FormControl<string>('', {
         validators: [Validators.required,
           Validators.minLength(29),
@@ -51,11 +51,18 @@ export class ImportFromComponent {
     console.log("On document click: ", target.tagName, "")
   }
 
-  handleImportForm(): void {
-    if (this.importFrom.valid) {
-      console.log("Handle import form: ", this.importFrom)
-      const importValue: ImportFromValue = this.importFrom.value as ImportFromValue
-      this.importFrom.reset()
+  handleImport(): void {
+    console.log("Handle import form: ", this.form);
+    if (this.form.invalid) {
+      this.markForm();
+      return;
     }
+    const importValue: ImportFormValue = this.form.value as ImportFormValue
+    this.form.reset()
+  }
+
+  private markForm() {
+    this.form.markAsDirty();
+    this.form.markAllAsTouched();
   }
 }

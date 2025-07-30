@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {ImportFromControl, ImportFromGroup} from "../import-from.component";
+import {ImportFormControl, ImportFormGroup} from "../import-from.component";
 import {FormGroup} from '@angular/forms';
 import {NgClass} from '@angular/common';
 
@@ -14,5 +14,5 @@ import {NgClass} from '@angular/common';
 })
 export class ImportButtonComponent {
 
-  @Input() importForm!: ImportFromGroup;
+  @Input() form!: ImportFormGroup;
 }

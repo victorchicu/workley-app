@@ -2,15 +2,15 @@
   type="submit"
   class="relative w-10 h-10 flex items-center justify-center text-neutral-600 hover:text-neutral-800 rounded-full border border-neutral-200 cursor-pointer group"
   [ngClass]="{
-            'bg-neutral-900': importForm.value.url && importForm.value.url.length > 0,
-            'bg-neutral-200': !importForm.value.url || importForm.value.url.length === 0
+            'bg-neutral-900': form.value.url && form.value.url.length > 0,
+            'bg-neutral-200': !form.value.url || form.value.url.length === 0
           }"
   aria-label="Submit"
 >
   <svg class="w-5 h-5 transition-colors duration-100"
        [ngClass]="{
-                 'text-white': importForm.value.url && importForm.value.url.length > 0,
-                 'text-neutral-700': !importForm.value.url || importForm.value.url.length === 0
+                 'text-white': form.value.url && form.value.url.length > 0,
+                 'text-neutral-700': !form.value.url || form.value.url.length === 0
                }"
        fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>

@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HeadlineH1Component} from './components/import-from/headline-h1/headline-h1.component';
+import {HeadlineComponent} from './components/headline/headline.component';
 import {ImportFromComponent} from './components/import-from/import-from.component';
 
 @Component({
@@ -9,7 +9,7 @@ import {ImportFromComponent} from './components/import-from/import-from.componen
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    HeadlineH1Component,
+    HeadlineComponent,
     ImportFromComponent
   ],
   templateUrl: './import-page.component.html',

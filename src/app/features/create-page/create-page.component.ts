@@ -1,20 +1,20 @@
 import {Component} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HeadlineComponent} from './components/headline/headline.component';
-import {ImportFromComponent} from './components/import-from/import-from.component';
+import {CreateFormComponent} from './components/create-form/create-form.component';
 
 @Component({
-  selector: 'app-import-page',
+  selector: 'app-create-page',
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
     HeadlineComponent,
-    ImportFromComponent
+    CreateFormComponent
   ],
-  templateUrl: './import-page.component.html',
-  styleUrl: './import-page.component.css',
+  templateUrl: './create-page.component.html',
+  styleUrl: './create-page.component.css',
 })
-export class ImportPageComponent {
+export class CreatePageComponent {
 
 }

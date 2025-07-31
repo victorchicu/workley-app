@@ -1,6 +1,5 @@
 import {Component, Input} from '@angular/core';
 import {TooltipDirective} from '../../../../../core/directives/tooltip.directive';
-import {CreateFormGroup} from '../create-form.component';
 
 @Component({
   selector: 'app-upload-button',
@@ -12,5 +11,6 @@ import {CreateFormGroup} from '../create-form.component';
   styleUrl: './upload-button.component.css'
 })
 export class UploadButtonComponent {
-  @Input() form!: CreateFormGroup;
+
+  @Input() isActive: boolean = false;
 }

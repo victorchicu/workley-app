@@ -14,5 +14,5 @@ import {NgClass} from '@angular/common';
 })
 export class CreateButtonComponent {
 
-  @Input() form!: CreateFormGroup;
+  @Input() isActive: boolean = false;
 }

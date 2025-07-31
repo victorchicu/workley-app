@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CreateButtonComponent} from './create-button/create-button.component';
 import {UploadButtonComponent} from './upload-button/upload-button.component';
+import {CreateButtonComponent} from './create-button/create-button.component';
 
 export interface CreateFormControl {
   text: FormControl<string | null>;
@@ -9,18 +9,14 @@ export interface CreateFormControl {
 
 export type CreateFormGroup = FormGroup<CreateFormControl>;
 
-export interface CreateFormValue {
-  text: string;
-}
-
 @Component({
   selector: 'app-create-form',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    CreateButtonComponent,
     UploadButtonComponent,
-    FormsModule
+    FormsModule,
+    CreateButtonComponent
   ],
   templateUrl: './create-form.component.html',
   styleUrl: './create-form.component.css'

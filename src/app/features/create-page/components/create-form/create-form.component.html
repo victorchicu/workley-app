@@ -14,8 +14,8 @@
     </div>
 
     <div class="flex items-center justify-between mt-auto px-2 pb-2">
-      <app-upload-button [form]="form"/>
-      <app-create-button [form]="form"/>
+      <app-upload-button [isActive]="!!(form.controls.text.value && form.controls.text.value.length > 0)"/>
+      <app-create-button [isActive]="!!(form.controls.text.value && form.controls.text.value.length > 0)"/>
     </div>
   </form>
 </div>

@@ -14,7 +14,7 @@ export interface CreateFormValue {
 }
 
 @Component({
-  selector: 'app-create-from',
+  selector: 'app-create-form',
   standalone: true,
   imports: [
     ReactiveFormsModule,

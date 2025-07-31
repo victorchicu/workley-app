@@ -4,7 +4,7 @@ import {FormGroup} from '@angular/forms';
 import {NgClass} from '@angular/common';
 
 @Component({
-  selector: 'app-import-button',
+  selector: 'app-create-button',
   standalone: true,
   imports: [
     NgClass

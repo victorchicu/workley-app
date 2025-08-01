@@ -1,11 +1,12 @@
 <button
   type="submit"
   class="relative px-4 py-2 flex items-center justify-center gap-2 rounded-full cursor-pointer group "
-  [ngClass]="{
-    'bg-neutral-900 text-white': isActive,
-    'bg-white text-neutral-900': !isActive
-  }"
   aria-label="Create Resume"
+  [ngClass]="{
+    'bg-neutral-900 text-white': activated,
+    'bg-white text-neutral-900': !activated
+  }"
+  (click)="handleClick()"
 >
   <svg
     width="24px"
@@ -14,8 +15,8 @@
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     [ngClass]="{
-      'text-white': isActive,
-      'text-neutral-900': !isActive
+      'text-white': activated,
+      'text-neutral-900': !activated
     }"
   >
     <path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C12 20.4477 12.4477 20 13 20H21C21.5523 20 22 20.4477 22 21C22 21.5523 21.5523 22 21 22H13C12.4477 22 12 21.5523 12 21Z" fill="currentColor"/>

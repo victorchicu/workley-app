@@ -12,5 +12,5 @@ import {TooltipDirective} from '../../../../../core/directives/tooltip.directive
 })
 export class UploadButtonComponent {
 
-  @Input() isActive: boolean = false;
+  @Input() activated: boolean = false;
 }

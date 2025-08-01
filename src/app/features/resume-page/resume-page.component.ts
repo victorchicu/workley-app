@@ -1,20 +1,20 @@
 import {Component} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HeadlineComponent} from './components/headline/headline.component';
-import {CreateFormComponent} from './components/create-form/create-form.component';
+import {PromptFormComponent} from './components/prompt-form/prompt-form.component';
 
 @Component({
-  selector: 'app-create-page',
+  selector: 'app-resume-page',
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
     HeadlineComponent,
-    CreateFormComponent
+    PromptFormComponent
   ],
-  templateUrl: './create-page.component.html',
-  styleUrl: './create-page.component.css',
+  templateUrl: './resume-page.component.html',
+  styleUrl: './resume-page.component.css',
 })
-export class CreatePageComponent {
+export class ResumePageComponent {
 
 }

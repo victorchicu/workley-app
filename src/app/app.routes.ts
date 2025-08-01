@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import {CreatePageComponent} from './features/create-page/create-page.component';
+import {ResumePageComponent} from './features/resume-page/resume-page.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: CreatePageComponent,
+    component: ResumePageComponent,
     title: 'Free Resume Builder | Zumely App',
   },
   {

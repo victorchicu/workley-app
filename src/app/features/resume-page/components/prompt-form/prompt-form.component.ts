@@ -3,14 +3,16 @@ import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, V
 import {UploadButtonComponent} from './upload-button/upload-button.component';
 import {CreateButtonComponent} from './create-button/create-button.component';
 import {ResumeService} from '../../services/resume.service';
+import {AsyncTaskResponse} from '../../services/objects/async-task-response';
+import {ProcessingTask} from '../../services/objects/processing-task';
 
-export interface PromptFormControl {
+export interface PromptControl {
   text: FormControl<string | null>;
 }
 
-export type PromptFormGroup = FormGroup<PromptFormControl>;
+export type PromptFormGroup = FormGroup<PromptControl>;
 
-export interface PromptFormValue {
+export interface PromptValueRequest {
   text: string
 }
 
@@ -30,7 +32,7 @@ export class PromptFormComponent {
 
   promptForm: PromptFormGroup;
 
-  constructor(private readonly formBuilder: FormBuilder, private readonly resume: ResumeService) {
+  constructor(private readonly formBuilder: FormBuilder, private readonly resumeService: ResumeService) {
     this.promptForm = this.formBuilder.nonNullable.group({
       text: new FormControl<string>('', {
         validators: [Validators.required,
@@ -47,9 +49,18 @@ export class PromptFormComponent {
       this.markPromptForm();
       return;
     }
-    const promptFormValue: PromptFormValue = this.promptForm.value as PromptFormValue
-    this.resume.handlePrompt(promptFormValue.text)
-    this.promptForm.reset()
+    const promptValueRequest: PromptValueRequest = this.promptForm.value as PromptValueRequest
+    this.resumeService.createFromPrompt(promptValueRequest)
+      .subscribe({
+        next: (response: AsyncTaskResponse<ProcessingTask>) => {
+          console.log('Resume creation task initiated successfully. Task ID:', response.taskId);
+          console.log("Task details: ", response.result)
+          this.promptForm.reset()
+        },
+        error: (error) => {
+          console.error('Error creating resume from prompt', error);
+        }
+      });
   }
 
   onKeyDown(event: KeyboardEvent) {

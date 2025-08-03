@@ -2,9 +2,7 @@ import {Component} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {UploadButtonComponent} from './upload-button/upload-button.component';
 import {CreateButtonComponent} from './create-button/create-button.component';
-import {ResumeService} from '../../services/resume.service';
-import {AsyncTaskResponse} from '../../services/objects/async-task-response';
-import {ProcessingTask} from '../../services/objects/processing-task';
+import {PromptService} from '../../services/prompt.service';
 
 export interface PromptControl {
   text: FormControl<string | null>;
@@ -12,7 +10,7 @@ export interface PromptControl {
 
 export type PromptFormGroup = FormGroup<PromptControl>;
 
-export interface PromptValueRequest {
+export interface Prompt {
   text: string
 }
 
@@ -32,7 +30,7 @@ export class PromptFormComponent {
 
   promptForm: PromptFormGroup;
 
-  constructor(private readonly formBuilder: FormBuilder, private readonly resumeService: ResumeService) {
+  constructor(private readonly formBuilder: FormBuilder, private readonly resumeService: PromptService) {
     this.promptForm = this.formBuilder.nonNullable.group({
       text: new FormControl<string>('', {
         validators: [Validators.required,
@@ -43,35 +41,42 @@ export class PromptFormComponent {
     })
   }
 
-  handlePrompt(): void {
+  async onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      await this.handlePrompt();
+    }
+  }
+
+  async handlePrompt(): Promise<void> {
     console.log("Handle prompt: ", this.promptForm);
+
     if (this.promptForm.invalid) {
-      this.markPromptForm();
+      this.markPromptFormAsNotOk();
       return;
     }
-    const promptValueRequest: PromptValueRequest = this.promptForm.value as PromptValueRequest
-    this.resumeService.createFromPrompt(promptValueRequest)
+
+    const prompt: Prompt =
+      this.promptForm.value as Prompt
+
+    await this.sendPrompt(prompt);
+  }
+
+  private markPromptFormAsNotOk() {
+    this.promptForm.markAsDirty();
+    this.promptForm.markAllAsTouched();
+  }
+
+  private async sendPrompt(prompt: Prompt) {
+    this.resumeService.sendPrompt(prompt)
       .subscribe({
-        next: (response: AsyncTaskResponse<ProcessingTask>) => {
-          console.log('Resume creation task initiated successfully. Task ID:', response.taskId);
-          console.log("Task details: ", response.result)
+        next: (response: string) => {
+          console.log('Prompt response details:', response);
           this.promptForm.reset()
         },
         error: (error) => {
-          console.error('Error creating resume from prompt', error);
+          console.error('Error sending prompt', error);
         }
       });
-  }
-
-  onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      this.handlePrompt();
-    }
-  }
-
-  private markPromptForm() {
-    this.promptForm.markAsDirty();
-    this.promptForm.markAllAsTouched();
   }
 }

@@ -92,7 +92,7 @@ export class CreateResumeComponent {
     this.isLoading = true;
     console.log("Sending prompt: ", prompt);
     this.resumeService.sendPrompt(prompt)
-      .pipe(delay(5000))
+      .pipe(delay(2000))
       .subscribe({
         next: (response: string) => {
           console.log('User prompt response details:', response);

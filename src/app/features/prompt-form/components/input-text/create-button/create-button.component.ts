@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {PromptControl, PromptFormGroup} from "../create-resume.component";
+import {PromptControl, PromptFormGroup} from "../input-text.component";
 import {FormGroup} from '@angular/forms';
 import {NgClass, NgIf} from '@angular/common';
 

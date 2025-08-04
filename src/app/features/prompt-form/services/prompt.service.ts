@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Prompt} from '../components/create-resume/create-resume.component';
+import {Prompt} from '../components/input-text/input-text.component';
 import {Observable} from 'rxjs';
 
 @Injectable({

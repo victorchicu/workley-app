@@ -26,10 +26,10 @@ export interface Prompt {
     CreateButtonComponent,
     AsyncPipe
   ],
-  templateUrl: './create-resume.component.html',
-  styleUrl: './create-resume.component.css'
+  templateUrl: './input-text.component.html',
+  styleUrl: './input-text.component.css'
 })
-export class CreateResumeComponent {
+export class InputTextComponent {
 
   isLoading: boolean = false;
   hasPrompt$: Observable<boolean>;
@@ -92,7 +92,7 @@ export class CreateResumeComponent {
     this.isLoading = true;
     console.log("Sending prompt: ", prompt);
     this.resumeService.sendPrompt(prompt)
-      .pipe(delay(2000))
+      .pipe(delay(1000))
       .subscribe({
         next: (response: string) => {
           console.log('User prompt response details:', response);

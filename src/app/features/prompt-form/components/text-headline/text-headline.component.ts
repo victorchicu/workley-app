@@ -4,12 +4,12 @@ import { Component } from '@angular/core';
   selector: 'app-resume-headline',
   standalone: true,
   imports: [],
-  templateUrl: './resume-headline.component.html',
-  styleUrl: './resume-headline.component.css',
+  templateUrl: './text-headline.component.html',
+  styleUrl: './text-headline.component.css',
   host: {
     class: 'contents'
   }
 })
-export class ResumeHeadlineComponent {
+export class TextHeadlineComponent {
 
 }

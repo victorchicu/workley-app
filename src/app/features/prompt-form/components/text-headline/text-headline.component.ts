@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-resume-headline',
+  selector: 'app-text-headline',
   standalone: true,
   imports: [],
   templateUrl: './text-headline.component.html',

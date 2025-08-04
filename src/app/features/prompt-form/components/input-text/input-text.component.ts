@@ -17,7 +17,7 @@ export interface Prompt {
 }
 
 @Component({
-  selector: 'app-create-resume',
+  selector: 'app-input-text',
   standalone: true,
   imports: [
     FormsModule,

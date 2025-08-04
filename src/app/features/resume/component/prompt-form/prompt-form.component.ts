@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {TextHeadlineComponent} from './components/text-headline/text-headline.component';
-import {InputPromptComponent} from './components/input-prompt/input-prompt.component';
+import {TextHeadlineComponent} from './component/text-headline/text-headline.component';
+import {InputPromptComponent} from './component/input-prompt/input-prompt.component';
 
 @Component({
   selector: 'app-resume-page',

@@ -2,9 +2,11 @@ import {Component} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {UploadResumeComponent} from './upload-resume/upload-resume.component';
 import {CreateResumeComponent} from './create-resume/create-resume.component';
-import {PromptService} from '../../services/prompt.service';
+import {PromptService} from '../../../../core/service/prompt.service';
 import {delay, map, Observable, shareReplay, startWith} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
+import {Router} from '@angular/router';
+import {Result} from '../../../../core/result/result';
 
 export interface PromptControl {
   text: FormControl<string | null>;
@@ -35,7 +37,11 @@ export class InputPromptComponent {
   hasPrompt$: Observable<boolean>;
   promptForm: PromptFormGroup;
 
-  constructor(private readonly formBuilder: FormBuilder, private readonly resumeService: PromptService) {
+  constructor(
+    private readonly router: Router,
+    private readonly formBuilder: FormBuilder,
+    private readonly promptService: PromptService
+  ) {
     this.promptForm = this.formBuilder.nonNullable.group({
       text: new FormControl<string>('', {
         validators: [Validators.required,
@@ -91,13 +97,14 @@ export class InputPromptComponent {
   private async sendPrompt(prompt: Prompt): Promise<void> {
     this.isLoading = true;
     console.log("Sending prompt: ", prompt);
-    this.resumeService.sendPrompt(prompt)
+    this.promptService.prompt<Result>(prompt)
       .pipe(delay(1000))
       .subscribe({
-        next: (response: string) => {
-          console.log('User prompt response details:', response);
+        next: (result: Result) => {
+          console.log('User prompt response details:', result);
           this.promptForm.reset();
           this.isLoading = false;
+          this.router.navigate(['/resume', result.aggregateId]);
         },
         error: (error) => {
           console.error('Error sending prompt', error);

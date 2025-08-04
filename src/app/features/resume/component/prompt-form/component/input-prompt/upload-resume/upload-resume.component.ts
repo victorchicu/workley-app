@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {TooltipDirective} from '../../../../../core/directives/tooltip.directive';
+import {TooltipDirective} from '../../../../../../../core/directives/tooltip.directive';
 
 @Component({
   selector: 'app-upload-resume',

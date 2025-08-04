@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {TooltipDirective} from '../../../../../core/directives/tooltip.directive';
 
 @Component({
@@ -12,5 +12,9 @@ import {TooltipDirective} from '../../../../../core/directives/tooltip.directive
 })
 export class UploadButtonComponent {
 
-  @Input() activated: boolean = false;
+  @Output() onClick: EventEmitter<void> = new EventEmitter<void>();
+
+  handleClick() {
+    console.log("Handle upload click")
+  }
 }

@@ -3,6 +3,8 @@ import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, V
 import {UploadButtonComponent} from './upload-button/upload-button.component';
 import {CreateButtonComponent} from './create-button/create-button.component';
 import {PromptService} from '../../services/prompt.service';
+import {delay, map, Observable, shareReplay, startWith} from 'rxjs';
+import {AsyncPipe} from '@angular/common';
 
 export interface PromptControl {
   text: FormControl<string | null>;
@@ -15,19 +17,22 @@ export interface Prompt {
 }
 
 @Component({
-  selector: 'app-prompt-form',
+  selector: 'app-create-resume',
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
     UploadButtonComponent,
-    CreateButtonComponent
+    CreateButtonComponent,
+    AsyncPipe
   ],
-  templateUrl: './prompt-form.component.html',
-  styleUrl: './prompt-form.component.css'
+  templateUrl: './create-resume.component.html',
+  styleUrl: './create-resume.component.css'
 })
-export class PromptFormComponent {
+export class CreateResumeComponent {
 
+  isLoading: boolean = false;
+  hasPrompt$: Observable<boolean>;
   promptForm: PromptFormGroup;
 
   constructor(private readonly formBuilder: FormBuilder, private readonly resumeService: PromptService) {
@@ -39,7 +44,13 @@ export class PromptFormComponent {
         ]
       })
     })
+    this.hasPrompt$ = this.promptForm.controls.text.valueChanges.pipe(
+      map((text: string | null): boolean => this.validatePrompt(text)),
+      startWith(false),
+      shareReplay(1)
+    );
   }
+
 
   async onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -50,6 +61,10 @@ export class PromptFormComponent {
 
   async handlePrompt(): Promise<void> {
     console.log("Handle prompt: ", this.promptForm);
+
+    if (this.isLoading) {
+      return;
+    }
 
     if (this.promptForm.invalid) {
       this.markPromptFormAsNotOk();
@@ -62,20 +77,31 @@ export class PromptFormComponent {
     await this.sendPrompt(prompt);
   }
 
+  private validatePrompt(text: string | null) {
+    if (!text)
+      return false;
+    return text.length > 0;
+  }
+
   private markPromptFormAsNotOk() {
     this.promptForm.markAsDirty();
     this.promptForm.markAllAsTouched();
   }
 
-  private async sendPrompt(prompt: Prompt) {
+  private async sendPrompt(prompt: Prompt): Promise<void> {
+    this.isLoading = true;
+    console.log("Sending prompt: ", prompt);
     this.resumeService.sendPrompt(prompt)
+      .pipe(delay(5000))
       .subscribe({
         next: (response: string) => {
-          console.log('Prompt response details:', response);
-          this.promptForm.reset()
+          console.log('User prompt response details:', response);
+          this.promptForm.reset();
+          this.isLoading = false;
         },
         error: (error) => {
           console.error('Error sending prompt', error);
+          this.isLoading = false;
         }
       });
   }

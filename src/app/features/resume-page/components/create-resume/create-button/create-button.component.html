@@ -7,7 +7,7 @@
     'bg-white text-neutral-900': !activated,
     'opacity-75 cursor-not-allowed': isLoading
   }"
-  [disabled]="isLoading"
+  [disabled]="!activated || isLoading"
   (click)="handleClick()"
 >
   <svg

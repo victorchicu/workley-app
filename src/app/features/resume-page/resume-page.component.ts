@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HeadlineComponent} from './components/headline/headline.component';
-import {PromptFormComponent} from './components/prompt-form/prompt-form.component';
+import {ResumeHeadlineComponent} from './components/resume-headline/resume-headline.component';
+import {CreateResumeComponent} from './components/create-resume/create-resume.component';
 
 @Component({
   selector: 'app-resume-page',
@@ -9,8 +9,8 @@ import {PromptFormComponent} from './components/prompt-form/prompt-form.componen
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    HeadlineComponent,
-    PromptFormComponent
+    ResumeHeadlineComponent,
+    CreateResumeComponent
   ],
   templateUrl: './resume-page.component.html',
   styleUrl: './resume-page.component.css',

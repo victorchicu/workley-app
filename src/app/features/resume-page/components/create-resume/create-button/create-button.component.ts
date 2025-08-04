@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {PromptControl, PromptFormGroup} from "../prompt-form.component";
+import {PromptControl, PromptFormGroup} from "../create-resume.component";
 import {FormGroup} from '@angular/forms';
 import {NgClass, NgIf} from '@angular/common';
 
@@ -15,14 +15,14 @@ import {NgClass, NgIf} from '@angular/common';
 })
 export class CreateButtonComponent {
 
-  @Input() isLoading: boolean = false;
-  @Input() activated: boolean = false;
+  @Input() activated: boolean | null = false;
+  @Input() isLoading: boolean | null = false;
 
   @Output() onClick: EventEmitter<void> = new EventEmitter<void>();
 
   handleClick() {
+    console.log("Handle resume creation click")
     if (!this.isLoading) {
-      console.log("Handle resume creation click")
       this.onClick.emit()
     }
   }

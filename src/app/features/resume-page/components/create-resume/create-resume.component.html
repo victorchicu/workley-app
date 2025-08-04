@@ -14,12 +14,11 @@
     </div>
 
     <div class="flex items-center justify-between mt-auto px-2 pb-2">
-      <app-upload-button
-        [activated]="!!(promptForm.controls.text.value && promptForm.controls.text.value.length > 0)"
-      />
+      <app-upload-button/>
       <app-create-button
-        [activated]="!!(promptForm.controls.text.value && promptForm.controls.text.value.length > 0)"
         (onClick)="handlePrompt()"
+        [activated]="(hasPrompt$ | async) && !isLoading"
+        [isLoading]="isLoading"
       />
     </div>
   </form>

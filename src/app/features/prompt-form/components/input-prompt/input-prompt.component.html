@@ -18,8 +18,8 @@
       </div>
 
       <div class="flex items-center justify-between mt-auto px-2 pb-2">
-        <app-upload-button/>
-        <app-create-button
+        <app-upload-resume/>
+        <app-create-resume
           (onClick)="handlePrompt()"
           [activated]="(hasPrompt$ | async) && !isLoading"
           [isLoading]="isLoading"

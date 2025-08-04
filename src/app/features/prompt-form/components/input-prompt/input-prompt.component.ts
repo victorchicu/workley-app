@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {UploadButtonComponent} from './upload-button/upload-button.component';
-import {CreateButtonComponent} from './create-button/create-button.component';
+import {UploadResumeComponent} from './upload-resume/upload-resume.component';
+import {CreateResumeComponent} from './create-resume/create-resume.component';
 import {PromptService} from '../../services/prompt.service';
 import {delay, map, Observable, shareReplay, startWith} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
@@ -17,19 +17,19 @@ export interface Prompt {
 }
 
 @Component({
-  selector: 'app-input-text',
+  selector: 'app-input-prompt',
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    UploadButtonComponent,
-    CreateButtonComponent,
+    UploadResumeComponent,
+    CreateResumeComponent,
     AsyncPipe
   ],
-  templateUrl: './input-text.component.html',
-  styleUrl: './input-text.component.css'
+  templateUrl: './input-prompt.component.html',
+  styleUrl: './input-prompt.component.css'
 })
-export class InputTextComponent {
+export class InputPromptComponent {
 
   isLoading: boolean = false;
   hasPrompt$: Observable<boolean>;

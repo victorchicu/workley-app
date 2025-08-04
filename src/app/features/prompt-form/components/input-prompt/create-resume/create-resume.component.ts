@@ -1,19 +1,19 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {PromptControl, PromptFormGroup} from "../input-text.component";
+import {PromptControl, PromptFormGroup} from "../input-prompt.component";
 import {FormGroup} from '@angular/forms';
 import {NgClass, NgIf} from '@angular/common';
 
 @Component({
-  selector: 'app-create-button',
+  selector: 'app-create-resume',
   standalone: true,
   imports: [
     NgClass,
     NgIf
   ],
-  templateUrl: './create-button.component.html',
-  styleUrl: './create-button.component.css'
+  templateUrl: './create-resume.component.html',
+  styleUrl: './create-resume.component.css'
 })
-export class CreateButtonComponent {
+export class CreateResumeComponent {
 
   @Input() activated: boolean | null = false;
   @Input() isLoading: boolean | null = false;

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Inject, Output, PLATFORM_ID} from '@angular/core';
+import {Component, EventEmitter, Inject, Input, Output, PLATFORM_ID} from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -34,6 +34,7 @@ export type PromptForm = FormGroup<PromptControl>;
 export class PromptInputComponent {
   form: PromptForm;
   loading$: Observable<boolean>;
+  @Input() placeholder: string = "Type your message";
   @Output() onPressEnter: EventEmitter<PromptForm> = new EventEmitter<PromptForm>();
 
   constructor(

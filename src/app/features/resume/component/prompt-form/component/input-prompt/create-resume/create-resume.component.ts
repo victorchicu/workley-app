@@ -15,15 +15,17 @@ import {NgClass, NgIf} from '@angular/common';
 })
 export class CreateResumeComponent {
 
-  @Input() activated: boolean | null = false;
-  @Input() isLoading: boolean | null = false;
+  @Input() activated: boolean = false;
+  @Input() isLoading: boolean = false;
 
   @Output() onClick: EventEmitter<void> = new EventEmitter<void>();
 
   handleClick() {
     console.log("Handle resume creation click")
-    if (!this.isLoading) {
-      this.onClick.emit()
+    if (this.activated) {
+      if (!this.isLoading) {
+        this.onClick.emit()
+      }
     }
   }
 }

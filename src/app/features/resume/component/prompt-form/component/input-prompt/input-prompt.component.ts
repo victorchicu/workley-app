@@ -3,10 +3,11 @@ import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, V
 import {UploadResumeComponent} from './upload-resume/upload-resume.component';
 import {CreateResumeComponent} from './create-resume/create-resume.component';
 import {PromptService} from '../../../../core/service/prompt.service';
-import {delay, map, Observable, shareReplay, startWith} from 'rxjs';
+import {BehaviorSubject, delay, finalize, map, Observable, shareReplay, startWith} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {Router} from '@angular/router';
 import {Result} from '../../../../core/result/result';
+import {LoaderService} from '../../../../../../core/service/loader.service';
 
 export interface PromptControl {
   text: FormControl<string | null>;
@@ -33,30 +34,26 @@ export interface Prompt {
 })
 export class InputPromptComponent {
 
-  isLoading: boolean = false;
-  hasPrompt$: Observable<boolean>;
+  loading$: Observable<boolean>;
   promptForm: PromptFormGroup;
 
   constructor(
     private readonly router: Router,
+    private readonly loader: LoaderService,
     private readonly formBuilder: FormBuilder,
-    private readonly promptService: PromptService
+    private readonly promptService: PromptService,
   ) {
+    this.loading$ = this.loader.loading$;
     this.promptForm = this.formBuilder.nonNullable.group({
       text: new FormControl<string>('', {
-        validators: [Validators.required,
+        validators: [
+          Validators.required,
           Validators.minLength(1),
           Validators.maxLength(1000),
         ]
       })
     })
-    this.hasPrompt$ = this.promptForm.controls.text.valueChanges.pipe(
-      map((text: string | null): boolean => this.validatePrompt(text)),
-      startWith(false),
-      shareReplay(1)
-    );
   }
-
 
   async onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -68,25 +65,20 @@ export class InputPromptComponent {
   async handlePrompt(): Promise<void> {
     console.log("Handle prompt: ", this.promptForm);
 
-    if (this.isLoading) {
+    if (this.loader.loading)
       return;
-    }
 
     if (this.promptForm.invalid) {
       this.markPromptFormAsNotOk();
       return;
     }
 
+    this.loader.setLoading(true);
+
     const prompt: Prompt =
       this.promptForm.value as Prompt
 
     await this.sendPrompt(prompt);
-  }
-
-  private validatePrompt(text: string | null) {
-    if (!text)
-      return false;
-    return text.length > 0;
   }
 
   private markPromptFormAsNotOk() {
@@ -95,20 +87,23 @@ export class InputPromptComponent {
   }
 
   private async sendPrompt(prompt: Prompt): Promise<void> {
-    this.isLoading = true;
     console.log("Sending prompt: ", prompt);
     this.promptService.prompt<Result>(prompt)
-      .pipe(delay(1000))
+      .pipe(
+        delay(3000),
+        finalize(() => this.loader.setLoading(false))
+      )
       .subscribe({
         next: (result: Result) => {
-          console.log('User prompt response details:', result);
+          console.log('Prompt result:', result);
           this.promptForm.reset();
-          this.isLoading = false;
-          this.router.navigate(['/resume', result.aggregateId]);
+          if (result.aggregateId) {
+            this.router.navigate(['/resume', result.aggregateId]);
+          }
         },
         error: (error) => {
           console.error('Error sending prompt', error);
-          this.isLoading = false;
+          this.router.navigate(['/error']);
         }
       });
   }

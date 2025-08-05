@@ -47,7 +47,6 @@ export class PromptFormComponent {
   private async sendRequest(form: PromptForm): Promise<void> {
     const prompt: Prompt = form.value as Prompt;
     console.log("Sending request with prompt: ", prompt);
-
     this.promptService.handlePrompt<Result>(prompt)
       .pipe(
         delay(1000),

@@ -2,7 +2,6 @@
   <!-- Chat Messages Area -->
   <div class="flex-1 overflow-y-auto">
     <div class="w-full max-w-2xl mx-auto px-4 pt-6 pb-4">
-      <!-- Agent Message 1 -->
       <div class="flex gap-3 mb-4">
         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +15,6 @@
         </div>
       </div>
 
-      <!-- Agent Message 2 -->
       <div class="flex gap-3 mb-4">
         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +33,6 @@
         </div>
       </div>
 
-      <!-- Progress Message -->
       <div class="flex gap-3 mb-4">
         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,7 +52,6 @@
         </div>
       </div>
 
-      <!-- Typing Indicator -->
       <div class="flex gap-3">
         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,16 +69,14 @@
     </div>
   </div>
 
-  <!-- Input Form at Bottom -->
   <div class="w-full px-4">
     <div class="w-full max-w-2xl mx-auto">
-      <app-input-prompt/>
-      <app-text-bottom-line/>
+      <app-prompt-input/>
+      <app-prompt-bottom-text/>
     </div>
   </div>
 </div>
 
-<!-- Add these styles to your component.css or global styles -->
 <style>
   @keyframes bounce {
     0%, 60%, 100% {

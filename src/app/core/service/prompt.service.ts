@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Prompt} from '../../features/resume/component/prompt-form/component/input-prompt/input-prompt.component';
+import {Prompt} from '../../features/resume/component/prompt-form/prompt-input/prompt-input.component';
 import {Observable} from 'rxjs';
 import {Result} from './result/result';
 
@@ -13,7 +13,7 @@ export class PromptService {
     //
   }
 
-  prompt<T extends Result>(prompt: Prompt): Observable<T> {
+  handlePrompt<T extends Result>(prompt: Prompt): Observable<T> {
     return this.httpClient.post<T>("/api/prompts", prompt)
   }
 }

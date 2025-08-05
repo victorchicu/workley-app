@@ -1,10 +1,9 @@
 import {Component} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {TextHeadlineComponent} from './component/text-headline/text-headline.component';
-import {InputPromptComponent, Prompt, PromptFormGroup} from './component/input-prompt/input-prompt.component';
-import {TextBottomLineComponent} from './component/text-bottom-line/text-bottom-line.component';
-import {CreateResumeComponent} from './component/input-prompt/create-resume/create-resume.component';
-import {UploadResumeComponent} from './component/input-prompt/upload-resume/upload-resume.component';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {PromptHeadlineComponent} from './prompt-headline/prompt-headline.component';
+import {PromptInputComponent, Prompt, PromptForm} from './prompt-input/prompt-input.component';
+import {BuildResumeComponent} from './action-buttons/build-resume/build-resume.component';
+import {UploadResumeComponent} from './action-buttons/upload-resume/upload-resume.component';
 import {delay, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {LoaderService} from '../../../../core/service/loader.service';
@@ -17,10 +16,9 @@ import {Result} from '../../../../core/service/result/result';
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    TextHeadlineComponent,
-    InputPromptComponent,
-    TextBottomLineComponent,
-    CreateResumeComponent,
+    PromptHeadlineComponent,
+    PromptInputComponent,
+    BuildResumeComponent,
     UploadResumeComponent
   ],
   templateUrl: './prompt-form.component.html',
@@ -28,60 +26,31 @@ import {Result} from '../../../../core/service/result/result';
 })
 export class PromptFormComponent {
   loading$: Observable<boolean>;
-  promptForm: PromptFormGroup;
 
   constructor(
     private readonly router: Router,
     private readonly loader: LoaderService,
-    private readonly formBuilder: FormBuilder,
     private readonly promptService: PromptService,
   ) {
     this.loading$ = this.loader.loading$;
-    this.promptForm = this.formBuilder.nonNullable.group({
-      text: new FormControl<string>('', {
-        validators: [
-          Validators.required,
-          Validators.minLength(1),
-          Validators.maxLength(1000),
-        ]
-      })
-    })
   }
 
-  async onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      await this.handlePrompt();
-    }
-  }
-
-  async handlePrompt(): Promise<void> {
-    console.log("Handle prompt: ", this.promptForm);
+  async handlePrompt(form: PromptForm): Promise<void> {
+    console.log("Handle prompt on press enter: ", form);
 
     if (this.loader.loading)
       return;
 
-    if (this.promptForm.invalid) {
-      this.markPromptFormAsNotOk();
-      return;
-    }
-
     this.loader.setLoading(true);
 
-    const prompt: Prompt =
-      this.promptForm.value as Prompt
-
-    await this.sendPrompt(prompt);
+    await this.sendRequest(form);
   }
 
-  private markPromptFormAsNotOk() {
-    this.promptForm.markAsDirty();
-    this.promptForm.markAllAsTouched();
-  }
+  private async sendRequest(form: PromptForm): Promise<void> {
+    const prompt: Prompt = form.value as Prompt;
+    console.log("Sending request with prompt: ", prompt);
 
-  private async sendPrompt(prompt: Prompt): Promise<void> {
-    console.log("Sending prompt: ", prompt);
-    this.promptService.prompt<Result>(prompt)
+    this.promptService.handlePrompt<Result>(prompt)
       .pipe(
         delay(1000),
         finalize(() => this.loader.setLoading(false))
@@ -89,7 +58,6 @@ export class PromptFormComponent {
       .subscribe({
         next: (result: Result) => {
           console.log('Prompt result:', result);
-          this.promptForm.reset();
           if (result.aggregateId) {
             this.router.navigate(['/resume', result.aggregateId]);
           }

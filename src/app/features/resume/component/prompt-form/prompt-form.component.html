@@ -1,8 +1,15 @@
 <div class="min-h-screen flex flex-col items-center justify-center">
   <div class="w-full max-w-2xl px-4">
     <div class="relative">
-      <app-text-headline/>
-      <app-input-prompt/>
+      <app-prompt-headline/>
+      <app-prompt-input #prompt (onPressEnter)="handlePrompt($event)">
+        <div class="flex items-center justify-between mt-auto px-2 pb-2">
+          <app-upload-resume/>
+          <app-build-resume (onClick)="handlePrompt(prompt.form)" [activated]="prompt.form.valid">
+            <span class="text-sm font-medium">Create Resume</span>
+          </app-build-resume>
+        </div>
+      </app-prompt-input>
     </div>
   </div>
 </div>

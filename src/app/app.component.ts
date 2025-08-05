@@ -8,7 +8,7 @@ import {HeaderComponent} from './shared/component/main/header/header.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FormsModule, FooterComponent, MainComponent, HeaderComponent],
+  imports: [FormsModule, MainComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   host: {

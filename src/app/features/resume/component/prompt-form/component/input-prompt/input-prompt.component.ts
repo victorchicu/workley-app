@@ -2,11 +2,11 @@ import {Component} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {UploadResumeComponent} from './upload-resume/upload-resume.component';
 import {CreateResumeComponent} from './create-resume/create-resume.component';
-import {PromptService} from '../../../../core/service/prompt.service';
+import {PromptService} from '../../../../../../core/service/prompt.service';
 import {BehaviorSubject, delay, finalize, map, Observable, shareReplay, startWith} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {Router, RouterOutlet} from '@angular/router';
-import {Result} from '../../../../core/result/result';
+import {Result} from '../../../../../../core/service/result/result';
 import {LoaderService} from '../../../../../../core/service/loader.service';
 
 export interface PromptControl {

@@ -8,8 +8,8 @@ import {UploadResumeComponent} from './component/input-prompt/upload-resume/uplo
 import {delay, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {LoaderService} from '../../../../core/service/loader.service';
-import {PromptService} from '../../core/service/prompt.service';
-import {Result} from '../../core/result/result';
+import {PromptService} from '../../../../core/service/prompt.service';
+import {Result} from '../../../../core/service/result/result';
 
 @Component({
   selector: 'app-resume-page',

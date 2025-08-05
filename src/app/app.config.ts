@@ -29,7 +29,13 @@ function provideAnalytics() {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      // withViewTransitions({
+      //   skipInitialTransition: true,
+      // })
+    ),
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
     provideAnalytics(),

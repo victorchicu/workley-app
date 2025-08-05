@@ -60,7 +60,7 @@ export class PromptFormComponent {
           }
         },
         error: (error) => {
-          console.error('Error sending prompt', error);
+          console.error('Error sending request', error);
           this.router.navigate(['/error']);
         }
       });

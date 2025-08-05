@@ -36,8 +36,6 @@ export class PromptFormComponent {
   }
 
   async handlePrompt(form: PromptForm): Promise<void> {
-    console.log("Handle prompt on press enter: ", form);
-
     if (this.loader.loading)
       return;
 

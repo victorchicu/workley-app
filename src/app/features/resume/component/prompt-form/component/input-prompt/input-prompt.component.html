@@ -22,7 +22,6 @@
         <app-create-resume
           (onClick)="handlePrompt()"
           [activated]="promptForm.valid"
-          [isLoading]="!!(loading$ | async)"
         />
       </div>
     </fieldset>

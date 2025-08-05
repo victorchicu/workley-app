@@ -5,7 +5,8 @@
       <div class="flex gap-3 mb-4">
         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
           </svg>
         </div>
         <div class="flex-1">
@@ -18,12 +19,14 @@
       <div class="flex gap-3 mb-4">
         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
           </svg>
         </div>
         <div class="flex-1">
           <div class="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
-            <p class="text-sm text-gray-800 mb-2">I'm now structuring your professional experience section. This will include:</p>
+            <p class="text-sm text-gray-800 mb-2">I'm now structuring your professional experience section. This will
+              include:</p>
             <ul class="text-sm text-gray-700 space-y-1 ml-4">
               <li>• Relevant work history</li>
               <li>• Key achievements and responsibilities</li>
@@ -36,7 +39,8 @@
       <div class="flex gap-3 mb-4">
         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
           </svg>
         </div>
         <div class="flex-1">
@@ -55,7 +59,8 @@
       <div class="flex gap-3">
         <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
           </svg>
         </div>
         <div class="flex-1">
@@ -71,7 +76,11 @@
 
   <div class="w-full px-4">
     <div class="w-full max-w-2xl mx-auto">
-      <app-prompt-input placeholder="Type your message"/>
+      <app-prompt-input placeholder="Type your message">
+        <div class="flex items-center justify-end mt-auto px-2 pb-2">
+          <app-send-message/>
+        </div>
+      </app-prompt-input>
       <app-prompt-bottom-text/>
     </div>
   </div>

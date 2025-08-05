@@ -5,7 +5,7 @@ import {CreateResumeComponent} from './create-resume/create-resume.component';
 import {PromptService} from '../../../../core/service/prompt.service';
 import {BehaviorSubject, delay, finalize, map, Observable, shareReplay, startWith} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
-import {Router} from '@angular/router';
+import {Router, RouterOutlet} from '@angular/router';
 import {Result} from '../../../../core/result/result';
 import {LoaderService} from '../../../../../../core/service/loader.service';
 
@@ -27,7 +27,8 @@ export interface Prompt {
     ReactiveFormsModule,
     UploadResumeComponent,
     CreateResumeComponent,
-    AsyncPipe
+    AsyncPipe,
+    RouterOutlet
   ],
   templateUrl: './input-prompt.component.html',
   styleUrl: './input-prompt.component.css'
@@ -90,7 +91,7 @@ export class InputPromptComponent {
     console.log("Sending prompt: ", prompt);
     this.promptService.prompt<Result>(prompt)
       .pipe(
-        delay(3000),
+        delay(1000),
         finalize(() => this.loader.setLoading(false))
       )
       .subscribe({

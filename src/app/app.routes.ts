@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import {PromptFormComponent} from './features/resume/component/prompt-form/prompt-form.component';
 import {AgentChatComponent} from './features/resume/component/agent-chat/agent-chat.component';
 import {
-  SomethingWentWrongComponent
-} from './shared/component/main/something-went-wrong/something-went-wrong.component';
+  ErrorComponent
+} from './shared/component/main/error/error.component';
 
 export const routes: Routes = [
   {
@@ -18,7 +18,7 @@ export const routes: Routes = [
   },
   {
     path: 'error',
-    component: SomethingWentWrongComponent,
+    component: ErrorComponent,
     title: 'Free Resume Builder | Something Went Wrong',
   },
   {

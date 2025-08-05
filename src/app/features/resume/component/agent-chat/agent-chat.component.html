@@ -1,21 +1,95 @@
-<div class="h-full flex flex-col">
+<div class="flex flex-col" style="height: 100%;">
+  <!-- Chat Messages Area -->
   <div class="flex-1 overflow-y-auto">
-    <div class="w-full max-w-2xl mx-auto px-4 py-4">
-      <div class="space-y-4">
-        <div *ngFor="let message of messages" class="flex items-start gap-3">
-          <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm">
-            A
+    <div class="w-full max-w-2xl mx-auto px-4 pt-6 pb-4">
+      <!-- Agent Message 1 -->
+      <div class="flex gap-3 mb-4">
+        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
+            <p class="text-sm text-gray-800">Hello! I'm analyzing your request and preparing to build your resume...</p>
           </div>
-          <div class="bg-gray-100 rounded-2xl px-4 py-2">
-            <p class="text-gray-800">{{ message }}</p>
+        </div>
+      </div>
+
+      <!-- Agent Message 2 -->
+      <div class="flex gap-3 mb-4">
+        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
+            <p class="text-sm text-gray-800 mb-2">I'm now structuring your professional experience section. This will include:</p>
+            <ul class="text-sm text-gray-700 space-y-1 ml-4">
+              <li>• Relevant work history</li>
+              <li>• Key achievements and responsibilities</li>
+              <li>• Quantifiable results where applicable</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Message -->
+      <div class="flex gap-3 mb-4">
+        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="bg-gray-100 rounded-2xl px-4 py-3 inline-block">
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <p class="text-sm text-gray-800">Building your resume... 75% complete</p>
+            </div>
+            <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-500 h-2 rounded-full" style="width: 75%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="flex gap-3">
+        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="bg-gray-100 rounded-2xl px-4 py-3 inline-flex items-center gap-1">
+            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+            <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="border-t bg-white">
-    <div class="w-full max-w-2xl mx-auto px-4 py-4">
+
+  <!-- Input Form at Bottom -->
+  <div class="w-full px-4">
+    <div class="w-full max-w-2xl mx-auto">
       <app-input-prompt/>
+      <app-text-bottom-line/>
     </div>
   </div>
 </div>
+
+<!-- Add these styles to your component.css or global styles -->
+<style>
+  @keyframes bounce {
+    0%, 60%, 100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-10px);
+    }
+  }
+</style>

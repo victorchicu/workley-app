@@ -10,19 +10,15 @@
         rows="1"
         style="field-sizing: content;"
         class="flex-grow min-w-0 text-neutral-800 bg-transparent focus:outline-none placeholder-neutral-400 resize-none overflow-y-auto min-h-[48px] max-h-[120px] p-0"
-        placeholder="Tell me the job title, I'll build the perfect example"
+        placeholder="Let me know the field, I'll build something great"
         autocomplete="off"
         formControlName="text"
         (keydown)="onKeyDown($event)"
       ></textarea>
       </div>
-
       <div class="flex items-center justify-between mt-auto px-2 pb-2">
         <app-upload-resume/>
-        <app-create-resume
-          (onClick)="handlePrompt()"
-          [activated]="promptForm.valid"
-        />
+        <app-create-resume (onClick)="handlePrompt()" [activated]="promptForm.valid"/>
       </div>
     </fieldset>
   </form>

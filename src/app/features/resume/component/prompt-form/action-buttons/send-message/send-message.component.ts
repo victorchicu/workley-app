@@ -1,11 +1,12 @@
 import {Component, EventEmitter, Output} from '@angular/core';
-import {TooltipDirective} from '../../../../../../core/directive/tooltip.directive';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-send-message',
   standalone: true,
   imports: [
-    TooltipDirective
+    FormsModule
+
   ],
   templateUrl: './send-message.component.html',
   styleUrl: './send-message.component.css'

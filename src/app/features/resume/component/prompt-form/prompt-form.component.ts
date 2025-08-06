@@ -7,7 +7,7 @@ import {UploadResumeComponent} from './action-buttons/upload-resume/upload-resum
 import {delay, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {LoaderService} from '../../../../core/service/loader.service';
-import {PromptService} from '../../../../core/service/prompt.service';
+import {AgentService} from '../../../../core/service/agent.service';
 import {Result} from '../../../../core/service/result/result';
 
 @Component({
@@ -30,7 +30,7 @@ export class PromptFormComponent {
   constructor(
     private readonly router: Router,
     private readonly loader: LoaderService,
-    private readonly promptService: PromptService,
+    private readonly agentService: AgentService,
   ) {
     this.loading$ = this.loader.loading$;
   }
@@ -47,7 +47,7 @@ export class PromptFormComponent {
   private async sendRequest(form: PromptForm): Promise<void> {
     const prompt: Prompt = form.value as Prompt;
     console.log("Sending request with prompt: ", prompt);
-    this.promptService.handlePrompt<Result>(prompt)
+    this.agentService.prompt<Result>(prompt)
       .pipe(
         delay(1000),
         finalize(() => this.loader.setLoading(false))
@@ -55,8 +55,10 @@ export class PromptFormComponent {
       .subscribe({
         next: (result: Result) => {
           console.log('Prompt result:', result);
-          if (result.aggregateId) {
-            this.router.navigate(['/resume', result.aggregateId]);
+          if (result.chatId) {
+            this.router.navigate(['/agent', result.chatId], {
+              state: result
+            });
           }
         },
         error: (error) => {

@@ -7,13 +7,15 @@ import {Result} from './result/result';
 @Injectable({
   providedIn: 'root'
 })
-export class PromptService {
+export class AgentService {
 
   constructor(private readonly httpClient: HttpClient) {
     //
   }
 
-  handlePrompt<T extends Result>(prompt: Prompt): Observable<T> {
-    return this.httpClient.post<T>("/api/prompts", prompt)
+  prompt<T extends Result>(prompt: Prompt): Observable<T> {
+    return this.httpClient.post<T>("/api/agent/prompt", prompt, {
+      withCredentials: true
+    })
   }
 }

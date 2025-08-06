@@ -35,6 +35,7 @@ export class PromptInputComponent {
   form: PromptForm;
   loading$: Observable<boolean>;
   @Input() placeholder: string = "Type your message";
+  @Input() deactivated: boolean = false;
   @Output() onPressEnter: EventEmitter<PromptForm> = new EventEmitter<PromptForm>();
 
   constructor(

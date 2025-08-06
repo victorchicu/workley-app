@@ -1,10 +1,10 @@
 <div class="relative w-full max-w-2xl mx-auto">
   <form [formGroup]="form"
         class="relative flex flex-col w-full bg-white rounded-3xl border border-neutral-200 shadow-sm shadow-neutral-300/50 overflow-hidden"
-        [class.opacity-75]="loading$ | async"
-        [class.pointer-events-none]="loading$ | async"
+        [class.opacity-50]="(loading$ | async) || deactivated"
+        [class.pointer-events-none]="(loading$ | async) || deactivated"
   >
-    <fieldset [disabled]="loading$ | async">
+    <fieldset [disabled]="(loading$ | async) || deactivated">
       <div class="flex items-start w-full mb-2 px-4 pt-4 overflow-hidden">
         <textarea
           rows="1"

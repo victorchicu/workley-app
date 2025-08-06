@@ -12,9 +12,9 @@ export const routes: Routes = [
     title: 'Free Resume Builder | Create Resume',
   },
   {
-    path: 'resume/:resumeId',
+    path: 'agent/:chatId',
     component: AgentChatComponent,
-    title: 'Free Resume Builder | Resume AI',
+    title: 'Free Resume Builder | Agent Clarifications',
   },
   {
     path: 'error',

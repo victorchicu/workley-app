@@ -1,4 +1,4 @@
 
 export interface Result {
-  aggregateId: string;
+  chatId: string;
 }

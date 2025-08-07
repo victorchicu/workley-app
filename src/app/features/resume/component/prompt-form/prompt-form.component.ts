@@ -9,6 +9,7 @@ import {Router} from '@angular/router';
 import {LoaderService} from '../../../../core/application/loader.service';
 import {AgentService} from '../../../../core/application/agent.service';
 import {Result} from '../../../../core/application/result/result';
+import {CreateChatResult} from '../../../../core/application/result/create-chat-result';
 
 @Component({
   selector: 'app-resume-page',
@@ -47,13 +48,13 @@ export class PromptFormComponent {
   private async sendRequest(form: PromptForm): Promise<void> {
     const prompt: Prompt = form.value as Prompt;
     console.log("Sending request with prompt: ", prompt);
-    this.agentService.sendPrompt<Result>(prompt)
+    this.agentService.sendPrompt<CreateChatResult>(prompt)
       .pipe(
         delay(1000),
         finalize(() => this.loader.setLoading(false))
       )
       .subscribe({
-        next: (result: Result) => {
+        next: (result: CreateChatResult) => {
           console.log('Prompt result:', result);
           if (result.chatId) {
             this.router.navigate(['/agent', result.chatId], {

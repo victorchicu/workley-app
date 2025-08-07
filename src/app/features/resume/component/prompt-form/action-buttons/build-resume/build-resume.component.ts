@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Prompt, PromptControl, PromptForm} from "../../prompt-input/prompt-input.component";
 import {FormGroup} from '@angular/forms';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
-import {LoaderService} from '../../../../../../core/service/loader.service';
+import {LoaderService} from '../../../../../../core/application/loader.service';
 import {Observable} from 'rxjs';
 
 @Component({

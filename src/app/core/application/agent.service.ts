@@ -13,7 +13,7 @@ export class AgentService {
     //
   }
 
-  prompt<T extends Result>(prompt: Prompt): Observable<T> {
+  sendPrompt<T extends Result>(prompt: Prompt): Observable<T> {
     return this.httpClient.post<T>("/api/agent/prompt", prompt, {
       withCredentials: true
     })

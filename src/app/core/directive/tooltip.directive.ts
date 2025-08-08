@@ -1,47 +1,66 @@
-import {Directive, ElementRef, HostListener, input, InputSignal, Renderer2} from '@angular/core';
+import { Directive, ElementRef, HostListener, Inject, Renderer2, input, InputSignal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[tooltipText]',
   standalone: true,
 })
 export class TooltipDirective {
+  // Signal input
   tooltipText: InputSignal<string> = input<string>('');
 
-  private tooltipElement: HTMLElement | null = null;
+  private tooltipElement: HTMLDivElement | null = null;
 
-  constructor(private el: ElementRef, private renderer: Renderer2) {
-  }
+  constructor(
+    private host: ElementRef<HTMLElement>,
+    private renderer: Renderer2,
+    @Inject(DOCUMENT) private doc: Document
+  ) {}
 
-  @HostListener('mouseenter') onMouseEnter() {
+  @HostListener('mouseenter')
+  onMouseEnter() {
     this.showTooltip();
   }
 
-  @HostListener('mouseleave') onMouseLeave() {
+  @HostListener('mouseleave')
+  onMouseLeave() {
     this.hideTooltip();
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onViewportChange() {
+    if (this.tooltipElement) this.positionTooltip();
   }
 
   private showTooltip() {
     if (this.tooltipElement) return;
 
-    this.tooltipElement = this.renderer.createElement('div');
+    const el = this.renderer.createElement('div') as HTMLDivElement;
+    this.renderer.addClass(el, 'tooltip-style');
+    this.renderer.setProperty(el, 'textContent', this.tooltipText());
 
-    this.renderer.addClass(this.tooltipElement, 'absolute');
-    this.renderer.addClass(this.tooltipElement, 'top-full');
-    this.renderer.addClass(this.tooltipElement, 'left-1/2');
-    this.renderer.addClass(this.tooltipElement, '-translate-x-1/2');
-    this.renderer.addClass(this.tooltipElement, 'mt-4');
+    this.renderer.appendChild(this.doc.body, el);
 
-    this.renderer.addClass(this.tooltipElement, 'tooltip-style');
+    this.tooltipElement = el;
 
-    this.renderer.setProperty(this.tooltipElement, 'textContent', this.tooltipText());
-    this.renderer.appendChild(this.el.nativeElement, this.tooltipElement);
+    this.positionTooltip();
+  }
+
+  private positionTooltip() {
+    if (!this.tooltipElement) return;
+
+    const rect = this.host.nativeElement.getBoundingClientRect();
+
+    this.renderer.setStyle(this.tooltipElement, 'top', `${rect.bottom + 4}px`); // 8px gap
+    this.renderer.setStyle(this.tooltipElement, 'left', `${rect.left + rect.width * 2}px`);
+    this.renderer.setStyle(this.tooltipElement, 'transform', 'translateX(-50%)');
   }
 
   private hideTooltip() {
-    if (this.tooltipElement) {
-      this.renderer.removeChild(this.el.nativeElement, this.tooltipElement);
-      this.tooltipElement = null;
-    }
-  }
+    if (!this.tooltipElement) return;
 
+    this.renderer.removeChild(this.doc.body, this.tooltipElement);
+    this.tooltipElement = null;
+  }
 }

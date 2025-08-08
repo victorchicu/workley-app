@@ -6,7 +6,7 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
-    path: 'agent/:chatId',
+    path: 'chat/:chatId',
     renderMode: RenderMode.Prerender
   },
   {

@@ -12,14 +12,14 @@ export const routes: Routes = [
     title: 'Free Resume Builder | Create Resume',
   },
   {
-    path: 'agent/:chatId',
+    path: 'chat/:chatId',
     component: AgentChatComponent,
-    title: 'Free Resume Builder | Agent Clarifications',
+    title: 'Free Resume Builder | Agent Chat',
   },
   {
     path: 'error',
     component: ErrorComponent,
-    title: 'Free Resume Builder | Something Went Wrong',
+    title: 'Free Resume Builder | Oops! Something went wrong.',
   },
   {
     path: '**',

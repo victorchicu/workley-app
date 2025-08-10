@@ -3,7 +3,7 @@ import {PromptFormComponent} from './features/resume/component/prompt-form/promp
 import {AgentChatComponent} from './features/resume/component/agent-chat/agent-chat.component';
 import {
   ErrorComponent
-} from './shared/component/main/error/error.component';
+} from './shared/component/error/error.component';
 
 export const routes: Routes = [
   {

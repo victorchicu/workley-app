@@ -1,4 +1,5 @@
 import {RenderMode, ServerRoute} from '@angular/ssr';
+import {ErrorComponent} from './shared/component/error/error.component';
 
 export const serverRoutes: ServerRoute[] = [
   {
@@ -7,6 +8,10 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'chat/:chatId',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'error',
     renderMode: RenderMode.Prerender
   },
   {

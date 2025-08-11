@@ -1,26 +1,99 @@
+<!-- agent-chat.component.html -->
+
 <div class="flex flex-col" style="height: 100%;">
-  <div class="flex-1 overflow-y-auto">
+  <!-- Messages Area -->
+  <div #scrollContainer class="flex-1 overflow-y-auto">
     <div class="w-full max-w-2xl mx-auto px-4 pt-6 pb-4">
-      <div class="flex gap-3 mb-4">
-        <div class="rounded-full flex items-center justify-center flex-shrink-0">
+
+      <!-- Loading State -->
+      <div *ngIf="chatState.isLoading && chatState.messages.length === 0" class="flex justify-center py-8">
+        <div class="flex items-center gap-2 text-neutral-500">
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-neutral-500"></div>
+          <span>Loading chat history...</span>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="chatState.error && chatState.messages.length === 0" class="flex justify-center py-8">
+        <div class="bg-red-50 text-red-600 px-4 py-3 rounded-lg">
+          {{ chatState.error }}
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div *ngFor="let message of chatState.messages; let i = index"
+           class="flex gap-3 mb-4"
+           [ngClass]="{'justify-end': message.sender === 'user'}">
+
+        <!-- Agent Message -->
+        <ng-container *ngIf="message.sender === 'agent'">
+          <div class="rounded-full w-8 h-8 bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
+            A
+          </div>
+          <div class="flex-1 max-w-[80%]">
+            <div class="bg-neutral-100 rounded-2xl px-4 py-3 inline-block">
+              <span class="text-sm text-neutral-950 whitespace-pre-wrap">{{ message.content }}</span>
+            </div>
+            <div class="text-xs text-neutral-400 mt-1 px-1">
+              {{ formatTime(message.timestamp) }}
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- User Message -->
+        <ng-container *ngIf="message.sender === 'user'">
+          <div class="flex-1 max-w-[80%]">
+            <div class="flex justify-end">
+              <div class="bg-blue-500 text-white rounded-2xl px-4 py-3 inline-block"
+                   [ngClass]="{
+                     'opacity-70': message.status === 'sending',
+                     'bg-red-500': message.status === 'error'
+                   }">
+                <span class="text-sm whitespace-pre-wrap">{{ message.content }}</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 text-xs text-neutral-400 mt-1 px-1">
+              <span *ngIf="message.status === 'sending'" class="flex items-center gap-1">
+                <span class="animate-pulse">Sending...</span>
+              </span>
+              <span *ngIf="message.status === 'error'" class="text-red-500 flex items-center gap-2">
+                Failed
+                <button (click)="retryMessage(message)"
+                        class="underline hover:no-underline">
+                  Retry
+                </button>
+              </span>
+              <span *ngIf="message.status === 'sent' || !message.status">
+                {{ formatTime(message.timestamp) }}
+              </span>
+            </div>
+          </div>
+          <div class="rounded-full w-8 h-8 bg-neutral-700 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
+            U
+          </div>
+        </ng-container>
+      </div>
+
+      <div *ngIf="isInputDisabled && chatState.messages[chatState.messages.length - 1]?.sender === 'user'"
+           class="flex gap-3 mb-4">
+        <div class="rounded-full w-8 h-8 bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
           A
         </div>
-        <div class="flex-1">
-          <div class="bg-neutral-100 rounded-2xl px-4 py-3 inline-block">
-            <span class="text-sm text-neutral-950 mb-2">I'm now structuring your professional experience section.</span>
+        <div class="bg-neutral-100 rounded-2xl px-4 py-3 inline-block">
+          <div class="flex gap-1">
+            <span class="typing-dot"></span>
+            <span class="typing-dot" style="animation-delay: 0.2s"></span>
+            <span class="typing-dot" style="animation-delay: 0.4s"></span>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="w-full px-4">
-    <div class="w-full max-w-4xl mx-auto">
-      <app-prompt-input
-        placeholder="How can I help you today?"
-        [deactivated]="true"
-      >
-        <div class="flex items-center justify-end mt-auto">
+  <div class="w-full px-4 bg-white">
+    <div class="w-full max-w-2xl mx-auto py-4">
+      <app-prompt-input>
+        <div class="flex items-center justify-end mt-auto px-2 pb-2">
           <app-send-message/>
         </div>
       </app-prompt-input>
@@ -37,5 +110,37 @@
     30% {
       transform: translateY(-10px);
     }
+  }
+
+  .typing-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #6b7280;
+    animation: bounce 1.4s infinite;
+  }
+
+  /* Smooth scrolling */
+  .overflow-y-auto {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar styles (optional) */
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f3f4f6;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
   }
 </style>

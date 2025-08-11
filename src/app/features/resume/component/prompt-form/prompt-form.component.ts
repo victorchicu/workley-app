@@ -8,7 +8,7 @@ import {delay, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {LoaderService} from '../../../../core/application/loader.service';
 import {AgentService} from '../../../../core/application/agent/agent.service';
-import {CreateChatCommandResult} from '../../../../core/application/agent/command/result/create-chat-command-result';
+import {CreateChatCommandResult} from '../../../../core/application/agent/command/create-chat-command-result';
 import {CreateChatCommand} from '../../../../core/application/agent/command/create-chat-command';
 
 @Component({

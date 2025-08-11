@@ -1,6 +1,6 @@
-import {ChatMessage} from '../../../../features/resume/component/agent-chat/states/chat-message';
+import {Message} from '../../../../features/resume/component/agent-chat/objects/message';
 
 export interface SendMessageCommandResult {
-  message: ChatMessage;
-  reply: ChatMessage;
+  message: Message;
+  reply: Message;
 }

@@ -1,8 +1,8 @@
-import {ChatMessage} from './chat-message';
+import {Message} from './message';
 
 export interface ChatViewState {
   chatId: string;
-  messages: ChatMessage[];
+  messages: Message[];
   isLoading: boolean;
   error: string | null;
 }

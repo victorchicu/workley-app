@@ -6,9 +6,10 @@ import {Navigation, Router} from '@angular/router';
 import {CreateChatCommandResult} from '../../../../core/application/agent/command/create-chat-command-result';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {finalize, Subject, takeUntil} from 'rxjs';
-import {ChatViewState} from './states/chat-view-state';
+import {ChatViewState} from './objects/chat-view-state';
 import {AgentService} from '../../../../core/application/agent/agent.service';
-import {ChatMessage} from './states/chat-message';
+import {Message} from './objects/message';
+import {GetChatHistoryQueryResult} from '../../../../core/application/agent/query/get-chat-history-query-result';
 
 @Component({
   selector: 'app-agent-chat',
@@ -25,17 +26,13 @@ import {ChatMessage} from './states/chat-message';
   styleUrl: './agent-chat.component.css'
 })
 export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
-  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
-
-  chatState: ChatViewState = {
+  chatViewState: ChatViewState = {
     chatId: '',
     messages: [],
     isLoading: false,
     error: null
   };
-
-  messageInput: string = '';
-  isInputDisabled: boolean = false;
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
   private destroy$ = new Subject<void>();
   private shouldScrollToBottom = false;
 
@@ -43,34 +40,26 @@ export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private router: Router,
     private agentService: AgentService
   ) {
-    // Handle navigation state
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const state = navigation.extras.state as CreateChatCommandResult;
-      this.chatState.chatId = state.chatId;
-      this.chatState.messages.push({
-        id: this.generateMessageId(),
-        content: state.prompt.text,
-        sender: 'agent',
-        timestamp: new Date(),
-        status: 'sent'
-      });
+      this.chatViewState.chatId = state.chatId;
     }
   }
 
   ngOnInit(): void {
     this.agentService.messages$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(messages => {
-        this.chatState.messages = messages;
+      .subscribe((messages: Message[]) => {
+        this.chatViewState.messages = messages;
         this.shouldScrollToBottom = true;
       });
 
-    if (this.chatState.chatId) {
+    if (this.chatViewState.chatId) {
       this.loadChatHistory();
     } else {
       console.error('No chatId provided');
-      this.chatState.error = 'Chat session not found';
+      this.chatViewState.error = 'Chat session not found';
     }
   }
 
@@ -88,92 +77,50 @@ export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   loadChatHistory(): void {
-    this.chatState.isLoading = true;
-    this.chatState.error = null;
-    this.agentService.getChatHistoryQuery({ chatId: this.chatState.chatId })
+    this.chatViewState.error = null;
+    this.chatViewState.isLoading = true;
+    this.agentService.getChatHistoryQuery({chatId: this.chatViewState.chatId})
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => this.chatState.isLoading = false)
+        finalize(() => this.chatViewState.isLoading = false)
       )
       .subscribe({
-        next: (result) => {
-          const existingIds = new Set(this.chatState.messages.map(m => m.id));
-          const newMessages = result.messages.filter(m => !existingIds.has(m.id));
-          this.chatState.messages = [...this.chatState.messages, ...newMessages];
+        next: (result: GetChatHistoryQueryResult) => {
+          if (!this.chatViewState.messages) {
+            this.chatViewState.messages = [];
+          }
+
+          console.log(result)
+
+          if (!result || !result.data) {
+            console.warn('No messages in response');
+            return;
+          }
+
+          const existingIds = new Set(this.chatViewState.messages.map((message: Message): string => message.id));
+
+          const newMessages: Message[] =
+            result.data.filter((message: Message) => !existingIds.has(message.id));
+
+          this.chatViewState.messages =
+            [...this.chatViewState.messages, ...newMessages];
+
           this.shouldScrollToBottom = true;
         },
         error: (error) => {
-          console.error('Failed to load chat history:', error);
-          this.chatState.error = 'Failed to load chat history';
+          console.error('Failed to load chat:', error);
+          this.chatViewState.error = 'Failed to load chat';
         }
       });
   }
 
-  sendMessage(): void {
-    if (!this.messageInput.trim() || this.isInputDisabled) {
-      return;
-    }
-
-    const userMessage: ChatMessage = {
-      id: this.generateMessageId(),
-      content: this.messageInput.trim(),
-      sender: 'user',
-      timestamp: new Date(),
-      status: 'sending'
-    };
-
-    // Add message optimistically
-    this.agentService.addOptimisticMessage(userMessage);
-    this.shouldScrollToBottom = true;
-
-    // Clear input and disable while sending
-    const messageContent = this.messageInput;
-    this.messageInput = '';
-    this.isInputDisabled = true;
-
-    // Send message to backend
-    this.agentService.sendMessage({
-      chatId: this.chatState.chatId,
-      content: messageContent
-    })
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.isInputDisabled = false;
-        })
-      )
-      .subscribe({
-        next: (result) => {
-          // Update user message status
-          this.agentService.updateMessageStatus(userMessage.id, 'sent');
-          this.shouldScrollToBottom = true;
-        },
-        error: (error) => {
-          console.error('Failed to send message:', error);
-          this.agentService.updateMessageStatus(userMessage.id, 'error');
-          this.chatState.error = 'Failed to send message. Please try again.';
-        }
-      });
-  }
-
-  onInputChange(value: string): void {
-    this.messageInput = value;
-  }
-
-  onEnterPressed(): void {
-    this.sendMessage();
-  }
-
-  retryMessage(message: ChatMessage): void {
-    if (message.status === 'error') {
-      this.messageInput = message.content;
-      // Remove the failed message
-      const updatedMessages = this.chatState.messages.filter(m => m.id !== message.id);
-      this.agentService.clearMessages();
-      updatedMessages.forEach(m => this.agentService.addOptimisticMessage(m));
-      // Retry sending
-      this.sendMessage();
-    }
+  toLocalTimeString(date: Date): string {
+    const d = new Date(date);
+    return d.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
   }
 
   private scrollToBottom(): void {
@@ -185,19 +132,5 @@ export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     } catch (err) {
       console.error('Could not scroll to bottom:', err);
     }
-  }
-
-  private generateMessageId(): string {
-    return `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  // Helper method for template
-  formatTime(date: Date): string {
-    const d = new Date(date);
-    return d.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
   }
 }

@@ -1,6 +1,6 @@
-import {ChatMessage} from '../../../../features/resume/component/agent-chat/states/chat-message';
+import {Message} from '../../../../features/resume/component/agent-chat/objects/message';
 
 export interface GetChatHistoryQueryResult {
   chatId: string;
-  messages: ChatMessage[];
+  data: Message[];
 }

@@ -1,5 +1,5 @@
 
-export interface ChatMessage {
+export interface Message {
   id: string;
   content: string;
   sender: 'agent' | 'user';

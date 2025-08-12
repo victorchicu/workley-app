@@ -8,9 +8,15 @@ import {PromptBottomTextComponent} from '../prompt-form/prompt-bottom-text/promp
 import {SendMessageComponent} from '../prompt-form/action-buttons/send-message/send-message.component';
 import {Navigation, Router} from '@angular/router';
 import {AgentService} from '../../../../core/application/agent/agent.service';
-import {CreateChatCommandResult, Message, Prompt} from '../../../../core/application/agent/agent.models';
+import {
+  CreateChatCommandResult,
+  Message,
+  Prompt,
+  SendMessageCommandResult
+} from '../../../../core/application/agent/agent.models';
 import {Observable, Subject, takeUntil} from 'rxjs';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {AgentChatService} from './agent-chat.service';
 
 @Component({
   selector: 'app-agent-chat',
@@ -41,18 +47,18 @@ export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   currentMessage = '';
 
-  constructor(private router: Router, private agentService: AgentService) {
-    this.messages$ = this.agentService.messages$;
-    this.loading$ = this.agentService.loading$;
-    this.isTyping$ = this.agentService.isTyping$;
-    this.error$ = this.agentService.error$;
-    this.chatId$ = this.agentService.chatId$;
+  constructor(private router: Router, private agentChatService: AgentChatService) {
+    this.messages$ = this.agentChatService.messages$;
+    this.loading$ = this.agentChatService.loading$;
+    this.isTyping$ = this.agentChatService.isTyping$;
+    this.error$ = this.agentChatService.error$;
+    this.chatId$ = this.agentChatService.chatId$;
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const state = navigation.extras.state as CreateChatCommandResult;
       console.log("Chat state: ", state);
       if (state.chatId && state.message) {
-        this.agentService.initializeChat(state.chatId, state.message);
+        this.agentChatService.initializeChat(state.chatId, state.message);
       }
     }
   }
@@ -92,31 +98,31 @@ export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
           const prompt: Prompt = {
             text: this.currentMessage.trim()
           };
-          this.agentService.createChat(prompt).pipe(
-            takeUntil(this.destroy$)
-          ).subscribe({
-            next: (result) => {
-              console.log('Chat created:', result);
-            },
-            error: (error) => {
-              console.error('Error creating chat:', error);
-            }
-          });
+          this.agentChatService.createChat(prompt)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (result: CreateChatCommandResult) => {
+                console.log('Chat created:', result);
+              },
+              error: (error) => {
+                console.error('Error creating chat:', error);
+              }
+            });
         } else {
           const message: Message = {
             role: 'USER',
             content: this.currentMessage.trim()
           }
-          this.agentService.sendMessage(message).pipe(
-            takeUntil(this.destroy$)
-          ).subscribe({
-            next: (result) => {
-              console.log('Message sent:', result);
-            },
-            error: (error) => {
-              console.error('Error sending message:', error);
-            }
-          });
+          this.agentChatService.sendMessage(message)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (result: SendMessageCommandResult) => {
+                console.log('Message sent:', result);
+              },
+              error: (error) => {
+                console.error('Error sending message:', error);
+              }
+            });
         }
       });
     this.currentMessage = '';
@@ -124,19 +130,19 @@ export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   onInputChange(value: string): void {
     this.currentMessage = value;
-    this.agentService.updateCurrentUserMessage(value);
+    this.agentChatService.updateCurrentUserMessage(value);
   }
 
   onRetryMessage(message: Message): void {
     if (message.status === 'error' && message.content) {
-      this.agentService.sendMessage(message).pipe(
+      this.agentChatService.sendMessage(message).pipe(
         takeUntil(this.destroy$)
       ).subscribe();
     }
   }
 
   clearError(): void {
-    this.agentService.clearError();
+    this.agentChatService.clearError();
   }
 
 

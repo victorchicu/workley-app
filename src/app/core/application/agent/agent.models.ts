@@ -1,5 +1,3 @@
-import {Prompt} from '../../../features/resume/component/prompt-form/prompt-input/prompt-input.component';
-
 
 export abstract class Query {
   abstract readonly type: string;
@@ -11,10 +9,11 @@ export abstract class Command {
 
 
 export interface QueryResult {
+  type: string;
 }
 
 export interface CommandResult {
-
+  type: string;
 }
 
 
@@ -26,15 +25,15 @@ export class CreateChatCommand extends Command {
   }
 }
 
-export class SendPromptCommand extends Command {
-  readonly type = 'SendPromptCommand' as const;
+export class SendMessageCommand extends Command {
+  readonly type = 'SendMessageCommand' as const;
 
-  constructor(public chatId: string, public prompt: Prompt) {
+  constructor(public chatId: string, public message: Message) {
     super();
   }
 }
 
-export class GetChatHistoryQuery extends Query {
+export class GetChatQuery extends Query {
   readonly type = 'GetChatHistoryQuery' as const;
 
   constructor(public chatId: string) {
@@ -44,16 +43,19 @@ export class GetChatHistoryQuery extends Query {
 
 
 export interface CreateChatCommandResult extends CommandResult {
+  type: 'CreateChatCommandResult';
   chatId: string;
   message: Message;
 }
 
 export interface SendMessageCommandResult extends CommandResult {
+  type: 'SendMessageCommandResult';
   chatId: string;
   message: Message;
 }
 
-export interface GetChatHistoryQueryResult extends QueryResult {
+export interface GetChatQueryResult extends QueryResult {
+  type: 'GetChatQueryResult';
   chatId: string;
   messages: Message[];
 }
@@ -61,17 +63,24 @@ export interface GetChatHistoryQueryResult extends QueryResult {
 
 export type AgentCommand =
   | CreateChatCommand
-  | SendPromptCommand;
+  | SendMessageCommand;
 
-export type AgentResult =
+export type AgentCommandResult =
   | CreateChatCommandResult
   | SendMessageCommandResult;
+
+export type AgentQuery =
+  GetChatQuery;
+
+export type AgentQueryResult =
+  GetChatQueryResult;
 
 
 export interface Message {
   id?: string;
-  role: 'agent' | 'user';
-  data: string;
+  role: 'AGENT' | 'USER';
+  content: string;
+  status?: 'sending' | 'sent' | 'error';
 }
 
 export interface ChatState {
@@ -79,4 +88,10 @@ export interface ChatState {
   messages: Message[];
   loading: boolean;
   error?: string;
+  isTyping?: boolean;
+  currentUserMessage?: string;
+}
+
+export interface Prompt {
+  text: string;
 }

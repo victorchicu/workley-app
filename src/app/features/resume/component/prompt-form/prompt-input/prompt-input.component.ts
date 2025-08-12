@@ -1,18 +1,14 @@
-import {Component, EventEmitter, Inject, Input, Output, PLATFORM_ID} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   FormsModule,
-  ReactiveFormsModule, UntypedFormBuilder, Validators
+  ReactiveFormsModule, Validators
 } from '@angular/forms';
 import {AsyncPipe} from '@angular/common';
 import {LoaderService} from '../../../../../core/application/loader.service';
 import {Observable} from 'rxjs';
-
-export interface Prompt {
-  text: string,
-}
 
 export interface PromptControl {
   text: FormControl<string>;

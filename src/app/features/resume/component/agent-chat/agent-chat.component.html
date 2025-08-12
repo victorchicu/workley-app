@@ -1,8 +1,47 @@
 <div class="flex flex-col" style="height: 100%;">
-  <div class="flex-1 overflow-y-auto">
+  <div *ngIf="error$ | async as error" class="error-banner">
+    <span>{{ error }}</span>
+    <button (click)="clearError()" class="retry-button">Dismiss</button>
+  </div>
+
+  <div #scrollContainer class="flex-1 overflow-y-auto">
     <div class="w-full max-w-3xl mx-auto px-4 pt-6 pb-4">
-      <div
-        class="flex gap-3 mb-4">
+      <div *ngFor="let message of messages$ | async;"
+           class="message-enter">
+
+        <div *ngIf="message.role === 'USER'" class="flex gap-3 mb-4 justify-end">
+          <div class="max-w-[70%]">
+            <div class="bg-blue-600 text-white rounded-2xl px-4 py-3 inline-block"
+                 [class.opacity-50]="message.status === 'sending'">
+              {{ message.content }}
+              <span *ngIf="message.status === 'error'"
+                    class="ml-2 text-red-200 cursor-pointer"
+                    (click)="onRetryMessage(message)"
+                    title="Click to retry">
+                  ⚠️ Failed - Click to retry
+                </span>
+            </div>
+          </div>
+          <div
+            class="rounded-full w-8 h-8 bg-blue-600 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
+            U
+          </div>
+        </div>
+
+        <div *ngIf="message.role === 'AGENT'" class="flex gap-3 mb-4">
+          <div
+            class="rounded-full w-8 h-8 bg-neutral-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
+            A
+          </div>
+          <div class="max-w-[70%]">
+            <div class="bg-neutral-100 rounded-2xl px-4 py-3 inline-block">
+              {{ message.content }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isTyping$ | async" class="flex gap-3 mb-4 message-enter">
         <div
           class="rounded-full w-8 h-8 bg-neutral-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
           A
@@ -19,56 +58,15 @@
   </div>
 
   <div class="w-full px-4 bg-white">
-    <div class="w-full max-w-3xl mx-auto">
-      <app-prompt-input>
-        <div class="flex items-center justify-end mt-auto px-2 pb-2">
-          <app-send-message/>
+    <div class="w-full max-w-3xl mx-auto py-4">
+      <app-prompt-input
+        (submit)="onSendMessage()">
+        <div class="flex items-center justify-end mt-2 px-2">
+          <app-send-message
+            (click)="onSendMessage()"/>
         </div>
       </app-prompt-input>
       <app-prompt-bottom-text/>
     </div>
   </div>
 </div>
-
-<style>
-  @keyframes bounce {
-    0%, 60%, 100% {
-      transform: translateY(0);
-    }
-    30% {
-      transform: translateY(-10px);
-    }
-  }
-
-  .typing-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #6b7280;
-    animation: bounce 1.4s infinite;
-  }
-
-  /* Smooth scrolling */
-  .overflow-y-auto {
-    scroll-behavior: smooth;
-  }
-
-  /* Custom scrollbar styles (optional) */
-  .overflow-y-auto::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .overflow-y-auto::-webkit-scrollbar-track {
-    background: #f3f4f6;
-  }
-
-  .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
-  }
-
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-  }
-</style>

@@ -3,13 +3,13 @@
     <div class="relative">
       <app-prompt-headline/>
       <app-prompt-input
-        #prompt
+        #message
         placeholder="Let me know the field, I'll build something great"
         (onPressEnter)="handlePrompt($event)"
       >
         <div class="flex items-center justify-between mt-auto px-2 pb-2">
           <app-upload-resume/>
-          <app-build-resume (onClick)="handlePrompt(prompt.form)" [activated]="prompt.form.valid">
+          <app-build-resume (onClick)="handlePrompt(message.form)" [activated]="message.form.valid">
             <span class="text-sm font-medium">Create Resume</span>
           </app-build-resume>
         </div>

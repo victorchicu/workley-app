@@ -1,4 +1,4 @@
-<div class="relative w-full max-w-2xl mx-auto">
+<div class="relative w-full mx-auto">
   <form [formGroup]="form"
         class="relative flex flex-col w-full bg-white rounded-3xl border border-neutral-200 shadow-sm shadow-neutral-300/50 overflow-hidden"
         [class.opacity-50]="(loading$ | async) || deactivated"
@@ -7,9 +7,10 @@
     <fieldset [disabled]="(loading$ | async) || deactivated">
       <div class="flex items-start w-full mb-2 px-4 pt-4 overflow-hidden">
         <textarea
+          id="prompt"
           rows="1"
           style="field-sizing: content; word-break: break-word; overflow-wrap: break-word;"
-          class="w-full text-neutral-950 bg-transparent focus:outline-none placeholder-neutral-400 resize-none overflow-y-auto max-h-[120px] p-0"
+          class="w-full text-neutral-950 bg-transparent focus:outline-none placeholder-neutral-400 resize-none overflow-y-auto min-h-[48px] max-h-[120px] p-0"
           autocomplete="off"
           formControlName="text"
           (keydown)="onKeyDown($event)"

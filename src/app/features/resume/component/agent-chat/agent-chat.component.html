@@ -21,7 +21,7 @@
 
         <ng-container *ngIf="message.sender === 'agent'">
           <div
-            class="rounded-full w-8 h-8 bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
+            class="rounded-full w-8 h-8 bg-neutral-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
             A
           </div>
           <div class="flex-1 max-w-[80%]">
@@ -37,7 +37,7 @@
         <ng-container *ngIf="message.sender === 'user'">
           <div class="flex-1 max-w-[80%]">
             <div class="flex justify-end">
-              <div class="bg-blue-500 text-white rounded-2xl px-4 py-3 inline-block"
+              <div class="bg-neutral-500 text-white rounded-2xl px-4 py-3 inline-block"
                    [ngClass]="{
                      'opacity-70': message.status === 'sending',
                      'bg-red-500': message.status === 'error'
@@ -71,7 +71,7 @@
       <div
         class="flex gap-3 mb-4">
         <div
-          class="rounded-full w-8 h-8 bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
+          class="rounded-full w-8 h-8 bg-neutral-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-medium">
           A
         </div>
         <div class="bg-neutral-100 rounded-2xl px-4 py-3 inline-block">
@@ -86,7 +86,7 @@
   </div>
 
   <div class="w-full px-4 bg-white">
-    <div class="w-full max-w-2xl mx-auto py-4">
+    <div class="w-full max-w-3xl mx-auto">
       <app-prompt-input>
         <div class="flex items-center justify-end mt-auto px-2 pb-2">
           <app-send-message/>

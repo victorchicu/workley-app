@@ -7,11 +7,11 @@ import {UploadResumeComponent} from './action-buttons/upload-resume/upload-resum
 import {delay, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {LoaderService} from '../../../../core/application/loader.service';
-import {AgentService} from '../../../../core/application/agent/agent.service';
 import {
   AgentCommandResult,
   Prompt
 } from '../../../../core/application/agent/agent.models';
+import {AgentChatService} from '../agent-chat/agent-chat.service';
 
 @Component({
   selector: 'app-resume-page',
@@ -33,7 +33,7 @@ export class PromptFormComponent {
   constructor(
     private readonly router: Router,
     private readonly loader: LoaderService,
-    private readonly agentService: AgentService,
+    private readonly agentService: AgentChatService,
   ) {
     this.loading$ = this.loader.loading$;
   }

@@ -20,7 +20,7 @@ export interface CommandResult {
 export class CreateChatCommand extends Command {
   readonly type = 'CreateChatCommand' as const;
 
-  constructor(public prompt: Prompt) {
+  constructor(public prompt: string) {
     super();
   }
 }
@@ -78,9 +78,8 @@ export type GetQueryResult =
 
 export interface Message {
   id?: string;
-  role: 'AGENT' | 'USER';
+  actor: string;
   content: string;
-  status?: 'sending' | 'sent' | 'error';
 }
 
 export interface ChatState {
@@ -89,9 +88,4 @@ export interface ChatState {
   loading: boolean;
   error?: string;
   isTyping?: boolean;
-  currentUserMessage?: string;
-}
-
-export interface Prompt {
-  text: string;
 }

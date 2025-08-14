@@ -2,7 +2,6 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
 import {LoaderService} from '../../../../../shared/service/loader.service';
 import {Observable} from 'rxjs';
-import {Prompt} from '../../../../../core/application/models/agent.models';
 
 @Component({
   selector: 'app-create-resume-button',
@@ -18,7 +17,7 @@ import {Prompt} from '../../../../../core/application/models/agent.models';
 export class CreateResumeButtonComponent {
 
   @Input() activated: boolean = true;
-  @Output() onClick: EventEmitter<Prompt> = new EventEmitter<Prompt>();
+  @Output() onClick: EventEmitter<String> = new EventEmitter<String>();
 
   loading$: Observable<boolean>;
 

@@ -5,7 +5,7 @@ import {GetQuery, GetQueryResult} from '../models/agent.models';
 @Injectable({
   providedIn: 'root'
 })
-export class GetChatQueryService {
+export class ChatQueryService {
 
   readonly apiBaseUrl: string = '/api/chats';
 

@@ -8,10 +8,13 @@ import {delay, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {LoaderService} from '../../shared/service/loader.service';
 import {
-  ActionCommandResult,
-  Prompt
+  ActionCommandResult, CreateChatCommand
 } from '../../core/application/models/agent.models';
-import {ResumeChatService} from '../resume-chat/service/resume-chat.service';
+import {CommandService} from '../../core/application/service/command.service';
+
+interface Prompt {
+  text: string;
+}
 
 @Component({
   selector: 'app-resume-prompt',
@@ -33,7 +36,7 @@ export class ResumePromptComponent {
   constructor(
     private readonly router: Router,
     private readonly loader: LoaderService,
-    private readonly agentService: ResumeChatService,
+    private readonly commandService: CommandService,
   ) {
     this.loading$ = this.loader.loading$;
   }
@@ -50,7 +53,7 @@ export class ResumePromptComponent {
   private async sendRequest(form: PromptForm): Promise<void> {
     const prompt: Prompt = form.value as Prompt;
     console.log("Sending request with prompt: ", prompt);
-    this.agentService.createChat(prompt)
+    this.commandService.execute(new CreateChatCommand(prompt.text))
       .pipe(
         delay(1000),
         finalize(() => this.loader.setLoading(false))

@@ -17,7 +17,7 @@ export class CommandService {
   }
 
   public execute(command: ActionCommand): Observable<ActionCommandResult> {
-    return this.httpClient.post<ActionCommandResult>(`${this.apiBaseUrl}`, command, {
+    return this.httpClient.post<ActionCommandResult>(this.apiBaseUrl, command, {
       withCredentials: true
     });
   }

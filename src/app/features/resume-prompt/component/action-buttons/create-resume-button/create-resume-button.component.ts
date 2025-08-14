@@ -1,21 +1,21 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
-import {LoaderService} from '../../../../../../core/application/loader.service';
+import {LoaderService} from '../../../../../core/application/loader.service';
 import {Observable} from 'rxjs';
-import {Prompt} from '../../../../../../core/application/agent/agent.models';
+import {Prompt} from '../../../../../core/application/agent/agent.models';
 
 @Component({
-  selector: 'app-build-resume',
+  selector: 'app-create-resume-button',
   standalone: true,
   imports: [
     NgClass,
     NgIf,
     AsyncPipe
   ],
-  templateUrl: './build-resume.component.html',
-  styleUrl: './build-resume.component.css'
+  templateUrl: './create-resume-button.component.html',
+  styleUrl: './create-resume-button.component.css'
 })
-export class BuildResumeComponent {
+export class CreateResumeButtonComponent {
 
   @Input() activated: boolean = true;
   @Output() onClick: EventEmitter<Prompt> = new EventEmitter<Prompt>();

@@ -1,16 +1,16 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {TooltipDirective} from '../../../../../../core/directive/tooltip.directive';
+import {TooltipDirective} from '../../../../../core/directive/tooltip.directive';
 
 @Component({
-  selector: 'app-upload-resume',
+  selector: 'app-upload-file-button',
   standalone: true,
   imports: [
     TooltipDirective,
   ],
-  templateUrl: './upload-resume.component.html',
-  styleUrl: './upload-resume.component.css'
+  templateUrl: './upload-file-button.component.html',
+  styleUrl: './upload-file-button.component.css'
 })
-export class UploadResumeComponent {
+export class UploadFileButtonComponent {
 
   @Output() onClick: EventEmitter<void> = new EventEmitter<void>();
 

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-prompt-headline',
+  selector: 'app-headline-text',
   standalone: true,
   imports: [],
   templateUrl: './prompt-headline.component.html',

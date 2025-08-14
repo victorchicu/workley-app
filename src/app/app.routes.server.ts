@@ -1,5 +1,4 @@
 import {RenderMode, ServerRoute} from '@angular/ssr';
-import {ErrorComponent} from './shared/component/error/error.component';
 
 export const serverRoutes: ServerRoute[] = [
   {

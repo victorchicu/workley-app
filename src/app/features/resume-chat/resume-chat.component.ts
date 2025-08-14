@@ -3,37 +3,37 @@ import {
   ChangeDetectionStrategy,
   Component, ElementRef, OnDestroy, OnInit, ViewChild,
 } from '@angular/core';
-import {PromptInputComponent} from '../prompt-form/prompt-input/prompt-input.component';
-import {PromptBottomTextComponent} from '../prompt-form/prompt-bottom-text/prompt-bottom-text.component';
-import {SendMessageComponent} from '../prompt-form/action-buttons/send-message/send-message.component';
+import {PromptInputComponent} from '../resume-prompt/component/prompt-input/prompt-input.component';
+import {ChatDisclaimerComponent} from './component/chat-disclaimer/chat-disclaimer.component';
+import {SendMessageButtonComponent} from './component/action-buttons/send-message-button/send-message-button.component';
 import {Navigation, Router} from '@angular/router';
-import {AgentService} from '../../../../core/application/agent/agent.service';
+import {AgentService} from '../../core/application/agent/agent.service';
 import {
   CreateChatCommandResult,
   Message,
   Prompt,
   SendMessageCommandResult
-} from '../../../../core/application/agent/agent.models';
+} from '../../core/application/agent/agent.models';
 import {Observable, Subject, takeUntil} from 'rxjs';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
-import {AgentChatService} from './agent-chat.service';
+import {ResumeChatService} from './service/resume-chat.service';
 
 @Component({
-  selector: 'app-agent-chat',
+  selector: 'app-chat-assistant',
   standalone: true,
   imports: [
-    PromptInputComponent,
-    PromptBottomTextComponent,
-    SendMessageComponent,
+    ChatDisclaimerComponent,
+    SendMessageButtonComponent,
     NgForOf,
     NgIf,
     AsyncPipe,
+    PromptInputComponent,
   ],
-  templateUrl: './agent-chat.component.html',
-  styleUrl: './agent-chat.component.css',
+  templateUrl: './resume-chat.component.html',
+  styleUrl: './resume-chat.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class ResumeChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   private destroy$ = new Subject<void>();
@@ -47,7 +47,7 @@ export class AgentChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   currentMessage = '';
 
-  constructor(private router: Router, private agentChatService: AgentChatService) {
+  constructor(private router: Router, private agentChatService: ResumeChatService) {
     this.messages$ = this.agentChatService.messages$;
     this.loading$ = this.agentChatService.loading$;
     this.isTyping$ = this.agentChatService.isTyping$;

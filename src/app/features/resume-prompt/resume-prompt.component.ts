@@ -1,39 +1,39 @@
 import {Component} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {PromptHeadlineComponent} from './prompt-headline/prompt-headline.component';
-import {PromptInputComponent, PromptForm} from './prompt-input/prompt-input.component';
-import {BuildResumeComponent} from './action-buttons/build-resume/build-resume.component';
-import {UploadResumeComponent} from './action-buttons/upload-resume/upload-resume.component';
+import {PromptHeadlineComponent} from './component/prompt-headline/prompt-headline.component';
+import {PromptInputComponent, PromptForm} from './component/prompt-input/prompt-input.component';
+import {CreateResumeButtonComponent} from './component/action-buttons/create-resume-button/create-resume-button.component';
+import {UploadFileButtonComponent} from './component/action-buttons/upload-file-button/upload-file-button.component';
 import {delay, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
-import {LoaderService} from '../../../../core/application/loader.service';
+import {LoaderService} from '../../core/application/loader.service';
 import {
   AgentCommandResult,
   Prompt
-} from '../../../../core/application/agent/agent.models';
-import {AgentChatService} from '../agent-chat/agent-chat.service';
+} from '../../core/application/agent/agent.models';
+import {ResumeChatService} from '../resume-chat/service/resume-chat.service';
 
 @Component({
-  selector: 'app-resume-page',
+  selector: 'app-resume-prompt',
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
     PromptHeadlineComponent,
     PromptInputComponent,
-    BuildResumeComponent,
-    UploadResumeComponent
+    CreateResumeButtonComponent,
+    UploadFileButtonComponent
   ],
-  templateUrl: './prompt-form.component.html',
-  styleUrl: './prompt-form.component.css',
+  templateUrl: './resume-prompt.component.html',
+  styleUrl: './resume-prompt.component.css',
 })
-export class PromptFormComponent {
+export class ResumePromptComponent {
   loading$: Observable<boolean>;
 
   constructor(
     private readonly router: Router,
     private readonly loader: LoaderService,
-    private readonly agentService: AgentChatService,
+    private readonly agentService: ResumeChatService,
   ) {
     this.loading$ = this.loader.loading$;
   }

@@ -7,14 +7,14 @@ import {
   CreateChatCommandResult, GetChatQuery, GetChatQueryResult,
   Message,
   Prompt, SendMessageCommand, SendMessageCommandResult
-} from '../../../../core/application/agent/agent.models';
+} from '../../../core/application/agent/agent.models';
 import {HttpClient} from '@angular/common/http';
-import {AgentService} from '../../../../core/application/agent/agent.service';
+import {AgentService} from '../../../core/application/agent/agent.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AgentChatService {
+export class ResumeChatService {
 
   readonly apiBaseUrl: string = '/api';
   private readonly _state: BehaviorSubject<ChatState> = new BehaviorSubject<ChatState>({

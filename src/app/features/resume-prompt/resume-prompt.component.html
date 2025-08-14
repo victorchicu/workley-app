@@ -1,17 +1,17 @@
 <div class="min-h-screen flex flex-col items-center justify-center -mt-24">
   <div class="w-full max-w-3xl px-4">
     <div class="relative">
-      <app-prompt-headline/>
+      <app-headline-text/>
       <app-prompt-input
         #message
         placeholder="Let me know the field, I'll build something great"
         (onPressEnter)="handlePrompt($event)"
       >
         <div class="flex items-center justify-between mt-auto px-2 pb-2">
-          <app-upload-resume/>
-          <app-build-resume (onClick)="handlePrompt(message.form)" [activated]="message.form.valid">
+          <app-upload-file-button/>
+          <app-create-resume-button (onClick)="handlePrompt(message.form)" [activated]="message.form.valid">
             <span class="text-sm font-medium">Create Resume</span>
-          </app-build-resume>
+          </app-create-resume-button>
         </div>
       </app-prompt-input>
     </div>

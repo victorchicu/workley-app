@@ -62,11 +62,10 @@
       <app-prompt-input
         (submit)="onSendMessage()">
         <div class="flex items-center justify-end mt-2 px-2">
-          <app-send-message
-            (click)="onSendMessage()"/>
+          <app-send-message-button (click)="onSendMessage()"/>
         </div>
       </app-prompt-input>
-      <app-prompt-bottom-text/>
+      <app-chat-disclaimer/>
     </div>
   </div>
 </div>

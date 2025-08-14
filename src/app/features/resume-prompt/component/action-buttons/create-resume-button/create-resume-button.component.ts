@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
-import {LoaderService} from '../../../../../core/application/loader.service';
+import {LoaderService} from '../../../../../shared/service/loader.service';
 import {Observable} from 'rxjs';
-import {Prompt} from '../../../../../core/application/agent/agent.models';
+import {Prompt} from '../../../../../core/application/models/agent.models';
 
 @Component({
   selector: 'app-create-resume-button',

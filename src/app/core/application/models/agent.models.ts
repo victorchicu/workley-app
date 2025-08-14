@@ -34,7 +34,7 @@ export class SendMessageCommand extends Command {
 }
 
 export class GetChatQuery extends Query {
-  readonly type = 'GetChatHistoryQuery' as const;
+  readonly type = 'GetChatQuery' as const;
 
   constructor(public chatId: string) {
     super();
@@ -61,18 +61,18 @@ export interface GetChatQueryResult extends QueryResult {
 }
 
 
-export type AgentCommand =
+export type ActionCommand =
   | CreateChatCommand
   | SendMessageCommand;
 
-export type AgentCommandResult =
+export type ActionCommandResult =
   | CreateChatCommandResult
   | SendMessageCommandResult;
 
-export type AgentQuery =
+export type GetQuery =
   GetChatQuery;
 
-export type AgentQueryResult =
+export type GetQueryResult =
   GetChatQueryResult;
 
 

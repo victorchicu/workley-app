@@ -7,13 +7,13 @@ import {PromptInputComponent} from '../resume-prompt/component/prompt-input/prom
 import {ChatDisclaimerComponent} from './component/chat-disclaimer/chat-disclaimer.component';
 import {SendMessageButtonComponent} from './component/action-buttons/send-message-button/send-message-button.component';
 import {Navigation, Router} from '@angular/router';
-import {AgentService} from '../../core/application/agent/agent.service';
+import {CommandService} from '../../core/application/service/command.service';
 import {
   CreateChatCommandResult,
   Message,
   Prompt,
   SendMessageCommandResult
-} from '../../core/application/agent/agent.models';
+} from '../../core/application/models/agent.models';
 import {Observable, Subject, takeUntil} from 'rxjs';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {ResumeChatService} from './service/resume-chat.service';

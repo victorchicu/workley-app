@@ -6,11 +6,11 @@ import {CreateResumeButtonComponent} from './component/action-buttons/create-res
 import {UploadFileButtonComponent} from './component/action-buttons/upload-file-button/upload-file-button.component';
 import {delay, finalize, Observable} from 'rxjs';
 import {Router} from '@angular/router';
-import {LoaderService} from '../../core/application/loader.service';
+import {LoaderService} from '../../shared/service/loader.service';
 import {
-  AgentCommandResult,
+  ActionCommandResult,
   Prompt
-} from '../../core/application/agent/agent.models';
+} from '../../core/application/models/agent.models';
 import {ResumeChatService} from '../resume-chat/service/resume-chat.service';
 
 @Component({
@@ -56,7 +56,7 @@ export class ResumePromptComponent {
         finalize(() => this.loader.setLoading(false))
       )
       .subscribe({
-        next: (result: AgentCommandResult) => {
+        next: (result: ActionCommandResult) => {
           console.log('Prompt result:', result);
           if (result.chatId) {
             this.router.navigate(['/chat', result.chatId], {

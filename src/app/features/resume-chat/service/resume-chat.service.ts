@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, catchError, finalize, map, Observable, shareReplay, tap, throwError} from 'rxjs';
 import {
-  AgentCommand, AgentCommandResult, AgentQuery, AgentQueryResult,
+  ActionCommand, ActionCommandResult, GetQuery, GetQueryResult,
   ChatState,
   CreateChatCommand,
   CreateChatCommandResult, GetChatQuery, GetChatQueryResult,
   Message,
   Prompt, SendMessageCommand, SendMessageCommandResult
-} from '../../../core/application/agent/agent.models';
+} from '../../../core/application/models/agent.models';
 import {HttpClient} from '@angular/common/http';
-import {AgentService} from '../../../core/application/agent/agent.service';
+import {CommandService} from '../../../core/application/service/command.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +30,7 @@ export class ResumeChatService {
   readonly isTyping$: Observable<boolean | undefined> = this.state$.pipe(map(state => state.isTyping));
   readonly error$: Observable<string | undefined> = this.state$.pipe(map(state => state.error));
 
-  constructor(private readonly agentService: AgentService) {
+  constructor(private readonly agentService: CommandService) {
   }
 
   initializeChat(chatId: string, initialMessage?: Message): void {
@@ -118,10 +118,10 @@ export class ResumeChatService {
       })) as Observable<GetChatQueryResult>;
   }
 
-  private executeCommand(command: AgentCommand): Observable<AgentCommandResult> {
-    const request$: Observable<AgentCommandResult> = this.agentService.executeCommand(command);
+  private executeCommand(command: ActionCommand): Observable<ActionCommandResult> {
+    const request$: Observable<ActionCommandResult> = this.agentService.execute(command);
     return request$.pipe(
-      tap((result: AgentCommandResult) => this.reduce(result)),
+      tap((result: ActionCommandResult) => this.reduce(result)),
       catchError(err => {
         this.patch({error: normalizeError(err)});
         const messages = this._state.value.messages;
@@ -136,7 +136,7 @@ export class ResumeChatService {
     );
   }
 
-  private executeQuery(query: AgentQuery): Observable<AgentQueryResult> {
+  private executeQuery(query: GetQuery): Observable<GetQueryResult> {
     return this.agentService.getChatQuery(query.chatId).pipe(
       catchError(err => {
         this.patch({error: normalizeError(err)});
@@ -147,7 +147,7 @@ export class ResumeChatService {
     );
   }
 
-  private reduce(result: AgentCommandResult) {
+  private reduce(result: ActionCommandResult) {
     switch (result.type) {
       case 'CreateChatCommandResult':
         // Chat ID and initial message are already handled in createChat

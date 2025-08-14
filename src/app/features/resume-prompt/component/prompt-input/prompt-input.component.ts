@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule, Validators
 } from '@angular/forms';
 import {AsyncPipe} from '@angular/common';
-import {LoaderService} from '../../../../core/application/loader.service';
+import {LoaderService} from '../../../../shared/service/loader.service';
 import {Observable} from 'rxjs';
 
 export interface PromptControl {

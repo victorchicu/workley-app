@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import {ResumePromptComponent} from './features/resume-prompt/resume-prompt.component';
-import {ChatAssistantComponent} from './features/chat-assistant/chat-assistant.component';
+import {PromptPageComponent} from './features/resume-prompt/pages/prompt-page.component';
+import {ChatPageComponent} from './features/resume-chat/pages/chat-page.component';
 import {
   ErrorComponent
 } from './shared/component/error/error.component';
@@ -8,12 +8,12 @@ import {
 export const routes: Routes = [
   {
     path: '',
-    component: ResumePromptComponent,
+    component: PromptPageComponent,
     title: 'Free Resume Builder | Create Resume',
   },
   {
     path: 'chat/:chatId',
-    component: ChatAssistantComponent,
+    component: ChatPageComponent,
     title: 'Free Resume Builder | Agent Chat',
   },
   {

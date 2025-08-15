@@ -1,0 +1,20 @@
+<div class="min-h-screen flex flex-col items-center justify-center -mt-24">
+  <div class="w-full max-w-3xl px-4">
+    <div class="relative">
+      <app-prompt-headline/>
+      <app-prompt-input
+        [form]="promptService.form"
+        placeholder="Let me know the field, I'll build something great"
+        (onKeyDown)="promptService.submitPrompt()"
+      >
+        <app-prompt-actions/>
+      </app-prompt-input>
+
+      @if (promptService.error()) {
+        <div class="mt-4 p-4 bg-red-50 text-red-600 rounded-lg">
+          {{ promptService.error() }}
+        </div>
+      }
+    </div>
+  </div>
+</div>

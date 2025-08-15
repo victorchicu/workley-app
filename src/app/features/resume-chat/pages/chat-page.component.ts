@@ -2,14 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component
 } from '@angular/core';
-import {PromptInputComponent} from '../resume-prompt/component/prompt-input/prompt-input.component';
-import {ChatDisclaimerComponent} from './component/chat-disclaimer/chat-disclaimer.component';
-import {SendMessageButtonComponent} from './component/action-buttons/send-message-button/send-message-button.component';
+import {PromptInputComponent} from '../../resume-prompt/components/prompt-input/prompt-input.component';
+import {ChatDisclaimerComponent} from '../components/chat-disclaimer/chat-disclaimer.component';
+import {SendMessageButtonComponent} from '../components/action-buttons/send-message-button/send-message-button.component';
 import {Navigation, Router} from '@angular/router';
 import {
   ChatState,
   CreateChatCommandResult, Message
-} from '../../core/application/models/agent.models';
+} from '../../../core/application/models/agent.models';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {BehaviorSubject, map, Observable, shareReplay} from 'rxjs';
 
@@ -24,11 +24,11 @@ import {BehaviorSubject, map, Observable, shareReplay} from 'rxjs';
     NgForOf,
     AsyncPipe,
   ],
-  templateUrl: './chat-assistant.component.html',
-  styleUrl: './chat-assistant.component.css',
+  templateUrl: './chat-page.component.html',
+  styleUrl: './chat-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChatAssistantComponent {
+export class ChatPageComponent {
   private readonly _state: BehaviorSubject<ChatState> = new BehaviorSubject<ChatState>({
     messages: [],
     loading: false,

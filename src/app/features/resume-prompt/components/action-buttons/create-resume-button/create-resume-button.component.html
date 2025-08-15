@@ -1,17 +1,17 @@
 <button
   type="submit"
-  class="relative px-4 py-2 flex items-center justify-center gap-2 rounded-full cursor-pointer group "
+  class="relative px-4 py-2 flex items-center justify-center gap-2 rounded-full cursor-pointer group"
   aria-label="Create Resume"
   [ngClass]="{
     'bg-neutral-900 text-white': activated,
     'bg-white text-neutral-900': !activated,
-    'opacity-75 cursor-not-allowed': loading$ | async
+    'opacity-75 cursor-not-allowed': promptService.loading$ | async
   }"
-  [disabled]="!activated || (loading$ | async)"
+  [disabled]="!activated || (promptService.loading$ | async)"
   (click)="handleClick()"
 >
   <svg
-    *ngIf="loading$ | async"
+    *ngIf="promptService.loading$ | async"
     class="animate-spin h-5 w-5"
     [ngClass]="{
       'text-white': activated,
@@ -29,7 +29,7 @@
   </svg>
 
   <svg
-    *ngIf="!(loading$ | async)"
+    *ngIf="!(promptService.loading$ | async)"
     width="24px"
     height="24px"
     viewBox="0 0 24 24"

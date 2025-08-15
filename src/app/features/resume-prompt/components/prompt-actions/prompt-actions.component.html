@@ -1,0 +1,26 @@
+<div class="flex items-center justify-between mt-auto px-2 pb-2">
+  <div class="flex items-center gap-2">
+    <app-upload-file-button
+      (onFileSelected)="promptService.uploadFile($event)"
+    />
+    @if (promptService.fileName()) {
+      <span class="text-sm text-gray-600">
+        {{ promptService.fileName() }}
+        <button
+          (click)="promptService.removeFile()"
+          class="ml-2 text-red-500 hover:text-red-700"
+          type="button">
+          ×
+        </button>
+      </span>
+    }
+  </div>
+  <app-create-resume-button
+    (onClick)="promptService.submitPrompt()"
+    [activated]="promptService.form.valid"
+  >
+    <span class="text-sm font-medium">
+      {{ (promptService.loading$ | async) ? 'Creating...' : 'Create Resume' }}
+    </span>
+  </app-create-resume-button>
+</div>

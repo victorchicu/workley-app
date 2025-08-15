@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule, Validators
 } from '@angular/forms';
 import {AsyncPipe} from '@angular/common';
-import {LoaderService} from '../../../../shared/service/loader.service';
+import {SpinnerService} from '../../../../shared/services/spinner.service';
 import {Observable} from 'rxjs';
 import {PromptForm, ResumePromptService} from '../../services/resume-prompt.service';
 

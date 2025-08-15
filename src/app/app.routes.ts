@@ -3,7 +3,7 @@ import {PromptPageComponent} from './features/resume-prompt/pages/prompt-page.co
 import {ChatPageComponent} from './features/resume-chat/pages/chat-page.component';
 import {
   ErrorComponent
-} from './shared/component/error/error.component';
+} from './shared/components/error/error.component';
 
 export const routes: Routes = [
   {

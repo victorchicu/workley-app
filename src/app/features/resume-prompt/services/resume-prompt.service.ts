@@ -1,10 +1,10 @@
 import {computed, inject, Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {CommandService} from '../../../core/application/service/command.service';
-import {LoaderService} from '../../../shared/service/loader.service';
+import {CommandService} from '../../../shared/services/command.service';
+import {SpinnerService} from '../../../shared/services/spinner.service';
 import {delay, finalize, Observable} from 'rxjs';
-import {CreateChatCommand} from '../../../core/application/models/agent.models';
+import {CreateChatCommand} from '../../../shared/models/agent.models';
 
 export interface PromptControl {
   text: FormControl<string>;
@@ -21,10 +21,12 @@ interface Prompt {
 })
 export class ResumePromptService {
   private router = inject(Router);
-  private commandService = inject(CommandService);
-  private loaderService = inject(LoaderService);
-  private formBuilder = inject(FormBuilder);
+  private loaderService: SpinnerService = inject(SpinnerService);
+  private commandService: CommandService = inject(CommandService);
 
+  readonly loading$: Observable<boolean> = this.loaderService.loading$;
+
+  private formBuilder = inject(FormBuilder);
   readonly form: PromptForm = this.formBuilder.group({
     text: new FormControl<string>('', {
       nonNullable: true,
@@ -35,14 +37,11 @@ export class ResumePromptService {
       ]
     })
   });
-
   private readonly _error: WritableSignal<string | null> = signal<string | null>(null);
-  private readonly _uploadedFile: WritableSignal<File | null> = signal<File | null>(null);
-
   readonly error: Signal<string | null> = this._error.asReadonly();
-  readonly loading$: Observable<boolean> = this.loaderService.loading$;
-  readonly uploadedFile: Signal<File | null> = this._uploadedFile.asReadonly();
+  private readonly _uploadedFile: WritableSignal<File | null> = signal<File | null>(null);
   readonly fileName: Signal<string | null> = computed(() => this._uploadedFile()?.name ?? null);
+  readonly uploadedFile: Signal<File | null> = this._uploadedFile.asReadonly();
 
   constructor() {
   }

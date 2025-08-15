@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {MainComponent} from './shared/component/main/main.component';
+import {MainComponent} from './shared/components/main/main.component';
 
 @Component({
   selector: 'app-root',

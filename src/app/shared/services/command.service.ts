@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 import {
   ActionCommand,
   ActionCommandResult, GetQueryResult,
-} from '../models/agent.models';
+} from '../models/api.objects';
 
 @Injectable({
   providedIn: 'root'

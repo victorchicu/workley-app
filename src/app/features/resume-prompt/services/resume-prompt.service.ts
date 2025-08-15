@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {CommandService} from '../../../shared/services/command.service';
 import {SpinnerService} from '../../../shared/services/spinner.service';
 import {delay, finalize, Observable} from 'rxjs';
-import {CreateChatCommand} from '../../../shared/models/agent.models';
+import {CreateChatCommand} from '../../../shared/models/api.objects';
 
 export interface PromptControl {
   text: FormControl<string>;

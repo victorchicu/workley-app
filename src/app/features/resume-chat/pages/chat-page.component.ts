@@ -9,7 +9,7 @@ import {Navigation, Router} from '@angular/router';
 import {
   ChatState,
   CreateChatCommandResult, Message
-} from '../../../shared/models/agent.models';
+} from '../../../shared/models/api.objects';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {BehaviorSubject, map, Observable, shareReplay} from 'rxjs';
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {GetQuery, GetQueryResult} from '../models/agent.models';
+import {GetQuery, GetQueryResult} from '../models/api.objects';
 
 @Injectable({
   providedIn: 'root'

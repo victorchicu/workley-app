@@ -40,8 +40,7 @@ export class ResumePromptService {
   private readonly _error: WritableSignal<string | null> = signal<string | null>(null);
   readonly error: Signal<string | null> = this._error.asReadonly();
   private readonly _uploadedFile: WritableSignal<File | null> = signal<File | null>(null);
-  readonly fileName: Signal<string | null> = computed(() => this._uploadedFile()?.name ?? null);
-  readonly uploadedFile: Signal<File | null> = this._uploadedFile.asReadonly();
+  readonly filename: Signal<string | null> = computed(() => this._uploadedFile()?.name ?? null);
 
   constructor() {
   }

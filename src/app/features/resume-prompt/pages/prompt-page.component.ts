@@ -3,7 +3,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PromptHeadlineComponent} from '../components/prompt-headline/prompt-headline.component';
 import {PromptInputComponent} from '../components/prompt-input/prompt-input.component';
 import {PromptActionsComponent} from '../components/prompt-actions/prompt-actions.component';
-import {AsyncPipe} from '@angular/common';
 import {ResumePromptService} from '../services/resume-prompt.service';
 
 @Component({
@@ -20,5 +19,5 @@ import {ResumePromptService} from '../services/resume-prompt.service';
   styleUrl: './prompt-page.component.css',
 })
 export class PromptPageComponent {
-  readonly promptService = inject(ResumePromptService);
+  readonly promptService: ResumePromptService = inject(ResumePromptService);
 }

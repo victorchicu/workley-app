@@ -3,9 +3,9 @@
     <app-upload-file-button
       (onFileSelected)="promptService.uploadFile($event)"
     />
-    @if (promptService.fileName()) {
+    @if (promptService.filename()) {
       <span class="text-sm text-gray-600">
-        {{ promptService.fileName() }}
+        {{ promptService.filename() }}
         <button
           (click)="promptService.removeFile()"
           class="ml-2 text-red-500 hover:text-red-700"

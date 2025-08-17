@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
+import {Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild} from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -6,7 +6,7 @@ import {
   FormsModule,
   ReactiveFormsModule, Validators
 } from '@angular/forms';
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {SpinnerService} from '../../../../shared/services/spinner.service';
 import {Observable} from 'rxjs';
 import {PromptForm, ResumePromptService} from '../../services/resume-prompt.service';
@@ -17,7 +17,8 @@ import {PromptForm, ResumePromptService} from '../../services/resume-prompt.serv
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    AsyncPipe
+    AsyncPipe,
+    NgIf
   ],
   templateUrl: './prompt-input.component.html',
   styleUrl: './prompt-input.component.css'
@@ -27,10 +28,32 @@ export class PromptInputComponent {
   @Input() placeholder: string = "How can I help you today?";
   @Input() deactivated: boolean = false;
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
+  @ViewChild('promptTextarea') textareaRef!: ElementRef<HTMLTextAreaElement>;
+
+  hasMultipleLines = false;
 
   readonly promptService = inject(ResumePromptService);
 
+  checkTextareaHeight(): void {
+    const textarea = this.textareaRef.nativeElement;
+
+    // Reset height to auto to get the scroll height
+    textarea.style.height = 'auto';
+    const scrollHeight = textarea.scrollHeight;
+
+    // You can adjust this threshold based on your line height
+    const singleLineHeight = 24; // min-h-[24px] from your CSS
+    this.hasMultipleLines = scrollHeight > singleLineHeight + 8; // +8 for some tolerance
+
+    // Set the actual height
+    textarea.style.height = Math.min(scrollHeight, 120) + 'px'; // max-h-[120px]
+  }
+
   async handleKeyDown(event: KeyboardEvent) {
+    setTimeout(() => {
+      this.checkTextareaHeight();
+    }, 0);
+
     if (event.key === 'Enter' && !event.shiftKey) {
       console.log("On 'Enter' key down: ", this.form);
       event.preventDefault();

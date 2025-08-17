@@ -16,5 +16,7 @@ import {AsyncPipe} from '@angular/common';
   styleUrl: './prompt-actions.component.css'
 })
 export class PromptActionsComponent {
+  @Input() multiLine: boolean = false;
+
   readonly promptService = inject(ResumePromptService);
 }

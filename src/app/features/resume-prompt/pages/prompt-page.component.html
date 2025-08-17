@@ -3,11 +3,12 @@
     <div class="relative">
       <app-prompt-headline/>
       <app-prompt-input
+        #promptInputRef
         [form]="promptService.form"
         placeholder="Let me know the field, I'll build something great"
         (onKeyDown)="promptService.submitPrompt()"
       >
-        <app-prompt-actions/>
+        <app-prompt-actions [multiLine]="promptInputRef.hasMultipleLines"/>
       </app-prompt-input>
 
       @if (promptService.error()) {

@@ -70,6 +70,29 @@ export class PromptInputComponent {
     }
   }
 
+  private getAvailableSpace(): number {
+    const textarea: HTMLTextAreaElement = this.textAreaRef.nativeElement;
+
+    // Try to find the form and measure actual layout
+    const form = textarea.closest('form');
+    if (form) {
+      const formWidth = form.offsetWidth;
+      const formPadding = 32; // px-4 * 2
+
+      // Try to find the actions element
+      const actionsElement = form.querySelector('app-prompt-actions') as HTMLElement;
+      if (actionsElement) {
+        const actionsWidth = actionsElement.offsetWidth;
+        const separatorWidth = 20;
+        return formWidth - formPadding - actionsWidth - separatorWidth;
+      }
+    }
+
+    // Fallback - use textarea width and estimate
+    const textareaContainerWidth = textarea.parentElement?.offsetWidth || textarea.offsetWidth;
+    return textareaContainerWidth * 0.65;
+  }
+
   private wouldTextCollideWithActions(text: string): boolean {
     if (!text.trim()) return false;
 
@@ -100,28 +123,5 @@ export class PromptInputComponent {
     const buffer = 10;
 
     return textWidth > (availableSpace - buffer);
-  }
-
-  private getAvailableSpace(): number {
-    const textarea: HTMLTextAreaElement = this.textAreaRef.nativeElement;
-
-    // Try to find the form and measure actual layout
-    const form = textarea.closest('form');
-    if (form) {
-      const formWidth = form.offsetWidth;
-      const formPadding = 32; // px-4 * 2
-
-      // Try to find the actions element
-      const actionsElement = form.querySelector('app-prompt-actions') as HTMLElement;
-      if (actionsElement) {
-        const actionsWidth = actionsElement.offsetWidth;
-        const separatorWidth = 20;
-        return formWidth - formPadding - actionsWidth - separatorWidth;
-      }
-    }
-
-    // Fallback - use textarea width and estimate
-    const textareaContainerWidth = textarea.parentElement?.offsetWidth || textarea.offsetWidth;
-    return textareaContainerWidth * 0.65;
   }
 }

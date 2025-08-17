@@ -1,6 +1,6 @@
 import {
   ChangeDetectionStrategy,
-  Component
+  Component, inject
 } from '@angular/core';
 import {PromptInputComponent} from '../../resume-prompt/components/prompt-input/prompt-input.component';
 import {ChatDisclaimerComponent} from '../components/chat-disclaimer/chat-disclaimer.component';
@@ -12,6 +12,7 @@ import {
 } from '../../../shared/models/api.objects';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {BehaviorSubject, map, Observable, shareReplay} from 'rxjs';
+import {ResumePromptService} from '../../resume-prompt/services/resume-prompt.service';
 
 @Component({
   selector: 'app-chat-assistant',
@@ -29,6 +30,8 @@ import {BehaviorSubject, map, Observable, shareReplay} from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatPageComponent {
+  readonly promptService: ResumePromptService = inject(ResumePromptService);
+
   private readonly _state: BehaviorSubject<ChatState> = new BehaviorSubject<ChatState>({
     messages: [],
     loading: false,
@@ -46,9 +49,5 @@ export class ChatPageComponent {
       const state = navigation.extras.state as CreateChatCommandResult;
       console.log("Chat state: ", state);
     }
-  }
-
-  onSendMessage() {
-
   }
 }

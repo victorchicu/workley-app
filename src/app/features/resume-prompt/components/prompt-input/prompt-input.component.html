@@ -2,15 +2,15 @@
   <form [formGroup]="form"
         class="relative w-full bg-white border border-neutral-200 shadow-sm shadow-neutral-300/50 overflow-hidden"
         [class.rounded-full]="!hasMultipleLines"
-        [class.rounded-4xl]="hasMultipleLines"
+        [class.rounded-3xl]="hasMultipleLines"
         [class.opacity-50]="(promptService.loading$ | async) || deactivated"
         [class.pointer-events-none]="(promptService.loading$ | async) || deactivated"
   >
     <fieldset [disabled]="(promptService.loading$ | async) || deactivated" class="w-full">
-      <div [class]="hasMultipleLines ? 'w-full' : 'flex items-center w-full px-4 py-4'">
-        <div [class]="hasMultipleLines ? 'flex items-center w-full px-4 py-4' : 'flex items-center flex-1'">
+      <div [class]="hasMultipleLines ? 'w-full' : 'flex items-center w-full px-2 py-2'">
+        <div [class]="hasMultipleLines ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
           <textarea
-            #promptTextarea
+            #textAreaRef
             id="message"
             rows="1"
             style="field-sizing: content; word-break: break-word; overflow-wrap: break-word;"
@@ -22,8 +22,7 @@
             [placeholder]="placeholder"
           ></textarea>
         </div>
-
-        <div [class]="hasMultipleLines ? 'px-4 py-3 border-neutral-200' : 'flex items-center'">
+        <div [class]="hasMultipleLines ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
           <ng-content/>
         </div>
       </div>

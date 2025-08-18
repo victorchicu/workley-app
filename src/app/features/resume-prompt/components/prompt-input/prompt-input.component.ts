@@ -123,8 +123,7 @@ export class PromptInputComponent implements OnInit, OnDestroy {
     // Create a temporary span to measure the exact text width
     const measureSpan: HTMLSpanElement = document.createElement('span');
 
-    // Copy the exact font styles from textarea
-    const styles = window.getComputedStyle(textarea);
+    const styles: CSSStyleDeclaration = window.getComputedStyle(textarea);
     measureSpan.style.font = styles.font;
     measureSpan.style.fontSize = styles.fontSize;
     measureSpan.style.fontFamily = styles.fontFamily;
@@ -136,12 +135,12 @@ export class PromptInputComponent implements OnInit, OnDestroy {
     measureSpan.textContent = text;
 
     document.body.appendChild(measureSpan);
-    const textWidth = measureSpan.offsetWidth;
+    const textWidth: number = measureSpan.offsetWidth;
     document.body.removeChild(measureSpan);
 
     const availableSpace = this.getAvailableSpace();
 
-    // Add a small buffer to trigger before actual collision
+    // Buffer to trigger before actual collision
     const buffer = 10;
 
     return textWidth > (availableSpace - buffer);

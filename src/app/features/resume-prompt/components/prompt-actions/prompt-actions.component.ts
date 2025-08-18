@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
+import {Component, inject, Input} from '@angular/core';
 import {CreateResumeButtonComponent} from '../action-buttons/create-resume-button/create-resume-button.component';
 import {UploadFileButtonComponent} from '../action-buttons/upload-file-button/upload-file-button.component';
 import {ResumePromptService} from '../../services/resume-prompt.service';
@@ -16,7 +16,7 @@ import {AsyncPipe} from '@angular/common';
   styleUrl: './prompt-actions.component.css'
 })
 export class PromptActionsComponent {
-  @Input() multiLine: boolean = false;
+  @Input() promptHasMultipleLines: boolean = false;
 
-  readonly promptService = inject(ResumePromptService);
+  readonly promptService: ResumePromptService = inject(ResumePromptService);
 }

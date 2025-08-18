@@ -30,7 +30,7 @@ import {ResumePromptService} from '../../resume-prompt/services/resume-prompt.se
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatPageComponent {
-  readonly promptService: ResumePromptService = inject(ResumePromptService);
+  readonly resumePromptService: ResumePromptService = inject(ResumePromptService);
 
   private readonly _state: BehaviorSubject<ChatState> = new BehaviorSubject<ChatState>({
     messages: [],

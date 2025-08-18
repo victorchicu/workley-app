@@ -18,7 +18,7 @@ export class CreateResumeButtonComponent {
   @Input() activated: boolean = true;
   @Output() onClick: EventEmitter<void> = new EventEmitter<void>();
 
-  readonly promptService = inject(ResumePromptService);
+  readonly resumePromptService: ResumePromptService = inject(ResumePromptService);
 
   handleClick() {
     this.onClick.emit();

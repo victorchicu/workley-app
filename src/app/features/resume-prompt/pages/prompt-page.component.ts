@@ -19,5 +19,5 @@ import {ResumePromptService} from '../services/resume-prompt.service';
   styleUrl: './prompt-page.component.css',
 })
 export class PromptPageComponent {
-  readonly promptService: ResumePromptService = inject(ResumePromptService);
+  readonly resumePromptService: ResumePromptService = inject(ResumePromptService);
 }

@@ -47,11 +47,11 @@
     <div class="w-full max-w-3xl mx-auto">
       <app-prompt-input
         #promptInputRef
-        [form]="promptService.form"
+        [form]="resumePromptService.form"
         placeholder="Ask anything"
-        (submit)="promptService.submitPrompt()">
+        (submit)="resumePromptService.submitPrompt()">
         <div class="flex items-center justify-end px-2">
-          <app-send-message-button (click)="promptService.submitPrompt()"/>
+          <app-send-message-button (click)="resumePromptService.submitPrompt()"/>
         </div>
       </app-prompt-input>
       <app-chat-disclaimer/>

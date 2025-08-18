@@ -23,7 +23,7 @@ export class PromptInputComponent implements OnInit, OnDestroy {
   @Input() placeholder: string = "How can I help you today?";
   @Input() deactivated: boolean = false;
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
-  @ViewChild('textAreaRef') textAreaRef!: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
   promptHasMultipleLines: boolean = false;
 
@@ -45,7 +45,7 @@ export class PromptInputComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  handleKeyDown(event: KeyboardEvent) {
+  handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       console.log("On 'Enter' key down: ", this.form);
       event.preventDefault();
@@ -61,7 +61,7 @@ export class PromptInputComponent implements OnInit, OnDestroy {
   }
 
   onTextCollideWrapNewLine(): void {
-    const textarea: HTMLTextAreaElement = this.textAreaRef.nativeElement;
+    const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
     const content: string = textarea.value;
 
     const hasLineBreaks: boolean = content.includes('\n');
@@ -93,10 +93,10 @@ export class PromptInputComponent implements OnInit, OnDestroy {
   }
 
   private getAvailableSpace(): number {
-    const textarea: HTMLTextAreaElement = this.textAreaRef.nativeElement;
+    const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
 
     // Try to find the form and measure actual layout
-    const form = textarea.closest('form');
+    const form: HTMLFormElement | null = textarea.closest('form');
     if (form) {
       const formWidth = form.offsetWidth;
       const formPadding = 32; // px-4 * 2
@@ -118,7 +118,7 @@ export class PromptInputComponent implements OnInit, OnDestroy {
   private wouldTextCollideWithActions(text: string): boolean {
     if (!text.trim()) return false;
 
-    const textarea: HTMLTextAreaElement = this.textAreaRef.nativeElement;
+    const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
 
     // Create a temporary span to measure the exact text width
     const measureSpan: HTMLSpanElement = document.createElement('span');

@@ -20,9 +20,9 @@ interface Prompt {
   providedIn: 'root'
 })
 export class ResumePromptService {
-  private router = inject(Router);
-  private loaderService: SpinnerService = inject(SpinnerService);
-  readonly loading$: Observable<boolean> = this.loaderService.loading$;
+  private router: Router = inject(Router);
+  private spinnerService: SpinnerService = inject(SpinnerService);
+  readonly loading$: Observable<boolean> = this.spinnerService.loading$;
   private commandService: CommandService = inject(CommandService);
   private promptHasMultipleLinesSubject = new BehaviorSubject<boolean>(false);
   promptHasMultipleLines$: Observable<boolean> = this.promptHasMultipleLinesSubject.asObservable();
@@ -62,11 +62,11 @@ export class ResumePromptService {
   }
 
   async submitPrompt(): Promise<void> {
-    if (this.loaderService.loading || !this.form.valid) {
+    if (this.spinnerService.loading || !this.form.valid) {
       return;
     }
 
-    this.loaderService.setLoading(true);
+    this.spinnerService.setLoading(true);
 
     const prompt: Prompt = this.form.value as Prompt;
     const file = this._uploadedFile();
@@ -79,7 +79,7 @@ export class ResumePromptService {
     this.commandService.execute(new CreateChatCommand(prompt.text))
       .pipe(
         delay(5000),
-        finalize(() => this.loaderService.setLoading(false))
+        finalize(() => this.spinnerService.setLoading(false))
       )
       .subscribe({
         next: (result: any) => {

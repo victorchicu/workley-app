@@ -4,11 +4,11 @@
       <app-prompt-headline/>
       <app-prompt-input
         #promptInputRef
-        [form]="promptService.form"
+        [form]="resumePromptService.form"
         placeholder="I'm a professional skilled in Python and AWS"
-        (onKeyDown)="promptService.submitPrompt()"
+        (onKeyDown)="resumePromptService.submitPrompt()"
       >
-        <app-prompt-actions [multiLine]="promptInputRef.promptHasMultipleLines"/>
+        <app-prompt-actions [promptHasMultipleLines]="promptInputRef.promptHasMultipleLines"/>
       </app-prompt-input>
     </div>
   </div>

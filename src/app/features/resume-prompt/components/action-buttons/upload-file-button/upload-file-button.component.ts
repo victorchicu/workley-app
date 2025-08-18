@@ -15,16 +15,16 @@ export class UploadFileButtonComponent {
   @Output() onFileSelected: EventEmitter<File> = new EventEmitter<File>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  handleClick() {
+  handleClick(): void {
     console.log("Handle upload click");
     this.fileInput?.nativeElement.click();
   }
 
-  onFileChange(event: Event) {
+  onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.onFileSelected.emit(input.files[0]);
-      input.value = ''; // Reset input
+      input.value = '';
     }
   }
 }

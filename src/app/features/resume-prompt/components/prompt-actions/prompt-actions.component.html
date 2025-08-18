@@ -1,4 +1,4 @@
-<div class="flex items-center" [class.justify-end]="multiLine">
+<div class="flex items-center" [class.justify-end]="promptHasMultipleLines">
   <app-upload-file-button
     (onFileSelected)="promptService.uploadFile($event)"
   />

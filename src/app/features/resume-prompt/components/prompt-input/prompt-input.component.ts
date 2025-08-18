@@ -25,7 +25,7 @@ export class PromptInputComponent implements OnInit, OnDestroy {
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('textAreaRef') textAreaRef!: ElementRef<HTMLTextAreaElement>;
 
-  promptHasMultipleLinesPrompt: boolean = false;
+  promptHasMultipleLines: boolean = false;
 
   readonly promptService: ResumePromptService = inject(ResumePromptService);
 
@@ -33,14 +33,14 @@ export class PromptInputComponent implements OnInit, OnDestroy {
   private resumePromptService = inject(ResumePromptService);
 
   ngOnInit(): void {
-    this.promptHasMultipleLinesPrompt = this.resumePromptService.getPromptHasMultipleLines();
+    this.promptHasMultipleLines = this.resumePromptService.getPromptHasMultipleLines();
     this.resumePromptService.promptHasMultipleLines$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(value => this.promptHasMultipleLinesPrompt = value);
+      .subscribe(value => this.promptHasMultipleLines = value);
   }
 
   ngOnDestroy(): void {
-    this.resumePromptService.setPromptHasMultipleLines(this.promptHasMultipleLinesPrompt);
+    this.resumePromptService.setPromptHasMultipleLines(this.promptHasMultipleLines);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -69,7 +69,7 @@ export class PromptInputComponent implements OnInit, OnDestroy {
 
     this.updatePromptHasMultipleLinesState(hasLineBreaks || wouldCollide);
 
-    if (this.promptHasMultipleLinesPrompt) {
+    if (this.promptHasMultipleLines) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;
@@ -88,7 +88,7 @@ export class PromptInputComponent implements OnInit, OnDestroy {
   }
 
   updatePromptHasMultipleLinesState(value: boolean) {
-    this.promptHasMultipleLinesPrompt = value;
+    this.promptHasMultipleLines = value;
     this.resumePromptService.setPromptHasMultipleLines(value);
   }
 

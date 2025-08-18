@@ -10,12 +10,7 @@
       >
         <app-prompt-actions [multiLine]="promptInputRef.hasMultipleLines"/>
       </app-prompt-input>
-
-      @if (promptService.error()) {
-        <div class="m-4 p-4 bg-red-50 rounded-sm">
-          {{ promptService.error() }}
-        </div>
-      }
     </div>
   </div>
 </div>
+

@@ -3,7 +3,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {CommandService} from '../../../shared/services/command.service';
 import {SpinnerService} from '../../../shared/services/spinner.service';
-import {delay, finalize, Observable} from 'rxjs';
+import {BehaviorSubject, delay, finalize, Observable} from 'rxjs';
 import {CreateChatCommand} from '../../../shared/models/api.objects';
 
 export interface PromptControl {
@@ -25,6 +25,8 @@ export class ResumePromptService {
   private commandService: CommandService = inject(CommandService);
 
   readonly loading$: Observable<boolean> = this.loaderService.loading$;
+  private hasMultipleLinesSubject = new BehaviorSubject<boolean>(false);
+  hasMultipleLines$: Observable<boolean> = this.hasMultipleLinesSubject.asObservable();
 
   private formBuilder = inject(FormBuilder);
   readonly form: PromptForm = this.formBuilder.group({
@@ -52,6 +54,14 @@ export class ResumePromptService {
 
   removeFile(): void {
     this._uploadedFile.set(null);
+  }
+
+  setHasMultipleLines(value: boolean) {
+    this.hasMultipleLinesSubject.next(value);
+  }
+
+  getHasMultipleLines(): boolean {
+    return this.hasMultipleLinesSubject.value;
   }
 
   async submitPrompt(): Promise<void> {

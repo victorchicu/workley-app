@@ -25,54 +25,51 @@ export class PromptInputComponent implements OnInit, OnDestroy {
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('textAreaRef') textAreaRef!: ElementRef<HTMLTextAreaElement>;
 
-  hasMultipleLines = false;
+  promptHasMultipleLinesPrompt: boolean = false;
+
   readonly promptService: ResumePromptService = inject(ResumePromptService);
+
   private destroy$: Subject<void> = new Subject<void>();
   private resumePromptService = inject(ResumePromptService);
 
   ngOnInit(): void {
-    this.hasMultipleLines = this.resumePromptService.getHasMultipleLines();
-    this.resumePromptService.hasMultipleLines$
+    this.promptHasMultipleLinesPrompt = this.resumePromptService.getPromptHasMultipleLines();
+    this.resumePromptService.promptHasMultipleLines$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(value => this.hasMultipleLines = value);
+      .subscribe(value => this.promptHasMultipleLinesPrompt = value);
   }
 
   ngOnDestroy(): void {
-    this.resumePromptService.setHasMultipleLines(this.hasMultipleLines);
+    this.resumePromptService.setPromptHasMultipleLines(this.promptHasMultipleLinesPrompt);
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  updateMultilineState(value: boolean) {
-    this.hasMultipleLines = value;
-    this.resumePromptService.setHasMultipleLines(value);
-  }
-
-  async handleKeyDown(event: KeyboardEvent) {
-    if (this.form.invalid) {
-      this.form.markAsDirty();
-      this.form.markAllAsTouched();
-      return;
-    }
-
+  handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
       console.log("On 'Enter' key down: ", this.form);
       event.preventDefault();
       this.onKeyDown.emit();
       return;
     }
+
+    if (this.form.invalid) {
+      this.form.markAsDirty();
+      this.form.markAllAsTouched();
+      return;
+    }
   }
 
-  checkTextareaHeight(): void {
+  onTextCollideWrapNewLine(): void {
     const textarea: HTMLTextAreaElement = this.textAreaRef.nativeElement;
-    const content = textarea.value;
+    const content: string = textarea.value;
 
-    const hasLineBreaks = content.includes('\n');
-    const wouldCollide = this.wouldTextCollideWithActions(content);
+    const hasLineBreaks: boolean = content.includes('\n');
+    const wouldCollide: boolean = this.wouldTextCollideWithActions(content);
 
-    this.updateMultilineState(hasLineBreaks || wouldCollide);
+    this.updatePromptHasMultipleLinesState(hasLineBreaks || wouldCollide);
 
-    if (this.hasMultipleLines) {
+    if (this.promptHasMultipleLinesPrompt) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;
@@ -88,6 +85,11 @@ export class PromptInputComponent implements OnInit, OnDestroy {
       textarea.style.height = '24px';
       textarea.style.overflowY = 'hidden';
     }
+  }
+
+  updatePromptHasMultipleLinesState(value: boolean) {
+    this.promptHasMultipleLinesPrompt = value;
+    this.resumePromptService.setPromptHasMultipleLines(value);
   }
 
   private getAvailableSpace(): number {

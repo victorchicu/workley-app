@@ -22,11 +22,10 @@ interface Prompt {
 export class ResumePromptService {
   private router = inject(Router);
   private loaderService: SpinnerService = inject(SpinnerService);
-  private commandService: CommandService = inject(CommandService);
-
   readonly loading$: Observable<boolean> = this.loaderService.loading$;
-  private hasMultipleLinesSubject = new BehaviorSubject<boolean>(false);
-  hasMultipleLines$: Observable<boolean> = this.hasMultipleLinesSubject.asObservable();
+  private commandService: CommandService = inject(CommandService);
+  private promptHasMultipleLinesSubject = new BehaviorSubject<boolean>(false);
+  promptHasMultipleLines$: Observable<boolean> = this.promptHasMultipleLinesSubject.asObservable();
 
   private formBuilder = inject(FormBuilder);
   readonly form: PromptForm = this.formBuilder.group({
@@ -39,8 +38,6 @@ export class ResumePromptService {
       ]
     })
   });
-  private readonly _error: WritableSignal<string | null> = signal<string | null>(null);
-  readonly error: Signal<string | null> = this._error.asReadonly();
   private readonly _uploadedFile: WritableSignal<File | null> = signal<File | null>(null);
   readonly filename: Signal<string | null> = computed(() => this._uploadedFile()?.name ?? null);
 
@@ -56,12 +53,12 @@ export class ResumePromptService {
     this._uploadedFile.set(null);
   }
 
-  setHasMultipleLines(value: boolean) {
-    this.hasMultipleLinesSubject.next(value);
+  setPromptHasMultipleLines(value: boolean) {
+    this.promptHasMultipleLinesSubject.next(value);
   }
 
-  getHasMultipleLines(): boolean {
-    return this.hasMultipleLinesSubject.value;
+  getPromptHasMultipleLines(): boolean {
+    return this.promptHasMultipleLinesSubject.value;
   }
 
   async submitPrompt(): Promise<void> {
@@ -70,7 +67,6 @@ export class ResumePromptService {
     }
 
     this.loaderService.setLoading(true);
-    this._error.set(null);
 
     const prompt: Prompt = this.form.value as Prompt;
     const file = this._uploadedFile();
@@ -97,7 +93,6 @@ export class ResumePromptService {
         },
         error: (error) => {
           console.error('Error sending create chat command', error);
-          this._error.set('Failed to create resume. Please try again.');
           this.router.navigate(['/error']);
         }
       });
@@ -105,7 +100,6 @@ export class ResumePromptService {
 
   private cleanup(): void {
     this.form.reset();
-    this._error.set(null);
     this._uploadedFile.set(null);
   }
 }

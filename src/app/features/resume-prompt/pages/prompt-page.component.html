@@ -5,14 +5,14 @@
       <app-prompt-input
         #promptInputRef
         [form]="promptService.form"
-        placeholder="Let me know the field, I'll build something great"
+        placeholder="I'm a professional skilled in Python and AWS"
         (onKeyDown)="promptService.submitPrompt()"
       >
         <app-prompt-actions [multiLine]="promptInputRef.hasMultipleLines"/>
       </app-prompt-input>
 
       @if (promptService.error()) {
-        <div class="mt-4 p-4 bg-red-50 text-red-600 rounded-lg">
+        <div class="m-4 p-4 bg-red-50 rounded-sm">
           {{ promptService.error() }}
         </div>
       }

@@ -18,7 +18,7 @@ export class SubmitComponent {
   @Input() activated: boolean = true;
   @Output() clicked: EventEmitter<void> = new EventEmitter<void>();
 
-  readonly promptFacade: PromptFacade = inject(PromptFacade);
+  readonly facade: PromptFacade = inject(PromptFacade);
 
   handleClick() {
     this.clicked.emit();

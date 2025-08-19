@@ -5,9 +5,9 @@
         #promptInputRef
         [form]="promptFacade.form"
         placeholder="Ask anything"
-        (submit)="promptFacade.submit()">
+        (submit)="promptFacade.createChat()">
         <div class="flex items-center justify-end px-2">
-          <app-send-message-button (click)="promptFacade.submit()"/>
+          <app-send-message-button (click)="promptFacade.createChat()"/>
         </div>
       </app-input>
       <app-chat-disclaimer/>

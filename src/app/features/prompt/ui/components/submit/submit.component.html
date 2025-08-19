@@ -5,13 +5,13 @@
   [ngClass]="{
     'bg-neutral-900 text-white': activated,
     'bg-white text-neutral-900': !activated,
-    'opacity-75 cursor-not-allowed': promptFacade.loading$ | async
+    'opacity-75 cursor-not-allowed': facade.loading()
   }"
-  [disabled]="!activated || (promptFacade.loading$ | async)"
+  [disabled]="!activated || facade.loading()"
   (click)="handleClick()"
 >
   <svg
-    *ngIf="promptFacade.loading$ | async"
+    *ngIf="facade.loading()"
     class="animate-spin h-5 w-5"
     [ngClass]="{
       'text-white': activated,
@@ -29,7 +29,7 @@
   </svg>
 
   <svg
-    *ngIf="!(promptFacade.loading$ | async)"
+    *ngIf="!facade.loading()"
     width="24px"
     height="24px"
     viewBox="0 0 24 24"

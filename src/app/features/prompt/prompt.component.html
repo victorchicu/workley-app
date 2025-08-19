@@ -2,17 +2,17 @@
   <div class="w-full max-w-3xl px-4">
     <div class="relative">
       <app-headline/>
-      <app-input #promptInputRef [form]="promptFacade.form"
+      <app-input #promptInputRef [form]="facade.form"
                         placeholder="I'm a professional skilled in Python and AWS"
-                        (onKeyDown)="promptFacade.submit()">
-        <div class="flex items-center" [class.justify-end]="promptFacade.hasLineBreaks()">
+                        (onKeyDown)="onSubmit()">
+        <div class="flex items-center" [class.justify-end]="facade.hasLineBreaks()">
           <app-upload-file/>
           <app-submit
-            (clicked)="promptFacade.submit()"
-            [activated]="promptFacade.form.valid"
+            (clicked)="onSubmit()"
+            [activated]="facade.form.valid"
           >
             <span class="text-sm font-medium whitespace-nowrap">
-              {{ (promptFacade.loading$ | async) ? 'Creating, Please Wait...' : 'Create Resume' }}
+              {{ (facade.loading()) ? 'Creating, Please Wait...' : 'Create Resume' }}
             </span>
           </app-submit>
         </div>

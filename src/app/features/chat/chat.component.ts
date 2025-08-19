@@ -9,7 +9,6 @@ import {Navigation, Router} from '@angular/router';
 import {
   CreateChatCommandResult, Message
 } from '../../shared/models/command.models';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {PromptFacade} from '../prompt/prompt.facade';
 
 @Component({
@@ -18,9 +17,6 @@ import {PromptFacade} from '../prompt/prompt.facade';
   imports: [
     ChatDisclaimerComponent,
     SendMessageComponent,
-    NgIf,
-    NgForOf,
-    AsyncPipe,
     InputComponent,
   ],
   templateUrl: './chat.component.html',

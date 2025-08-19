@@ -13,7 +13,6 @@ import {toSignal} from '@angular/core/rxjs-interop';
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    AsyncPipe,
   ],
   templateUrl: './input.component.html',
   styleUrl: './input.component.css'
@@ -25,7 +24,7 @@ export class InputComponent {
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
-  readonly promptService: PromptFacade = inject(PromptFacade);
+  readonly facade: PromptFacade = inject(PromptFacade);
 
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -49,9 +48,9 @@ export class InputComponent {
     const hasLineBreaks: boolean = content.includes('\n');
     const wouldCollide: boolean = this.wouldTextCollideWithActions(content);
 
-    this.promptService.setHasMultipleLines(hasLineBreaks || wouldCollide);
+    this.facade.setHasLineBreaks(hasLineBreaks || wouldCollide);
 
-    if (this.promptService.hasLineBreaks()) {
+    if (this.facade.hasLineBreaks()) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;

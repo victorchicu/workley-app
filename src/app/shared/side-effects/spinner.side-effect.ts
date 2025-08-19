@@ -4,11 +4,10 @@ import {BehaviorSubject, Observable} from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class SpinnerService {
+export class SpinnerSideEffect {
 
   loading$: Observable<boolean>;
-
-  private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  readonly loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor() {
     this.loading$ = this.loadingSubject.asObservable();

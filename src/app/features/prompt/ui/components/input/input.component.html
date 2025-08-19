@@ -1,14 +1,14 @@
 <div class="relative w-full mx-auto">
   <form [formGroup]="form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!promptService.hasLineBreaks()"
-        [class.rounded-3xl]="promptService.hasLineBreaks()"
-        [class.opacity-50]="(promptService.loading$ | async) || deactivated"
-        [class.pointer-events-none]="(promptService.loading$ | async) || deactivated"
+        [class.rounded-full]="!facade.hasLineBreaks()"
+        [class.rounded-3xl]="facade.hasLineBreaks()"
+        [class.opacity-50]="facade.loading() || deactivated"
+        [class.pointer-events-none]="facade.loading() || deactivated"
   >
-    <fieldset [disabled]="(promptService.loading$ | async) || deactivated" class="w-full">
-      <div [class]="promptService.hasLineBreaks() ? 'w-full' : 'flex items-center w-full px-2 py-2'">
-        <div [class]="promptService.hasLineBreaks() ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
+    <fieldset [disabled]="facade.loading() || deactivated" class="w-full">
+      <div [class]="facade.hasLineBreaks() ? 'w-full' : 'flex items-center w-full px-2 py-2'">
+        <div [class]="facade.hasLineBreaks() ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
           <textarea
             #promptRef
             id="message"
@@ -22,7 +22,7 @@
             [placeholder]="placeholder"
           ></textarea>
         </div>
-        <div [class]="promptService.hasLineBreaks() ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+        <div [class]="facade.hasLineBreaks() ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
           <ng-content/>
         </div>
       </div>

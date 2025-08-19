@@ -5,13 +5,13 @@
   [ngClass]="{
     'bg-neutral-900 text-white': activated,
     'bg-white text-neutral-900': !activated,
-    'opacity-75 cursor-not-allowed': resumePromptService.loading$ | async
+    'opacity-75 cursor-not-allowed': promptFacade.loading$ | async
   }"
-  [disabled]="!activated || (resumePromptService.loading$ | async)"
+  [disabled]="!activated || (promptFacade.loading$ | async)"
   (click)="handleClick()"
 >
   <svg
-    *ngIf="resumePromptService.loading$ | async"
+    *ngIf="promptFacade.loading$ | async"
     class="animate-spin h-5 w-5"
     [ngClass]="{
       'text-white': activated,
@@ -29,7 +29,7 @@
   </svg>
 
   <svg
-    *ngIf="!(resumePromptService.loading$ | async)"
+    *ngIf="!(promptFacade.loading$ | async)"
     width="24px"
     height="24px"
     viewBox="0 0 24 24"

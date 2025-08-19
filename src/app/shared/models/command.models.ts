@@ -1,15 +1,6 @@
 
-export abstract class Query {
-  abstract readonly type: string;
-}
-
 export abstract class Command {
   abstract readonly type: string;
-}
-
-
-export interface QueryResult {
-  type: string;
 }
 
 export interface CommandResult {
@@ -33,13 +24,6 @@ export class SendMessageCommand extends Command {
   }
 }
 
-export class GetChatQuery extends Query {
-  readonly type = 'GetChatQuery' as const;
-
-  constructor(public chatId: string) {
-    super();
-  }
-}
 
 
 export interface CreateChatCommandResult extends CommandResult {
@@ -54,12 +38,6 @@ export interface SendMessageCommandResult extends CommandResult {
   message: Message;
 }
 
-export interface GetChatQueryResult extends QueryResult {
-  type: 'GetChatQueryResult';
-  chatId: string;
-  messages: Message[];
-}
-
 
 export type ActionCommand =
   | CreateChatCommand
@@ -69,23 +47,8 @@ export type ActionCommandResult =
   | CreateChatCommandResult
   | SendMessageCommandResult;
 
-export type GetQuery =
-  GetChatQuery;
-
-export type GetQueryResult =
-  GetChatQueryResult;
-
-
 export interface Message {
   id?: string;
   actor: string;
   content: string;
-}
-
-export interface ChatState {
-  chatId?: string;
-  messages: Message[];
-  loading: boolean;
-  error?: string;
-  isTyping?: boolean;
 }

@@ -2,15 +2,15 @@ import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@an
 import {TooltipDirective} from '../../../../../core/directive/tooltip.directive';
 
 @Component({
-  selector: 'app-upload-file-button',
+  selector: 'app-upload-file',
   standalone: true,
   imports: [
     TooltipDirective,
   ],
-  templateUrl: './upload-file-button.component.html',
-  styleUrl: './upload-file-button.component.css'
+  templateUrl: './upload-file.component.html',
+  styleUrl: './upload-file.component.css'
 })
-export class UploadFileButtonComponent {
+export class UploadFileComponent {
 
   @Output() onFileSelected: EventEmitter<File> = new EventEmitter<File>();
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;

@@ -4,28 +4,28 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import {AsyncPipe, NgIf} from '@angular/common';
-import {PromptForm, ResumePromptService} from '../../services/resume-prompt.service';
+import {PromptForm, PromptFacade} from '../../../prompt.facade';
 import {toSignal} from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-prompt-input',
+  selector: 'app-input',
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
     AsyncPipe,
   ],
-  templateUrl: './prompt-input.component.html',
-  styleUrl: './prompt-input.component.css'
+  templateUrl: './input.component.html',
+  styleUrl: './input.component.css'
 })
-export class PromptInputComponent {
+export class InputComponent {
   @Input() form!: PromptForm;
   @Input() placeholder: string = "How can I help you today?";
   @Input() deactivated: boolean = false;
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
-  readonly resumePromptService: ResumePromptService = inject(ResumePromptService);
+  readonly promptService: PromptFacade = inject(PromptFacade);
 
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -49,9 +49,9 @@ export class PromptInputComponent {
     const hasLineBreaks: boolean = content.includes('\n');
     const wouldCollide: boolean = this.wouldTextCollideWithActions(content);
 
-    this.resumePromptService.setHasMultipleLines(hasLineBreaks || wouldCollide);
+    this.promptService.setHasMultipleLines(hasLineBreaks || wouldCollide);
 
-    if (this.resumePromptService.hasMultipleLines()) {
+    if (this.promptService.hasLineBreaks()) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;

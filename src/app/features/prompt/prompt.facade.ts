@@ -1,10 +1,10 @@
 import {computed, inject, Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {CommandService} from '../../../shared/services/command.service';
-import {SpinnerService} from '../../../shared/services/spinner.service';
-import {BehaviorSubject, delay, finalize, Observable} from 'rxjs';
-import {CreateChatCommand} from '../../../shared/models/api.objects';
+import {CommandService} from '../../shared/services/command.service';
+import {SpinnerService} from '../../shared/side-effects/spinner.service';
+import {delay, finalize, Observable} from 'rxjs';
+import {CreateChatCommand} from '../../shared/models/command.models';
 
 export interface PromptControl {
   text: FormControl<string>;
@@ -19,18 +19,13 @@ interface Prompt {
 @Injectable({
   providedIn: 'root'
 })
-export class ResumePromptService {
+export class PromptFacade {
   private router: Router = inject(Router);
+  private promptService: CommandService = inject(CommandService);
   private spinnerService: SpinnerService = inject(SpinnerService);
   readonly loading$: Observable<boolean> = this.spinnerService.loading$;
-  private commandService: CommandService = inject(CommandService);
-  private readonly _hasMultipleLines: WritableSignal<boolean> = signal(false);
-  readonly hasMultipleLines: Signal<boolean> = this._hasMultipleLines.asReadonly();
-
-  setHasMultipleLines(v: boolean) {
-    this._hasMultipleLines.set(v);
-  }
-
+  private readonly _hasLineBreaks: WritableSignal<boolean> = signal(false);
+  readonly hasLineBreaks: Signal<boolean> = this._hasLineBreaks.asReadonly();
   private formBuilder = inject(FormBuilder);
   readonly form: PromptForm = this.formBuilder.group({
     text: new FormControl<string>('', {
@@ -48,33 +43,32 @@ export class ResumePromptService {
   constructor() {
   }
 
-  uploadFile(file: File): void {
-    this._uploadedFile.set(file);
-    console.log('File uploaded:', file);
+  setHasMultipleLines(value: boolean) {
+    this._hasLineBreaks.set(value);
   }
 
-  removeFile(): void {
-    this._uploadedFile.set(null);
-  }
+  async submit(): Promise<void> {
+    if (!this.form.valid) {
+      return ;
+    }
 
-  async submitPrompt(): Promise<void> {
-    if (this.spinnerService.loading || !this.form.valid) {
+    if (this.spinnerService.loading) {
       return;
     }
 
     this.spinnerService.setLoading(true);
 
     const prompt: Prompt = this.form.value as Prompt;
-    const file = this._uploadedFile();
+    console.log("Execute create chat command with prompt: ", prompt);
 
-    console.log("Sending create chat command with prompt: ", prompt);
+    const file: File | null = this._uploadedFile();
     if (file) {
       console.log("With attached file: ", file.name);
     }
 
-    this.commandService.execute(new CreateChatCommand(prompt.text))
+    this.promptService.execute(new CreateChatCommand(prompt.text))
       .pipe(
-        delay(5000),
+        delay(1000),
         finalize(() => this.spinnerService.setLoading(false))
       )
       .subscribe({
@@ -90,12 +84,13 @@ export class ResumePromptService {
         error: (error) => {
           console.error('Error sending create chat command', error);
           this.router.navigate(['/error']);
-        }
+        },
       });
   }
 
   private cleanup(): void {
     this.form.reset();
     this._uploadedFile.set(null);
+    this._hasLineBreaks.set(false);
   }
 }

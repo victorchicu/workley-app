@@ -1,0 +1,22 @@
+<div class="min-h-screen flex flex-col items-center justify-center -mt-24">
+  <div class="w-full max-w-3xl px-4">
+    <div class="relative">
+      <app-headline/>
+      <app-input #promptInputRef [form]="promptFacade.form"
+                        placeholder="I'm a professional skilled in Python and AWS"
+                        (onKeyDown)="promptFacade.submit()">
+        <div class="flex items-center" [class.justify-end]="promptFacade.hasLineBreaks()">
+          <app-upload-file/>
+          <app-submit
+            (clicked)="promptFacade.submit()"
+            [activated]="promptFacade.form.valid"
+          >
+            <span class="text-sm font-medium whitespace-nowrap">
+              {{ (promptFacade.loading$ | async) ? 'Creating, Please Wait...' : 'Create Resume' }}
+            </span>
+          </app-submit>
+        </div>
+      </app-input>
+    </div>
+  </div>
+</div>

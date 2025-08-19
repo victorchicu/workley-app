@@ -8,10 +8,10 @@ import {FormsModule} from '@angular/forms';
     FormsModule
 
   ],
-  templateUrl: './send-message-button.component.html',
-  styleUrl: './send-message-button.component.css'
+  templateUrl: './send-message.component.html',
+  styleUrl: './send-message.component.css'
 })
-export class SendMessageButtonComponent {
+export class SendMessageComponent {
   @Output() onClick: EventEmitter<void> = new EventEmitter<void>();
 
   handleClick() {

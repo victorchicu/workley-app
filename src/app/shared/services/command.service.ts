@@ -3,8 +3,8 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {
   ActionCommand,
-  ActionCommandResult, GetQueryResult,
-} from '../models/api.objects';
+  ActionCommandResult,
+} from '../models/command.models';
 
 @Injectable({
   providedIn: 'root'

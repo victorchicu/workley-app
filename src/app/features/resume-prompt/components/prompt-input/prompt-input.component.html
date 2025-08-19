@@ -1,14 +1,14 @@
 <div class="relative w-full mx-auto">
   <form [formGroup]="form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!promptHasMultipleLines"
-        [class.rounded-3xl]="promptHasMultipleLines"
+        [class.rounded-full]="!promptService.hasMultipleLines"
+        [class.rounded-3xl]="promptService.hasMultipleLines"
         [class.opacity-50]="(promptService.loading$ | async) || deactivated"
         [class.pointer-events-none]="(promptService.loading$ | async) || deactivated"
   >
     <fieldset [disabled]="(promptService.loading$ | async) || deactivated" class="w-full">
-      <div [class]="promptHasMultipleLines ? 'w-full' : 'flex items-center w-full px-2 py-2'">
-        <div [class]="promptHasMultipleLines ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
+      <div [class]="promptService.hasMultipleLines ? 'w-full' : 'flex items-center w-full px-2 py-2'">
+        <div [class]="promptService.hasMultipleLines ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
           <textarea
             #promptRef
             id="message"
@@ -22,7 +22,7 @@
             [placeholder]="placeholder"
           ></textarea>
         </div>
-        <div [class]="promptHasMultipleLines ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+        <div [class]="promptService.hasMultipleLines ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
           <ng-content/>
         </div>
       </div>

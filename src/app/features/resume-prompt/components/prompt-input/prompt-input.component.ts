@@ -1,11 +1,10 @@
-import {Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild} from '@angular/core';
 import {
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {PromptForm, ResumePromptService} from '../../services/resume-prompt.service';
-import {Subject, takeUntil} from 'rxjs';
 
 @Component({
   selector: 'app-prompt-input',
@@ -18,32 +17,14 @@ import {Subject, takeUntil} from 'rxjs';
   templateUrl: './prompt-input.component.html',
   styleUrl: './prompt-input.component.css'
 })
-export class PromptInputComponent implements OnInit, OnDestroy {
+export class PromptInputComponent {
   @Input() form!: PromptForm;
   @Input() placeholder: string = "How can I help you today?";
   @Input() deactivated: boolean = false;
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
-  promptHasMultipleLines: boolean = false;
-
   readonly promptService: ResumePromptService = inject(ResumePromptService);
-
-  private destroy$: Subject<void> = new Subject<void>();
-  private resumePromptService = inject(ResumePromptService);
-
-  ngOnInit(): void {
-    this.promptHasMultipleLines = this.resumePromptService.getPromptHasMultipleLines();
-    this.resumePromptService.promptHasMultipleLines$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(value => this.promptHasMultipleLines = value);
-  }
-
-  ngOnDestroy(): void {
-    this.resumePromptService.setPromptHasMultipleLines(this.promptHasMultipleLines);
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -67,9 +48,9 @@ export class PromptInputComponent implements OnInit, OnDestroy {
     const hasLineBreaks: boolean = content.includes('\n');
     const wouldCollide: boolean = this.wouldTextCollideWithActions(content);
 
-    this.updatePromptHasMultipleLinesState(hasLineBreaks || wouldCollide);
+    this.promptService.hasMultipleLines = hasLineBreaks || wouldCollide;
 
-    if (this.promptHasMultipleLines) {
+    if (this.promptService.hasMultipleLines) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;
@@ -87,11 +68,6 @@ export class PromptInputComponent implements OnInit, OnDestroy {
     }
   }
 
-  updatePromptHasMultipleLinesState(value: boolean) {
-    this.promptHasMultipleLines = value;
-    this.resumePromptService.setPromptHasMultipleLines(value);
-  }
-
   private getAvailableSpace(): number {
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
 
@@ -100,7 +76,6 @@ export class PromptInputComponent implements OnInit, OnDestroy {
     if (form) {
       const formWidth = form.offsetWidth;
       const formPadding = 32; // px-4 * 2
-
       // Try to find the actions element
       const actionsElement = form.querySelector('app-prompt-actions') as HTMLElement;
       if (actionsElement) {

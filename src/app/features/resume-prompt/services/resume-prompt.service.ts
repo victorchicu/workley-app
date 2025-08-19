@@ -24,8 +24,12 @@ export class ResumePromptService {
   private spinnerService: SpinnerService = inject(SpinnerService);
   readonly loading$: Observable<boolean> = this.spinnerService.loading$;
   private commandService: CommandService = inject(CommandService);
-  private hasMultipleLinesSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  hasMultipleLines$: Observable<boolean> = this.hasMultipleLinesSubject.asObservable();
+  private readonly _hasMultipleLines: WritableSignal<boolean> = signal(false);
+  readonly hasMultipleLines: Signal<boolean> = this._hasMultipleLines.asReadonly();
+
+  setHasMultipleLines(v: boolean) {
+    this._hasMultipleLines.set(v);
+  }
 
   private formBuilder = inject(FormBuilder);
   readonly form: PromptForm = this.formBuilder.group({
@@ -42,14 +46,6 @@ export class ResumePromptService {
   readonly filename: Signal<string | null> = computed(() => this._uploadedFile()?.name ?? null);
 
   constructor() {
-  }
-
-  get hasMultipleLines(): boolean {
-    return this.hasMultipleLinesSubject.value;
-  }
-
-  set hasMultipleLines(value: boolean) {
-    this.hasMultipleLinesSubject.next(value);
   }
 
   uploadFile(file: File): void {

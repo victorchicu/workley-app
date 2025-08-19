@@ -1,10 +1,11 @@
-import {Component, ElementRef, EventEmitter, inject, Input, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, inject, Input, Output, Signal, ViewChild} from '@angular/core';
 import {
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {PromptForm, ResumePromptService} from '../../services/resume-prompt.service';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-prompt-input',
@@ -24,7 +25,7 @@ export class PromptInputComponent {
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
-  readonly promptService: ResumePromptService = inject(ResumePromptService);
+  readonly resumePromptService: ResumePromptService = inject(ResumePromptService);
 
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -48,9 +49,9 @@ export class PromptInputComponent {
     const hasLineBreaks: boolean = content.includes('\n');
     const wouldCollide: boolean = this.wouldTextCollideWithActions(content);
 
-    this.promptService.hasMultipleLines = hasLineBreaks || wouldCollide;
+    this.resumePromptService.setHasMultipleLines(hasLineBreaks || wouldCollide);
 
-    if (this.promptService.hasMultipleLines) {
+    if (this.resumePromptService.hasMultipleLines()) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;

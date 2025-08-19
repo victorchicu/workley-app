@@ -1,14 +1,14 @@
 <div class="relative w-full mx-auto">
   <form [formGroup]="form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!promptService.hasMultipleLines"
-        [class.rounded-3xl]="promptService.hasMultipleLines"
-        [class.opacity-50]="(promptService.loading$ | async) || deactivated"
-        [class.pointer-events-none]="(promptService.loading$ | async) || deactivated"
+        [class.rounded-full]="!resumePromptService.hasMultipleLines()"
+        [class.rounded-3xl]="resumePromptService.hasMultipleLines()"
+        [class.opacity-50]="(resumePromptService.loading$ | async) || deactivated"
+        [class.pointer-events-none]="(resumePromptService.loading$ | async) || deactivated"
   >
-    <fieldset [disabled]="(promptService.loading$ | async) || deactivated" class="w-full">
-      <div [class]="promptService.hasMultipleLines ? 'w-full' : 'flex items-center w-full px-2 py-2'">
-        <div [class]="promptService.hasMultipleLines ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
+    <fieldset [disabled]="(resumePromptService.loading$ | async) || deactivated" class="w-full">
+      <div [class]="resumePromptService.hasMultipleLines() ? 'w-full' : 'flex items-center w-full px-2 py-2'">
+        <div [class]="resumePromptService.hasMultipleLines() ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
           <textarea
             #promptRef
             id="message"
@@ -22,7 +22,7 @@
             [placeholder]="placeholder"
           ></textarea>
         </div>
-        <div [class]="promptService.hasMultipleLines ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+        <div [class]="resumePromptService.hasMultipleLines() ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
           <ng-content/>
         </div>
       </div>

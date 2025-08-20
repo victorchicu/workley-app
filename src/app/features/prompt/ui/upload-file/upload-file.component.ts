@@ -5,7 +5,8 @@ import {TooltipDirective} from '../../../../core/directive/tooltip.directive';
   selector: 'app-upload-file',
   standalone: true,
   imports: [
-    TooltipDirective,
+    TooltipDirective
+
   ],
   templateUrl: './upload-file.component.html',
   styleUrl: './upload-file.component.css'

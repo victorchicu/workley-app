@@ -1,13 +1,15 @@
 import {Component, computed, EventEmitter, inject, Input, Output} from '@angular/core';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
 import {PromptFacade} from '../../prompt.facade';
+import {SpinnerComponent} from '../../../../shared/ui/spinner/spinner.component';
+import {CommandService} from '../../../../shared/services/command.service';
 
 @Component({
   selector: 'app-submit',
   standalone: true,
   imports: [
     NgClass,
-    NgIf
+    SpinnerComponent
   ],
   templateUrl: './submit.component.html',
   styleUrl: './submit.component.css'

@@ -20,8 +20,7 @@ import {TooltipDirective} from '../../core/directive/tooltip.directive';
     HeadlineComponent,
     InputComponent,
     SubmitComponent,
-    UploadFileComponent,
-    TooltipDirective
+    UploadFileComponent
   ],
   templateUrl: './prompt.component.html',
   styleUrl: './prompt.component.css',

@@ -11,40 +11,24 @@
   [disabled]="!activated || prompt.submitting"
   (click)="handleClick()"
 >
-  <div class="flex items-center justify-center">
-    <svg
-      *ngIf="prompt.submitting"
-      width="24"
-      height="24"
-      class="animate-spin"
-      [ngClass]="{
+  @if (prompt.submitting) {
+    <app-spinner/>
+  } @else {
+    <div class="flex items-center justify-center">
+      <svg
+        width="24px"
+        height="24px"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        [ngClass]="{
         'text-white': activated,
         'text-neutral-900': !activated
       }"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
-      <path class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-      </path>
-    </svg>
-
-    <svg
-      *ngIf="!prompt.submitting"
-      width="24px"
-      height="24px"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      [ngClass]="{
-        'text-white': activated,
-        'text-neutral-900': !activated
-      }"
-    >
-      <path d="M12 6V18M12 6L7 11M12 6L17 11" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <ng-content/>
-  </div>
+      >
+        <path d="M12 6V18M12 6L7 11M12 6L17 11" fill="currentColor" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <ng-content/>
+    </div>
+  }
 </button>

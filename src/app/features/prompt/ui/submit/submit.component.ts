@@ -1,7 +1,7 @@
 import {Component, computed, EventEmitter, inject, Input, Output} from '@angular/core';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
 import {PromptFacade} from '../../prompt.facade';
-import {SpinnerComponent} from '../../../../shared/ui/spinner/spinner.component';
+import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner.component';
 import {CommandService} from '../../../../shared/services/command.service';
 
 @Component({

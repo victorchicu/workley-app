@@ -7,14 +7,14 @@
         [class.pointer-events-none]="facade.submitting() || deactivated"
   >
     <fieldset [disabled]="facade.submitting() || deactivated" class="w-full">
-      <div [class]="facade.hasLineBreaks() ? 'w-full' : 'flex items-center w-full px-2 py-2'">
+      <div [class]="facade.hasLineBreaks() ? 'w-full' : 'flex items-stretch w-full p-3'">
         <div [class]="facade.hasLineBreaks() ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
           <textarea
             #promptRef
             id="message"
-            rows="1"
+            rows="2"
             style="field-sizing: content; word-break: break-word; overflow-wrap: break-word;"
-            class="w-full text-neutral-950 bg-transparent focus:outline-none placeholder-neutral-400 resize-none overflow-y-auto min-h-[24px] max-h-[120px] pl-3 pr-2 py-0 custom-scrollbar smooth-scroll "
+            class="w-full text-neutral-950 bg-transparent focus:outline-none placeholder-neutral-400 resize-none overflow-y-auto pl-3 pr-2 custom-scrollbar smooth-scroll"
             autocomplete="off"
             formControlName="text"
             (keydown)="handleKeyDown($event)"

@@ -19,14 +19,14 @@ import {ActionCommandResult, CreateChatCommandResult} from '../../shared/models/
     HeadlineComponent,
     InputComponent,
     SubmitComponent,
-    UploadFileComponent,
+    UploadFileComponent
   ],
   templateUrl: './prompt.component.html',
   styleUrl: './prompt.component.css',
 })
 export class PromptComponent {
-  readonly router: Router = inject(Router);
-  readonly facade: PromptFacade = inject(PromptFacade);
+  private readonly router: Router = inject(Router);
+  private readonly facade: PromptFacade = inject(PromptFacade);
 
   viewModel = computed(() => ({
     form: this.facade.form,

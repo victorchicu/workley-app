@@ -6,9 +6,11 @@
       <app-input #promptInputRef
                         placeholder="Describe your background: skills, jobs, or goals"
                         (onKeyDown)="onSubmit()">
-        <div class="flex items-center" [class.justify-end]="prompt.hasLineBreaks">
+        <div class="flex items-center gap-1" [class.justify-end]="prompt.hasLineBreaks">
           <app-upload-file/>
           <app-submit
+            aria-label="Create my resume"
+            tooltipText="Create my resume"
             (clicked)="onSubmit()"
             [activated]="prompt.form.valid"
           >

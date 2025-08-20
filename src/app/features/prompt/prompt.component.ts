@@ -9,6 +9,7 @@ import {
 import {UploadFileComponent} from './ui/upload-file/upload-file.component';
 import {Router} from '@angular/router';
 import {ActionCommandResult, CreateChatCommandResult} from '../../shared/models/command.models';
+import {TooltipDirective} from '../../core/directive/tooltip.directive';
 
 @Component({
   selector: 'app-resume-prompt',
@@ -19,7 +20,8 @@ import {ActionCommandResult, CreateChatCommandResult} from '../../shared/models/
     HeadlineComponent,
     InputComponent,
     SubmitComponent,
-    UploadFileComponent
+    UploadFileComponent,
+    TooltipDirective
   ],
   templateUrl: './prompt.component.html',
   styleUrl: './prompt.component.css',

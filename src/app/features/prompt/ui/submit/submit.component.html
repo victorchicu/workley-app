@@ -2,10 +2,10 @@
 <button
   type="submit"
   class="relative px-2 py-2 flex items-center justify-center rounded-full cursor-pointer group "
-  aria-label="Create Resume"
+  aria-label="Create my resume"
   [ngClass]="{
     'bg-neutral-900 text-white': activated,
-    'bg-white text-neutral-900': !activated,
+    'bg-white hover:bg-neutral-100 text-neutral-900': !activated,
     'opacity-75 cursor-not-allowed': prompt.submitting
   }"
   [disabled]="!activated || prompt.submitting"

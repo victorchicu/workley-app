@@ -6,7 +6,6 @@ import { DOCUMENT } from '@angular/common';
   standalone: true,
 })
 export class TooltipDirective {
-  // Signal input
   tooltipText: InputSignal<string> = input<string>('');
 
   private tooltipElement: HTMLDivElement | null = null;

@@ -3,20 +3,12 @@
   <div class="w-full max-w-3xl px-4">
     <div class="relative">
       <app-headline/>
-      <app-input #promptInputRef
-                        placeholder="Describe your background: skills, jobs, or goals"
-                        (onKeyDown)="onSubmit()">
+      <app-input #promptRef
+                 placeholder="Describe your background: skills, jobs, or goals"
+                 (onKeyDown)="onSubmit()">
         <div class="flex items-center gap-1" [class.justify-end]="prompt.hasLineBreaks">
           <app-upload-file/>
-          <app-submit
-            aria-label="Create my resume"
-            (clicked)="onSubmit()"
-            [activated]="prompt.form.valid"
-          >
-<!--            <span class="text-sm font-medium whitespace-nowrap">-->
-<!--              {{ (prompt.submitting) ? 'Create Resume' : 'Create Resume' }}-->
-<!--            </span>-->
-          </app-submit>
+          <app-submit aria-label="Create my resume" (clicked)="onSubmit()" [activated]="prompt.form.valid"/>
         </div>
       </app-input>
     </div>

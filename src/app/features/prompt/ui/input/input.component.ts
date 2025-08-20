@@ -3,9 +3,7 @@ import {
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
-import {AsyncPipe, NgIf} from '@angular/common';
-import {PromptForm, PromptFacade} from '../../prompt.facade';
-import {toSignal} from '@angular/core/rxjs-interop';
+import {PromptFacade} from '../../prompt.facade';
 
 @Component({
   selector: 'app-input',

@@ -49,6 +49,6 @@ export type ActionCommandResult =
 
 export interface Message {
   id?: string;
-  actor: string;
+  actor?: string;
   content: string;
 }

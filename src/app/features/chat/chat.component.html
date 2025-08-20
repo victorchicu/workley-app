@@ -1,12 +1,75 @@
-<div class="flex flex-col" style="height: 100%;">
-  <div class="w-full px-4 bg-white">
-    <div class="w-full max-w-3xl mx-auto">
+<div class="flex flex-col h-full">
+  <!-- Messages Container -->
+  <div class="flex-1 overflow-y-auto" #messagesContainer>
+    <div class="w-full max-w-3xl mx-auto px-4 py-6">
+      <!-- Loading initial chat -->
+      <div *ngIf="(isLoading$ | async) && (messages$ | async)?.length === 0"
+           class="flex justify-center items-center h-32">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error$ | async as error"
+           class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+          <span class="text-red-800">{{ error }}</span>
+          <button (click)="retry()" class="ml-auto text-red-600 hover:text-red-800 underline text-sm">
+            Retry
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div *ngFor="let message of messages$ | async"
+           class="mb-6 animate-fadeIn">
+        <!-- User Message -->
+        <div *ngIf="message.actor !== 'assistant'" class="flex justify-end mb-4">
+          <div class="max-w-xs lg:max-w-md xl:max-w-lg">
+            <div class="bg-blue-600 text-white rounded-lg px-4 py-2">
+              <p class="text-sm">{{ message.content }}</p>
+            </div>
+            <div class="text-xs text-gray-500 mt-1 text-right">
+<!--              {{ message.timestamp | date:'short' }}-->
+              {{ Date() | date:'short' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Assistant Message -->
+        <div *ngIf="message.actor === 'assistant'" class="flex justify-start mb-4">
+          <div class="max-w-xs lg:max-w-md xl:max-w-2xl">
+            <div class="bg-gray-100 rounded-lg px-4 py-2">
+              <!-- Loading state for assistant -->
+              <div *ngIf="!!(isLoading$ | async)" class="flex items-center space-x-2">
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+              </div>
+              <!-- Actual message content -->
+              <p *ngIf="!(!!(isLoading$ | async))" class="text-sm text-gray-800 whitespace-pre-wrap">{{ message.content }}</p>
+            </div>
+            <div *ngIf="!(!!(isLoading$ | async))" class="text-xs text-gray-500 mt-1">
+<!--              {{ message.timestamp | date:'short' }}-->
+              {{ Date() | date:'short' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full px-4 bg-white border-t">
+    <div class="w-full max-w-3xl mx-auto py-4">
       <app-input
-        #promptInputRef
-        placeholder="Ask anything"
-        (submit)="promptFacade.createChat()">
+        #promptRef
+        placeholder="Type your message..."
+        [deactivated]="!!(isLoading$ | async)"
+        (submit)="sendMessage($event)">
         <div class="flex items-center justify-end px-2">
-          <app-send-message-button (click)="promptFacade.createChat()"/>
+          <app-submit aria-label="Send message" (clicked)="onSubmit()"/>
         </div>
       </app-input>
       <app-chat-disclaimer/>

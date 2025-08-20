@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component, inject
 } from '@angular/core';
-import {InputComponent} from '../prompt/ui/components/input/input.component';
+import {InputComponent} from '../prompt/ui/input/input.component';
 import {ChatDisclaimerComponent} from './ui/chat-disclaimer/chat-disclaimer.component';
 import {SendMessageComponent} from './ui/action-buttons/send-message/send-message.component';
 import {Navigation, Router} from '@angular/router';

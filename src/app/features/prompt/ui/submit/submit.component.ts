@@ -1,6 +1,6 @@
 import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
-import {PromptFacade} from '../../../prompt.facade';
+import {PromptFacade} from '../../prompt.facade';
 
 @Component({
   selector: 'app-submit',

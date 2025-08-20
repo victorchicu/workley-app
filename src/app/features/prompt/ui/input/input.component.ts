@@ -4,7 +4,7 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import {AsyncPipe, NgIf} from '@angular/common';
-import {PromptForm, PromptFacade} from '../../../prompt.facade';
+import {PromptForm, PromptFacade} from '../../prompt.facade';
 import {toSignal} from '@angular/core/rxjs-interop';
 
 @Component({

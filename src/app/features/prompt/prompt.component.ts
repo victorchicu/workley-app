@@ -1,12 +1,12 @@
 import {Component, computed, inject, Signal} from '@angular/core';
 import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HeadlineComponent} from './ui/components/headline/headline.component';
-import {InputComponent} from './ui/components/input/input.component';
+import {HeadlineComponent} from './ui/headline/headline.component';
+import {InputComponent} from './ui/input/input.component';
 import {PromptFacade} from './prompt.facade';
 import {
   SubmitComponent
-} from './ui/components/submit/submit.component';
-import {UploadFileComponent} from './ui/components/upload-file/upload-file.component';
+} from './ui/submit/submit.component';
+import {UploadFileComponent} from './ui/upload-file/upload-file.component';
 import {Router} from '@angular/router';
 import {ActionCommandResult, CreateChatCommandResult} from '../../shared/models/command.models';
 

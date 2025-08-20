@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {TooltipDirective} from '../../../../../core/directive/tooltip.directive';
+import {TooltipDirective} from '../../../../core/directive/tooltip.directive';
 
 @Component({
   selector: 'app-upload-file',

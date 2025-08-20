@@ -7,8 +7,7 @@ import {PromptFacade} from '../../../prompt.facade';
   standalone: true,
   imports: [
     NgClass,
-    NgIf,
-    AsyncPipe
+    NgIf
   ],
   templateUrl: './submit.component.html',
   styleUrl: './submit.component.css'

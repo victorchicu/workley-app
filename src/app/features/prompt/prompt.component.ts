@@ -8,6 +8,7 @@ import {
 } from './ui/components/submit/submit.component';
 import {UploadFileComponent} from './ui/components/upload-file/upload-file.component';
 import {Router} from '@angular/router';
+import {ActionCommandResult, CreateChatCommandResult} from '../../shared/models/command.models';
 
 @Component({
   selector: 'app-resume-prompt',
@@ -24,28 +25,28 @@ import {Router} from '@angular/router';
   styleUrl: './prompt.component.css',
 })
 export class PromptComponent {
-  readonly facade: PromptFacade = inject(PromptFacade);
   readonly router: Router = inject(Router);
+  readonly facade: PromptFacade = inject(PromptFacade);
 
-  vm = computed(() => ({
+  viewModel = computed(() => ({
     form: this.facade.form,
-    filename: this.facade.filename(),
+    error: this.facade.error(),
+    submitting: this.facade.submitting(),
     hasLineBreaks: this.facade.hasLineBreaks(),
-    loading: this.facade.loading(),
-    error: this.facade.error()
   }));
 
   onSubmit() {
     this.facade.createChat().subscribe({
-      next: res => {
-        this.facade.reset();
-        if (res?.chatId)
-          this.router.navigate(['/chat', res.chatId], {state: res})
-            .then();
+      next: (response: CreateChatCommandResult) => {
+        console.log("Navigating to chat with id:", response.chatId)
+        this.router.navigate(['/chat', response.chatId], {state: response})
+          .then();
       },
-      error: () => this.router.navigate(['/error'])
+      error: (cause) => {
+        console.error("Chat creation failed:", cause);
+        this.router.navigate(['/error'])
+          .then();
+      }
     });
   }
-
-  onHasLineBreaks(v: boolean) { this.facade.setHasLineBreaks(v); }
 }

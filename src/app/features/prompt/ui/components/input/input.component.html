@@ -3,10 +3,10 @@
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
         [class.rounded-full]="!facade.hasLineBreaks()"
         [class.rounded-3xl]="facade.hasLineBreaks()"
-        [class.opacity-50]="facade.loading() || deactivated"
-        [class.pointer-events-none]="facade.loading() || deactivated"
+        [class.opacity-50]="facade.submitting() || deactivated"
+        [class.pointer-events-none]="facade.submitting() || deactivated"
   >
-    <fieldset [disabled]="facade.loading() || deactivated" class="w-full">
+    <fieldset [disabled]="facade.submitting() || deactivated" class="w-full">
       <div [class]="facade.hasLineBreaks() ? 'w-full' : 'flex items-center w-full px-2 py-2'">
         <div [class]="facade.hasLineBreaks() ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
           <textarea

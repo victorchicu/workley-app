@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, inject, Input, Output, Signal, ViewChild} from '@angular/core';
+import {Component, computed, ElementRef, EventEmitter, inject, Input, Output, Signal, ViewChild} from '@angular/core';
 import {
   FormsModule,
   ReactiveFormsModule
@@ -18,25 +18,31 @@ import {toSignal} from '@angular/core/rxjs-interop';
   styleUrl: './input.component.css'
 })
 export class InputComponent {
-  @Input() form!: PromptForm;
   @Input() placeholder: string = "How can I help you today?";
   @Input() deactivated: boolean = false;
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
-  readonly facade: PromptFacade = inject(PromptFacade);
+  private readonly facade: PromptFacade = inject(PromptFacade);
+
+  viewModel = computed(() => ({
+    form: this.facade.form,
+    error: this.facade.error(),
+    submitting: this.facade.submitting(),
+    hasLineBreaks: this.facade.hasLineBreaks(),
+  }));
 
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
-      console.log("On 'Enter' key down: ", this.form);
+      console.log("On 'Enter' key down: ", this.facade.form);
       event.preventDefault();
       this.onKeyDown.emit();
       return;
     }
 
-    if (this.form.invalid) {
-      this.form.markAsDirty();
-      this.form.markAllAsTouched();
+    if (this.facade.form.invalid) {
+      this.facade.form.markAsDirty();
+      this.facade.form.markAllAsTouched();
       return;
     }
   }

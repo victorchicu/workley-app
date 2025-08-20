@@ -3,7 +3,6 @@
     <div class="w-full max-w-3xl mx-auto">
       <app-input
         #promptInputRef
-        [form]="promptFacade.form"
         placeholder="Ask anything"
         (submit)="promptFacade.createChat()">
         <div class="flex items-center justify-end px-2">

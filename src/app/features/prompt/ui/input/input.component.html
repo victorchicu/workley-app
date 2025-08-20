@@ -1,14 +1,15 @@
+@let prompt = viewModel();
 <div class="relative w-full mx-auto">
-  <form [formGroup]="form"
+  <form [formGroup]="prompt.form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!facade.hasLineBreaks()"
-        [class.rounded-3xl]="facade.hasLineBreaks()"
-        [class.opacity-50]="facade.submitting() || deactivated"
-        [class.pointer-events-none]="facade.submitting() || deactivated"
+        [class.rounded-full]="!prompt.hasLineBreaks"
+        [class.rounded-3xl]="prompt.hasLineBreaks"
+        [class.opacity-50]="prompt.submitting || deactivated"
+        [class.pointer-events-none]="prompt.submitting || deactivated"
   >
-    <fieldset [disabled]="facade.submitting() || deactivated" class="w-full">
-      <div [class]="facade.hasLineBreaks() ? 'w-full' : 'flex items-stretch w-full p-3'">
-        <div [class]="facade.hasLineBreaks() ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
+    <fieldset [disabled]="prompt.submitting || deactivated" class="w-full">
+      <div [class]="prompt.hasLineBreaks ? 'w-full' : 'flex items-stretch w-full p-3'">
+        <div [class]="prompt.hasLineBreaks ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
           <textarea
             #promptRef
             id="message"
@@ -22,7 +23,7 @@
             [placeholder]="placeholder"
           ></textarea>
         </div>
-        <div [class]="facade.hasLineBreaks() ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+        <div [class]="prompt.hasLineBreaks ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
           <ng-content/>
         </div>
       </div>

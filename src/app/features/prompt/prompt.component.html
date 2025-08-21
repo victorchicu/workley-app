@@ -8,7 +8,11 @@
                  (onKeyDown)="onSubmit()">
         <div class="flex items-center gap-1" [class.justify-end]="prompt.hasLineBreaks">
           <app-upload-file/>
-          <app-submit aria-label="Create my resume" (clicked)="onSubmit()" [activated]="prompt.form.valid"/>
+          <app-submit
+            aria-label="Create my resume"
+            (clicked)="onSubmit()"
+            [activated]="prompt.form.valid"
+          />
         </div>
       </app-input>
     </div>

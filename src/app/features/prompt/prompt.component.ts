@@ -2,7 +2,7 @@ import {Component, computed, inject} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HeadlineComponent} from './ui/headline/headline.component';
 import {InputComponent} from './ui/input/input.component';
-import {PromptFacade} from './prompt.facade';
+import {PromptFacade} from '../../shared/services/prompt.facade';
 import {
   SubmitComponent
 } from './ui/submit/submit.component';
@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
 import {CreateChatCommandResult} from '../../shared/models/command.models';
 
 @Component({
-  selector: 'app-resume-prompt',
+  selector: 'app-prompt',
   standalone: true,
   imports: [
     FormsModule,

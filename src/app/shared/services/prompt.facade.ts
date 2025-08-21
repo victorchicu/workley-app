@@ -1,8 +1,8 @@
-import {computed, inject, Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {inject, Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {CommandService} from '../../shared/services/command.service';
+import {CommandService} from './command.service';
 import {catchError, delay, EMPTY, finalize, map, Observable, tap, throwError} from 'rxjs';
-import {ActionCommandResult, CreateChatCommand, CreateChatCommandResult} from '../../shared/models/command.models';
+import {ActionCommandResult, CreateChatCommand, CreateChatCommandResult} from '../models/command.models';
 
 export interface PromptControl {
   text: FormControl<string>;

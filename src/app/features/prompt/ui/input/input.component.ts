@@ -3,7 +3,7 @@ import {
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
-import {PromptFacade} from '../../prompt.facade';
+import {PromptFacade} from '../../../../shared/services/prompt.facade';
 
 @Component({
   selector: 'app-input',

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, catchError, delay, finalize, map, of, tap} from 'rxjs';
 import {
   ActionCommandResult, Message,
@@ -8,7 +8,8 @@ import {
 import {GetChatQueryService} from '../../shared/services/get-chat-query.service';
 import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models';
 import {CommandService} from '../../shared/services/command.service';
-
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {PromptForm} from '../../shared/services/prompt.facade';
 @Injectable({
   providedIn: 'root'
 })

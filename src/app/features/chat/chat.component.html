@@ -1,15 +1,12 @@
-<!-- Container with explicit height constraint -->
+@let prompt = viewModel();
 <div class="h-full max-h-screen flex flex-col overflow-hidden">
-  <!-- Messages container - takes remaining space with min-height constraint -->
   <div class="flex-1 min-h-0 overflow-y-auto" #messagesContainer>
     <div class="w-full max-w-3xl mx-auto px-4 py-6">
-      <!-- Loading spinner -->
       <div *ngIf="(isLoading$ | async) && (messages$ | async)?.length === 0"
            class="flex justify-center items-center h-32">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
 
-      <!-- Error message -->
       <div *ngIf="error$ | async as error"
            class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
         <div class="flex items-center">
@@ -23,10 +20,8 @@
         </div>
       </div>
 
-      <!-- Messages -->
       <div *ngFor="let message of messages$ | async"
            class="mb-6 animate-fadeIn">
-        <!-- User Message -->
         <div *ngIf="message.actor !== 'assistant'" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg">
             <div class="bg-blue-600 text-white rounded-lg px-4 py-2">
@@ -38,11 +33,9 @@
           </div>
         </div>
 
-        <!-- Assistant Message -->
         <div *ngIf="message.actor === 'assistant'" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl">
             <div class="bg-gray-100 rounded-lg px-4 py-2">
-              <!-- Loading state for assistant -->
               <div *ngIf="!!(isLoading$ | async)" class="flex items-center space-x-2">
                 <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
                 <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
@@ -66,8 +59,12 @@
         placeholder="Ask anything"
         [deactivated]="!!(isLoading$ | async)"
         (submit)="sendMessage($event)">
-        <div class="flex items-center justify-end px-2">
-          <app-submit aria-label="Send message" (clicked)="onSubmit()"/>
+        <div class="flex items-center justify-end">
+          <app-submit
+            aria-label="Send message"
+            (clicked)="onSubmit()"
+            [activated]="prompt.form.valid"
+          />
         </div>
       </app-input>
       <app-chat-disclaimer/>

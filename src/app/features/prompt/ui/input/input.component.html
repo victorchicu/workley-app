@@ -7,8 +7,8 @@
         [class.opacity-50]="prompt.submitting || deactivated"
         [class.pointer-events-none]="prompt.submitting || deactivated"
   >
-    <fieldset [disabled]="prompt.submitting || deactivated" class="w-full">
-      <div [class]="prompt.hasLineBreaks ? 'w-full' : 'flex items-stretch w-full p-3'">
+    <fieldset [disabled]="prompt.submitting || deactivated">
+      <div [class]="prompt.hasLineBreaks ? 'w-full' : 'flex items-stretch w-full p-2'">
         <div [class]="prompt.hasLineBreaks ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
           <textarea
             #promptRef

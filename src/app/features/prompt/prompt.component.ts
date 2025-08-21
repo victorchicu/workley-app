@@ -1,5 +1,5 @@
-import {Component, computed, inject, Signal} from '@angular/core';
-import {FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {Component, computed, inject} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HeadlineComponent} from './ui/headline/headline.component';
 import {InputComponent} from './ui/input/input.component';
 import {PromptFacade} from './prompt.facade';
@@ -8,8 +8,7 @@ import {
 } from './ui/submit/submit.component';
 import {UploadFileComponent} from './ui/upload-file/upload-file.component';
 import {Router} from '@angular/router';
-import {ActionCommandResult, CreateChatCommandResult} from '../../shared/models/command.models';
-import {TooltipDirective} from '../../core/directive/tooltip.directive';
+import {CreateChatCommandResult} from '../../shared/models/command.models';
 
 @Component({
   selector: 'app-resume-prompt',

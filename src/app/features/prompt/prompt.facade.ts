@@ -14,7 +14,7 @@ export type PromptForm = FormGroup<PromptControl>;
   providedIn: 'root'
 })
 export class PromptFacade {
-  private builder: FormBuilder = inject(FormBuilder);
+  private readonly builder: FormBuilder = inject(FormBuilder);
   readonly form: PromptForm = this.builder.nonNullable.group({
     text: ['', [Validators.required, Validators.maxLength(2000)]]
   });

@@ -4,7 +4,7 @@
     <div class="relative">
       <app-headline/>
       <app-input #promptRef
-                 placeholder="Describe your background: skills, jobs, or goals"
+                 placeholder="Ask anything"
                  (onKeyDown)="onSubmit()">
         <div class="flex items-center gap-1" [class.justify-end]="prompt.hasLineBreaks">
           <app-upload-file/>

@@ -16,15 +16,12 @@ export type PromptForm = FormGroup<PromptControl>;
 export class PromptFacade {
   private builder: FormBuilder = inject(FormBuilder);
   readonly form: PromptForm = this.builder.nonNullable.group({
-    text: ['', [Validators.required, Validators.maxLength(1000)]]
+    text: ['', [Validators.required, Validators.maxLength(2000)]]
   });
   readonly api: CommandService = inject(CommandService);
 
   private _error: WritableSignal<string | null> = signal<string | null>(null);
   readonly error: Signal<string | null> = this._error.asReadonly();
-
-  private _file: WritableSignal<File | null> = signal<File | null>(null);
-  readonly filename: Signal<string | null> = computed(() => this._file()?.name ?? null);
 
   readonly submitting: WritableSignal<boolean> = signal(false);
 
@@ -67,7 +64,6 @@ export class PromptFacade {
 
   private clear(): void {
     this.form.reset();
-    this._file.set(null);
     this._error.set(null);
     this._hasLineBreaks.set(false);
   }

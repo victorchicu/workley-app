@@ -4,7 +4,6 @@ import {
   Component, ElementRef, inject, OnInit, ViewChild
 } from '@angular/core';
 import {InputComponent} from '../prompt/ui/input/input.component';
-import {ChatDisclaimerComponent} from './ui/chat-disclaimer/chat-disclaimer.component';
 import {ActivatedRoute, Navigation, Router} from '@angular/router';
 import {
   CreateChatCommandResult, Message
@@ -13,18 +12,19 @@ import {AsyncPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
 import {ChatFacade} from './chat.facade';
 import {Observable} from 'rxjs';
 import {SubmitComponent} from '../prompt/ui/submit/submit.component';
+import {ChatDisclaimerComponent} from './ui/chat-disclaimer/chat-disclaimer.component';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
   imports: [
-    ChatDisclaimerComponent,
     InputComponent,
     NgIf,
     AsyncPipe,
     DatePipe,
     NgForOf,
     SubmitComponent,
+    ChatDisclaimerComponent,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -35,8 +35,6 @@ export class ChatComponent implements AfterViewInit {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   readonly facade: ChatFacade = inject(ChatFacade);
-  readonly route: ActivatedRoute = inject(ActivatedRoute);
-
   chatId: string | null = null;
   messages$: Observable<Message[]> = this.facade.messages$;
   isLoading$: Observable<boolean> = this.facade.isLoading$;
@@ -84,15 +82,7 @@ export class ChatComponent implements AfterViewInit {
       element.scrollTop = element.scrollHeight;
     }
   }
-
-  retry() {
-    if (this.chatId) {
-      this.facade.retryLastMessage(this.chatId);
-    }
-  }
-
-  protected readonly DatePipe = DatePipe;
-  protected readonly Date = Date;
+  protected readonly Date: DateConstructor = Date;
 
   onSubmit() {
 

@@ -4,7 +4,7 @@ import {
   Component, ElementRef, inject, OnInit, ViewChild
 } from '@angular/core';
 import {InputComponent} from '../prompt/ui/input/input.component';
-import {ActivatedRoute, Navigation, Router} from '@angular/router';
+import {Navigation, Router} from '@angular/router';
 import {
   CreateChatCommandResult, Message
 } from '../../shared/models/command.models';
@@ -28,7 +28,6 @@ import {ChatDisclaimerComponent} from './ui/chat-disclaimer/chat-disclaimer.comp
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatComponent implements AfterViewInit {
   @ViewChild('promptRef') promptInput!: InputComponent;

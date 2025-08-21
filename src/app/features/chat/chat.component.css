@@ -30,3 +30,9 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}

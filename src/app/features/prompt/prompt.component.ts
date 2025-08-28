@@ -1,12 +1,12 @@
 import {Component, computed, inject} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HeadlineComponent} from './ui/headline/headline.component';
-import {InputComponent} from './ui/input/input.component';
+import {PromptHeadlineComponent} from './components/prompt-headline/prompt-headline.component';
+import {PromptInputComponent} from './components/prompt-input/prompt-input.component';
 import {PromptFacade} from '../../shared/services/prompt.facade';
 import {
-  SubmitComponent
-} from './ui/submit/submit.component';
-import {UploadFileComponent} from './ui/upload-file/upload-file.component';
+  PromptSubmitComponent
+} from './components/prompt-submit/prompt-submit.component';
+import {PromptFileUploadComponent} from './components/prompt-file-upload/prompt-file-upload.component';
 import {Router} from '@angular/router';
 import {CreateChatCommandResult} from '../../shared/models/command.models';
 
@@ -16,10 +16,10 @@ import {CreateChatCommandResult} from '../../shared/models/command.models';
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    HeadlineComponent,
-    InputComponent,
-    SubmitComponent,
-    UploadFileComponent
+    PromptHeadlineComponent,
+    PromptInputComponent,
+    PromptSubmitComponent,
+    PromptFileUploadComponent
   ],
   templateUrl: './prompt.component.html',
   styleUrl: './prompt.component.css',

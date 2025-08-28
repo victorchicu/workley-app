@@ -54,19 +54,19 @@
 
   <div class="flex-shrink-0 w-full bg-white">
     <div class="w-full max-w-3xl mx-auto px-4">
-      <app-input
+      <app-prompt-input
         #promptRef
         placeholder="Ask anything"
         [deactivated]="!!(isLoading$ | async)"
         (submit)="sendMessage($event)">
         <div class="flex items-center justify-end">
-          <app-submit
+          <app-prompt-submit
             aria-label="Send message"
             (clicked)="onSubmit()"
             [activated]="prompt.form.valid"
           />
         </div>
-      </app-input>
+      </app-prompt-input>
       <app-chat-disclaimer/>
     </div>
   </div>

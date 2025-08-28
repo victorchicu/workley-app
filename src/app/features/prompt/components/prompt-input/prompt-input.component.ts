@@ -6,16 +6,16 @@ import {
 import {PromptFacade} from '../../../../shared/services/prompt.facade';
 
 @Component({
-  selector: 'app-input',
+  selector: 'app-prompt-input',
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
   ],
-  templateUrl: './input.component.html',
-  styleUrl: './input.component.css'
+  templateUrl: './prompt-input.component.html',
+  styleUrl: './prompt-input.component.css'
 })
-export class InputComponent {
+export class PromptInputComponent {
   @Input() placeholder: string = "How can I help you today?";
   @Input() deactivated: boolean = false;
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();

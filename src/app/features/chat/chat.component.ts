@@ -2,7 +2,7 @@ import {
   AfterViewInit,
   Component, computed, ElementRef, inject, ViewChild
 } from '@angular/core';
-import {InputComponent} from '../prompt/ui/input/input.component';
+import {PromptInputComponent} from '../prompt/components/prompt-input/prompt-input.component';
 import {Navigation, Router} from '@angular/router';
 import {
   CreateChatCommandResult, Message
@@ -10,20 +10,20 @@ import {
 import {AsyncPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
 import {ChatFacade} from './chat.facade';
 import {Observable} from 'rxjs';
-import {SubmitComponent} from '../prompt/ui/submit/submit.component';
-import {ChatDisclaimerComponent} from './ui/chat-disclaimer/chat-disclaimer.component';
+import {PromptSubmitComponent} from '../prompt/components/prompt-submit/prompt-submit.component';
+import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
 import {PromptFacade} from '../../shared/services/prompt.facade';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
   imports: [
-    InputComponent,
+    PromptInputComponent,
     NgIf,
     AsyncPipe,
     DatePipe,
     NgForOf,
-    SubmitComponent,
+    PromptSubmitComponent,
     ChatDisclaimerComponent,
   ],
   templateUrl: './chat.component.html',
@@ -42,7 +42,7 @@ export class ChatComponent implements AfterViewInit {
   isLoading$: Observable<boolean> = this.chat.isLoading$;
   error$: Observable<string | null> = this.chat.error$;
   protected readonly Date: DateConstructor = Date;
-  @ViewChild('promptRef') promptInput!: InputComponent;
+  @ViewChild('promptRef') promptInput!: PromptInputComponent;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   constructor(readonly router: Router) {

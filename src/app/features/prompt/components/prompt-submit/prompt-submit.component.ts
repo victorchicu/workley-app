@@ -5,16 +5,16 @@ import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner
 import {CommandService} from '../../../../shared/services/command.service';
 
 @Component({
-  selector: 'app-submit',
+  selector: 'app-prompt-submit',
   standalone: true,
   imports: [
     NgClass,
     SpinnerComponent
   ],
-  templateUrl: './submit.component.html',
-  styleUrl: './submit.component.css'
+  templateUrl: './prompt-submit.component.html',
+  styleUrl: './prompt-submit.component.css'
 })
-export class SubmitComponent {
+export class PromptSubmitComponent {
 
   @Input() activated: boolean = true;
   @Output() clicked: EventEmitter<void> = new EventEmitter<void>();

@@ -2,19 +2,19 @@
 <div class="min-h-screen flex flex-col items-center justify-center -mt-24">
   <div class="w-full max-w-3xl px-4">
     <div class="relative">
-      <app-headline/>
-      <app-input #promptRef
+      <app-prompt-headline/>
+      <app-prompt-input #promptRef
                  placeholder="Ask anything"
                  (onKeyDown)="onSubmit()">
         <div class="flex items-center gap-1" [class.justify-end]="prompt.hasLineBreaks">
-          <app-upload-file/>
-          <app-submit
+          <app-prompt-file-upload/>
+          <app-prompt-submit
             aria-label="Create my resume"
             (clicked)="onSubmit()"
             [activated]="prompt.form.valid"
           />
         </div>
-      </app-input>
+      </app-prompt-input>
     </div>
   </div>
 </div>

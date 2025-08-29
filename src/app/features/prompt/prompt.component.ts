@@ -2,7 +2,7 @@ import {Component, computed, inject} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PromptHeadlineComponent} from './components/prompt-headline/prompt-headline.component';
 import {PromptInputComponent} from './components/prompt-input/prompt-input.component';
-import {PromptFacade} from '../../shared/services/prompt.facade';
+import {PromptState} from './prompt-state.service';
 import {
   PromptSubmitComponent
 } from './components/prompt-submit/prompt-submit.component';
@@ -26,17 +26,17 @@ import {CreateChatCommandResult} from '../../shared/models/command.models';
 })
 export class PromptComponent {
   private readonly router: Router = inject(Router);
-  private readonly facade: PromptFacade = inject(PromptFacade);
+  private readonly prompt: PromptState = inject(PromptState);
 
   viewModel = computed(() => ({
-    form: this.facade.form,
-    error: this.facade.error(),
-    submitting: this.facade.submitting(),
-    hasLineBreaks: this.facade.hasLineBreaks(),
+    form: this.prompt.form,
+    error: this.prompt.error(),
+    submitting: this.prompt.submitting(),
+    hasLineBreaks: this.prompt.hasLineBreaks(),
   }));
 
-  onSubmit() {
-    this.facade.createChat().subscribe({
+  handlePrompt() {
+    this.prompt.createChat().subscribe({
       next: (response: CreateChatCommandResult) => {
         console.log("Navigating to chat with id:", response.chatId)
         this.router.navigate(['/chat', response.chatId], {state: response})

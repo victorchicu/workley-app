@@ -1,4 +1,4 @@
-@let prompt = viewModel();
+@let chat = viewModel();
 <div class="h-full max-h-screen flex flex-col overflow-hidden">
   <div class="flex-1 min-h-0 overflow-y-auto" #messagesContainer>
     <div class="w-full max-w-3xl mx-auto px-4 py-6">
@@ -24,7 +24,7 @@
            class="mb-6 animate-fadeIn">
         <div *ngIf="message.actor !== 'assistant'" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg">
-            <div class="bg-blue-600 text-white rounded-lg px-4 py-2">
+            <div class="bg-neutral-600 text-white rounded-lg px-4 py-2">
               <p class="text-sm">{{ message.content }}</p>
             </div>
             <div class="text-xs text-gray-500 mt-1 text-right">
@@ -35,11 +35,11 @@
 
         <div *ngIf="message.actor === 'assistant'" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl">
-            <div class="bg-gray-100 rounded-lg px-4 py-2">
+            <div class="bg-neutral-100 rounded-lg px-4 py-2">
               <div *ngIf="!!(isLoading$ | async)" class="flex items-center space-x-2">
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
+                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
+                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
               </div>
               <p *ngIf="!(!!(isLoading$ | async))" class="text-sm text-gray-800 whitespace-pre-wrap">{{ message.content }}</p>
             </div>
@@ -51,19 +51,17 @@
       </div>
     </div>
   </div>
-
   <div class="flex-shrink-0 w-full bg-white">
     <div class="w-full max-w-3xl mx-auto px-4">
       <app-prompt-input
         #promptRef
-        placeholder="Ask anything"
-        [deactivated]="!!(isLoading$ | async)"
-        (submit)="sendMessage($event)">
-        <div class="flex items-center justify-end">
+        placeholder="Share your experience..."
+        (onKeyDown)="onSubmit()">
+        <div class="flex items-center gap-1" [class.justify-end]="chat.hasLineBreaks">
           <app-prompt-submit
             aria-label="Send message"
             (clicked)="onSubmit()"
-            [activated]="prompt.form.valid"
+            [activated]="chat.form.valid"
           />
         </div>
       </app-prompt-input>

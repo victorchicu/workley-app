@@ -1,6 +1,6 @@
 import {Component, computed, EventEmitter, inject, Input, Output} from '@angular/core';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
-import {PromptFacade} from '../../../../shared/services/prompt.facade';
+import {PromptState} from '../../prompt-state.service';
 import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner.component';
 import {CommandService} from '../../../../shared/services/command.service';
 
@@ -19,7 +19,7 @@ export class PromptSubmitComponent {
   @Input() activated: boolean = true;
   @Output() clicked: EventEmitter<void> = new EventEmitter<void>();
 
-  private readonly facade: PromptFacade = inject(PromptFacade);
+  private readonly facade: PromptState = inject(PromptState);
 
   viewModel = computed(() => ({
     submitting: this.facade.submitting(),

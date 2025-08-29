@@ -3,7 +3,7 @@ import {
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
-import {PromptFacade} from '../../../../shared/services/prompt.facade';
+import {PromptState} from '../../prompt-state.service';
 
 @Component({
   selector: 'app-prompt-input',
@@ -21,7 +21,7 @@ export class PromptInputComponent {
   @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
-  private readonly facade: PromptFacade = inject(PromptFacade);
+  private readonly facade: PromptState = inject(PromptState);
 
   viewModel = computed(() => ({
     form: this.facade.form,

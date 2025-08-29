@@ -6,14 +6,14 @@ import {Observable} from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class GetChatQueryService {
+export class QueryService {
 
   readonly baseUrl: string = '/api/chats';
 
   constructor(private readonly httpClient: HttpClient) {
   }
 
-  public fetch(query: GetQuery): Observable<GetChatQueryResult> {
+  public fetchChat(query: GetQuery): Observable<GetChatQueryResult> {
     return this.httpClient.get<GetQueryResult>(`${this.baseUrl}/${query.chatId}`, {
       withCredentials: true,
     })

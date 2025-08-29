@@ -3,14 +3,15 @@
   <div class="w-full max-w-3xl px-4">
     <div class="relative">
       <app-prompt-headline/>
-      <app-prompt-input #promptRef
-                 placeholder="Ask anything"
-                 (onKeyDown)="onSubmit()">
+      <app-prompt-input
+        #promptRef
+        placeholder="What job are you applying for?"
+        (onKeyDown)="handlePrompt()">
         <div class="flex items-center gap-1" [class.justify-end]="prompt.hasLineBreaks">
           <app-prompt-file-upload/>
           <app-prompt-submit
             aria-label="Create my resume"
-            (clicked)="onSubmit()"
+            (clicked)="handlePrompt()"
             [activated]="prompt.form.valid"
           />
         </div>

@@ -8,11 +8,11 @@ import {
   CreateChatCommandResult, Message
 } from '../../shared/models/command.models';
 import {AsyncPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
-import {ChatFacade} from './chat.facade';
+import {ChatState} from './chat-state.service';
 import {Observable} from 'rxjs';
 import {PromptSubmitComponent} from '../prompt/components/prompt-submit/prompt-submit.component';
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
-import {PromptFacade} from '../../shared/services/prompt.facade';
+import {PromptState} from '../prompt/prompt-state.service';
 
 @Component({
   selector: 'app-chat',
@@ -29,20 +29,20 @@ import {PromptFacade} from '../../shared/services/prompt.facade';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
-export class ChatComponent implements AfterViewInit {
-  readonly chat: ChatFacade = inject(ChatFacade);
-  readonly prompt: PromptFacade = inject(PromptFacade);
+export class ChatComponent {
+  readonly chat: ChatState = inject(ChatState);
+  readonly prompt: PromptState = inject(PromptState);
 
   viewModel = computed(() => ({
     form: this.prompt.form,
+    hasLineBreaks: this.prompt.hasLineBreaks()
   }));
 
+  error$: Observable<string | null> = this.chat.error$;
   chatId: string | null = null;
   messages$: Observable<Message[]> = this.chat.messages$;
   isLoading$: Observable<boolean> = this.chat.isLoading$;
-  error$: Observable<string | null> = this.chat.error$;
   protected readonly Date: DateConstructor = Date;
-  @ViewChild('promptRef') promptInput!: PromptInputComponent;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   constructor(readonly router: Router) {
@@ -50,37 +50,36 @@ export class ChatComponent implements AfterViewInit {
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatCommandResult;
       console.log("Create chat command result: ", result);
-      this.handleCreateChatCommandResult(result);
+      this.handleResult(result);
     }
   }
 
-  ngAfterViewInit() {
-    this.messages$.subscribe(() => {
-      setTimeout(() => this.scrollToBottom(), 100);
-    });
-  }
-
-  sendMessage(content: SubmitEvent) {
-    console.log("Sending message:", content);
-    // if (!content.trim() || !this.chatId) return;
-    // this.facade.sendMessage(this.chatId, content);
-    // this.promptInput.clear(); // Clear input after sending
-  }
-
   onSubmit() {
-
+    console.log("On Submit")
+    if (!this.chatId)
+      return;
+    // this.chat.sendMessage(this.chatId, ).subscribe({
+    //   next: (response: CreateChatCommandResult) => {
+    //     console.log("Navigating to chat with id:", response.chatId)
+    //     this.router.navigate(['/chat', response.chatId], {state: response})
+    //       .then();
+    //   },
+    //   error: (cause) => {
+    //     console.error("Chat creation failed:", cause);
+    //     this.router.navigate(['/error'])
+    //       .then();
+    //   }
+    // });
   }
 
-  private handleCreateChatCommandResult(result: CreateChatCommandResult) {
-    console.log('Handling initial message:', result);
-    this.chat.createChat(result.chatId, result.message);
+  private handleResult(result: CreateChatCommandResult) {
+    this.chat.addMessage(result.chatId, result.message);
     // Optionally fetch full history to ensure consistency
     // this.loadChatHistory();
   }
 
   private loadChatHistory() {
     if (!this.chatId) return;
-
     console.log('Loading chat history for:', this.chatId);
     this.chat.loadChatHistory(this.chatId);
   }

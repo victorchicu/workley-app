@@ -12,7 +12,7 @@ import {ChatState} from './chat-state.service';
 import {Observable} from 'rxjs';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
-import {PromptState} from '../../shared/services/prompt-state.service';
+import {PromptState} from '../prompt/prompt-state.service';
 
 @Component({
   selector: 'app-chat',

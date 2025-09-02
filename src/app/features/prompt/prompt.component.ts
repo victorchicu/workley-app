@@ -2,7 +2,7 @@ import {Component, computed, DestroyRef, inject} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PromptHeadlineComponent} from './components/prompt-headline/prompt-headline.component';
 import {PromptInputFormComponent} from './components/prompt-input-form/prompt-input-form.component';
-import {PromptState} from '../../shared/services/prompt-state.service';
+import {PromptState} from './prompt-state.service';
 import {
   PromptSendButtonComponent
 } from './components/prompt-send-button/prompt-send-button.component';

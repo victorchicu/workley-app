@@ -3,7 +3,7 @@ import {
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
-import {PromptState} from '../../../../shared/services/prompt-state.service';
+import {PromptState} from '../../prompt-state.service';
 
 @Component({
   selector: 'app-prompt-input-form',

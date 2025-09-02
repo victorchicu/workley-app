@@ -1,6 +1,6 @@
 import {Component, computed, EventEmitter, inject, Input, Output} from '@angular/core';
 import {NgClass} from '@angular/common';
-import {PromptState} from '../../../../shared/services/prompt-state.service';
+import {PromptState} from '../../prompt-state.service';
 import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner.component';
 
 @Component({

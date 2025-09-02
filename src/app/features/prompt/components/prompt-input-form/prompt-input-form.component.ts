@@ -6,55 +6,55 @@ import {
 import {PromptState} from '../../prompt-state.service';
 
 @Component({
-  selector: 'app-prompt-input',
+  selector: 'app-prompt-input-form',
   standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,
   ],
-  templateUrl: './prompt-input.component.html',
-  styleUrl: './prompt-input.component.css'
+  templateUrl: './prompt-input-form.component.html',
+  styleUrl: './prompt-input-form.component.css'
 })
-export class PromptInputComponent {
-  @Input() placeholder: string = "How can I help you today?";
+export class PromptInputFormComponent {
+  @Input() placeholder: string = "What job are you applying for?";
   @Input() deactivated: boolean = false;
-  @Output() onKeyDown: EventEmitter<void> = new EventEmitter<void>();
+  @Output() onPressEnter: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
-  private readonly facade: PromptState = inject(PromptState);
+  private readonly prompt: PromptState = inject(PromptState);
 
   viewModel = computed(() => ({
-    form: this.facade.form,
-    error: this.facade.error(),
-    isSubmitting: this.facade.isSubmitting(),
-    lineBreakDetected: this.facade.lineBreakDetected(),
+    form: this.prompt.form,
+    error: this.prompt.error(),
+    isSubmitting: this.prompt.isSubmitting(),
+    isLinedWrapped: this.prompt.lineWrapDetected(),
   }));
 
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
-      console.log("On 'Enter' key down: ", this.facade.form);
+      console.log("On 'Enter' key down: ", this.prompt.form);
       event.preventDefault();
-      this.onKeyDown.emit();
+      this.onPressEnter.emit();
       return;
     }
 
-    if (this.facade.form.invalid) {
-      this.facade.form.markAsDirty();
-      this.facade.form.markAllAsTouched();
+    if (this.prompt.form.invalid) {
+      this.prompt.form.markAsDirty();
+      this.prompt.form.markAllAsTouched();
       return;
     }
   }
 
-  onTextCollideWrapNewLine(): void {
+  onLineWrapDetected(): void {
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
     const content: string = textarea.value;
 
-    const hasLineBreaks: boolean = content.includes('\n');
+    const hasNewLine: boolean = content.includes('\n');
     const wouldCollide: boolean = this.wouldTextCollideWithActions(content);
 
-    this.facade.setHasLineBreaks(hasLineBreaks || wouldCollide);
+    this.prompt.setLineWrapped(hasNewLine || wouldCollide);
 
-    if (this.facade.lineBreakDetected()) {
+    if (this.prompt.lineWrapDetected()) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;

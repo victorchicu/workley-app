@@ -24,16 +24,21 @@ export class PromptState {
   });
 
   private _error: WritableSignal<string | null> = signal<string | null>(null);
-  private _hasLineBreaks: WritableSignal<boolean> = signal(false);
+  private _lineWrapDetected: WritableSignal<boolean> = signal(false);
 
   readonly error: Signal<string | null> = this._error.asReadonly();
   readonly isSubmitting: WritableSignal<boolean> = signal(false);
-  readonly lineBreakDetected: Signal<boolean> = this._hasLineBreaks.asReadonly();
+  readonly lineWrapDetected: Signal<boolean> = this._lineWrapDetected.asReadonly();
 
   createChat(): Observable<CreateChatCommandResult> {
-    if (this.isSubmitting() || this.form.invalid)
+    if (this.form.invalid)
       return EMPTY;
+
+    if (this.isSubmitting())
+      return EMPTY;
+
     this.isSubmitting.set(true);
+
     const text: string = this.form.controls.text.value;
     return this.command.execute(new CreateChatCommand(text))
       .pipe(
@@ -59,13 +64,13 @@ export class PromptState {
       );
   }
 
-  setHasLineBreaks(value: boolean) {
-    this._hasLineBreaks.set(value);
+  setLineWrapped(value: boolean) {
+    this._lineWrapDetected.set(value);
   }
 
   private clear(): void {
     this.form.reset();
     this._error.set(null);
-    this._hasLineBreaks.set(false);
+    this._lineWrapDetected.set(false);
   }
 }

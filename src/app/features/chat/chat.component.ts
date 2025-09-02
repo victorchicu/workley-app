@@ -2,7 +2,7 @@ import {
   AfterViewInit,
   Component, computed, ElementRef, inject, ViewChild
 } from '@angular/core';
-import {PromptInputComponent} from '../prompt/components/prompt-input/prompt-input.component';
+import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {Navigation, Router} from '@angular/router';
 import {
   CreateChatCommandResult, Message
@@ -10,7 +10,7 @@ import {
 import {AsyncPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
 import {ChatState} from './chat-state.service';
 import {Observable} from 'rxjs';
-import {PromptSubmitComponent} from '../prompt/components/prompt-submit/prompt-submit.component';
+import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
 import {PromptState} from '../prompt/prompt-state.service';
 
@@ -18,12 +18,12 @@ import {PromptState} from '../prompt/prompt-state.service';
   selector: 'app-chat',
   standalone: true,
   imports: [
-    PromptInputComponent,
+    PromptInputFormComponent,
     NgIf,
     AsyncPipe,
     DatePipe,
     NgForOf,
-    PromptSubmitComponent,
+    PromptSendButtonComponent,
     ChatDisclaimerComponent,
   ],
   templateUrl: './chat.component.html',
@@ -35,7 +35,7 @@ export class ChatComponent {
 
   viewModel = computed(() => ({
     form: this.prompt.form,
-    hasLineBreaks: this.prompt.lineBreakDetected()
+    isLineWrapped: this.prompt.lineWrapDetected()
   }));
 
   error$: Observable<string | null> = this.chat.error$;

@@ -5,18 +5,18 @@ import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner
 import {CommandService} from '../../../../shared/services/command.service';
 
 @Component({
-  selector: 'app-prompt-submit',
+  selector: 'app-prompt-send-button',
   standalone: true,
   imports: [
     NgClass,
     SpinnerComponent
   ],
-  templateUrl: './prompt-submit.component.html',
-  styleUrl: './prompt-submit.component.css'
+  templateUrl: './prompt-send-button.component.html',
+  styleUrl: './prompt-send-button.component.css'
 })
-export class PromptSubmitComponent {
+export class PromptSendButtonComponent {
 
-  @Input() activated: boolean = true;
+  @Input() deactivated: boolean = true;
   @Output() clicked: EventEmitter<void> = new EventEmitter<void>();
 
   private readonly facade: PromptState = inject(PromptState);

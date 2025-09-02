@@ -53,18 +53,18 @@
   </div>
   <div class="flex-shrink-0 w-full bg-white">
     <div class="w-full max-w-3xl mx-auto px-4">
-      <app-prompt-input
+      <app-prompt-input-form
         #promptRef
         placeholder="Share your experience..."
-        (onKeyDown)="onSubmit()">
-        <div class="flex items-center gap-1" [class.justify-end]="chat.hasLineBreaks">
-          <app-prompt-submit
+        (onPressEnter)="onSubmit()">
+        <div class="flex items-center gap-1" [class.justify-end]="chat.isLineWrapped">
+          <app-prompt-send-button
             aria-label="Send message"
             (clicked)="onSubmit()"
-            [activated]="chat.form.valid"
+            [deactivated]="chat.form.invalid"
           />
         </div>
-      </app-prompt-input>
+      </app-prompt-input-form>
       <app-chat-disclaimer/>
     </div>
   </div>

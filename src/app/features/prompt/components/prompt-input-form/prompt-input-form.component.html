@@ -2,14 +2,14 @@
 <div class="relative w-full mx-auto">
   <form [formGroup]="prompt.form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!prompt.lineBreakDetected"
-        [class.rounded-3xl]="prompt.lineBreakDetected"
+        [class.rounded-full]="!prompt.isLinedWrapped"
+        [class.rounded-3xl]="prompt.isLinedWrapped"
         [class.opacity-50]="prompt.isSubmitting || deactivated"
         [class.pointer-events-none]="prompt.isSubmitting || deactivated"
   >
     <fieldset [disabled]="prompt.isSubmitting || deactivated">
-      <div [class]="prompt.lineBreakDetected ? 'w-full' : 'w-full flex items-stretch p-2'">
-        <div [class]="prompt.lineBreakDetected ? 'w-full flex items-center px-1 py-3' : 'w-full flex flex-1 items-center'">
+      <div [class]="prompt.isLinedWrapped ? 'w-full' : 'w-full flex items-stretch p-2'">
+        <div [class]="prompt.isLinedWrapped ? 'w-full flex items-center px-1 py-3' : 'w-full flex flex-1 items-center'">
           <textarea
             #promptRef
             id="message"
@@ -19,11 +19,11 @@
             autocomplete="off"
             formControlName="text"
             (keydown)="handleKeyDown($event)"
-            (input)="onTextCollideWrapNewLine()"
+            (input)="onLineWrapDetected()"
             [placeholder]="placeholder"
           ></textarea>
         </div>
-        <div [class]="prompt.lineBreakDetected ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+        <div [class]="prompt.isLinedWrapped ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
           <ng-content/>
         </div>
       </div>

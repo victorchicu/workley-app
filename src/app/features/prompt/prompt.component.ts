@@ -1,14 +1,15 @@
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed, DestroyRef, inject} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PromptHeadlineComponent} from './components/prompt-headline/prompt-headline.component';
 import {PromptInputFormComponent} from './components/prompt-input-form/prompt-input-form.component';
-import {PromptState} from './prompt-state.service';
+import {PromptState} from '../../shared/services/prompt-state.service';
 import {
   PromptSendButtonComponent
 } from './components/prompt-send-button/prompt-send-button.component';
 import {PromptFileUploadComponent} from './components/prompt-file-upload/prompt-file-upload.component';
 import {Router} from '@angular/router';
 import {CreateChatCommandResult} from '../../shared/models/command.models';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-prompt',
@@ -25,8 +26,9 @@ import {CreateChatCommandResult} from '../../shared/models/command.models';
   styleUrl: './prompt.component.css',
 })
 export class PromptComponent {
-  private readonly router: Router = inject(Router);
-  private readonly prompt: PromptState = inject(PromptState);
+  readonly router: Router = inject(Router);
+  readonly prompt: PromptState = inject(PromptState);
+  readonly destroyRef: DestroyRef = inject(DestroyRef);
 
   viewModel = computed(() => ({
     form: this.prompt.form,
@@ -36,17 +38,19 @@ export class PromptComponent {
   }));
 
   sendPrompt() {
-    this.prompt.createChat().subscribe({
-      next: (response: CreateChatCommandResult) => {
-        console.log("Navigating to chat with id:", response.chatId)
-        this.router.navigate(['/chat', response.chatId], {state: response})
-          .then();
-      },
-      error: (cause) => {
-        console.error("Chat creation failed:", cause);
-        this.router.navigate(['/error'])
-          .then();
-      }
-    });
+    this.prompt.createChat()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: CreateChatCommandResult) => {
+          console.log("Navigating to chat with id:", response.chatId)
+          this.router.navigate(['/chat', response.chatId], {state: response})
+            .then();
+        },
+        error: (cause) => {
+          console.error("Chat creation failed:", cause);
+          this.router.navigate(['/error'])
+            .then();
+        }
+      });
   }
 }

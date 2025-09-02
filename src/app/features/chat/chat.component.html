@@ -24,7 +24,7 @@
            class="mb-6 animate-fadeIn">
         <div *ngIf="message.actor !== 'assistant'" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg">
-            <div class="bg-neutral-600 text-white rounded-lg px-4 py-2">
+            <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2">
               <p class="text-sm">{{ message.content }}</p>
             </div>
             <div class="text-xs text-gray-500 mt-1 text-right">
@@ -55,7 +55,7 @@
     <div class="w-full max-w-3xl mx-auto px-4">
       <app-prompt-input-form
         #promptRef
-        placeholder="Share your experience..."
+        placeholder="Reply to Zumely..."
         (onPressEnter)="onSubmit()">
         <div class="flex items-center gap-1" [class.justify-end]="chat.isLineWrapped">
           <app-prompt-send-button

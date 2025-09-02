@@ -1,9 +1,8 @@
-import {DestroyRef, inject, Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {inject, Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {CommandService} from '../../shared/services/command.service';
+import {CommandService} from './command.service';
 import {catchError, delay, EMPTY, finalize, map, Observable, tap, throwError} from 'rxjs';
-import {ActionCommandResult, CreateChatCommand, CreateChatCommandResult} from '../../shared/models/command.models';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ActionCommandResult, CreateChatCommand, CreateChatCommandResult} from '../models/command.models';
 
 export interface PromptControl {
   text: FormControl<string>;
@@ -17,7 +16,6 @@ export type PromptForm = FormGroup<PromptControl>;
 export class PromptState {
   readonly builder: FormBuilder = inject(FormBuilder);
   readonly command: CommandService = inject(CommandService);
-  readonly destroyRef: DestroyRef = inject(DestroyRef);
 
   readonly form: PromptForm = this.builder.nonNullable.group({
     text: ['', [Validators.required, Validators.maxLength(2000)]]
@@ -31,18 +29,12 @@ export class PromptState {
   readonly lineWrapDetected: Signal<boolean> = this._lineWrapDetected.asReadonly();
 
   createChat(): Observable<CreateChatCommandResult> {
-    if (this.form.invalid)
+    if (this.form.invalid || this.isSubmitting())
       return EMPTY;
-
-    if (this.isSubmitting())
-      return EMPTY;
-
     this.isSubmitting.set(true);
-
     const text: string = this.form.controls.text.value;
     return this.command.execute(new CreateChatCommand(text))
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
         delay(500),
         map((result: ActionCommandResult) => result as CreateChatCommandResult),
         tap((result: CreateChatCommandResult) => {

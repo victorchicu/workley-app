@@ -18,8 +18,8 @@
             class="w-full text-neutral-950 bg-transparent focus:outline-none placeholder-neutral-400 resize-none overflow-y-auto pl-3 pr-2 custom-scrollbar smooth-scroll"
             autocomplete="off"
             formControlName="text"
-            (keydown)="handleKeyDown($event)"
-            (input)="onLineWrapDetected()"
+            (keydown)="handlePressEnter($event)"
+            (input)="handleTextWrapToNewLive()"
             [placeholder]="placeholder"
           ></textarea>
         </div>

@@ -18,13 +18,15 @@ export class PromptSendButtonComponent {
   @Input() deactivated: boolean = true;
   @Output() clicked: EventEmitter<void> = new EventEmitter<void>();
 
-  private readonly facade: PromptState = inject(PromptState);
+  private readonly prompt: PromptState = inject(PromptState);
 
   viewModel = computed(() => ({
-    submitting: this.facade.isSubmitting(),
+    submitting: this.prompt.isSubmitting(),
   }));
 
   handleClick() {
-    this.clicked.emit();
+    if (!this.prompt.isSubmitting()) {
+      this.clicked.emit();
+    }
   }
 }

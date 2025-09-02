@@ -30,9 +30,8 @@ export class PromptInputFormComponent {
     isLinedWrapped: this.prompt.lineWrapDetected(),
   }));
 
-  handleKeyDown(event: KeyboardEvent): void {
+  handlePressEnter(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
-      console.log("On 'Enter' key down: ", this.prompt.form);
       event.preventDefault();
       this.onPressEnter.emit();
       return;
@@ -45,7 +44,7 @@ export class PromptInputFormComponent {
     }
   }
 
-  onLineWrapDetected(): void {
+  handleTextWrapToNewLive(): void {
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
     const content: string = textarea.value;
 
@@ -74,35 +73,34 @@ export class PromptInputFormComponent {
 
   private getAvailableSpace(): number {
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
-
     // Try to find the form and measure actual layout
     const form: HTMLFormElement | null = textarea.closest('form');
     if (form) {
       const formWidth = form.offsetWidth;
       const formPadding = 32; // px-4 * 2
       // Try to find the actions element
-      const actionsElement = form.querySelector('app-prompt-actions') as HTMLElement;
+      const actionsElement = form.querySelector('#action-buttons') as HTMLElement;
       if (actionsElement) {
+        console.log("found actions")
         const actionsWidth = actionsElement.offsetWidth;
         const separatorWidth = 20;
         return formWidth - formPadding - actionsWidth - separatorWidth;
       }
     }
-
     // Fallback - use textarea width and estimate
     const textareaContainerWidth = textarea.parentElement?.offsetWidth || textarea.offsetWidth;
     return textareaContainerWidth * 0.65;
   }
 
   private wouldTextCollideWithActions(text: string): boolean {
-    if (!text.trim()) return false;
+    if (!text.trim())
+      return false;
 
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
-
     // Create a temporary span to measure the exact text width
-    const measureSpan: HTMLSpanElement = document.createElement('span');
-
     const styles: CSSStyleDeclaration = window.getComputedStyle(textarea);
+
+    const measureSpan: HTMLSpanElement = document.createElement('span');
     measureSpan.style.font = styles.font;
     measureSpan.style.fontSize = styles.fontSize;
     measureSpan.style.fontFamily = styles.fontFamily;
@@ -112,16 +110,12 @@ export class PromptInputFormComponent {
     measureSpan.style.position = 'absolute';
     measureSpan.style.whiteSpace = 'nowrap';
     measureSpan.textContent = text;
-
     document.body.appendChild(measureSpan);
     const textWidth: number = measureSpan.offsetWidth;
     document.body.removeChild(measureSpan);
 
-    const availableSpace = this.getAvailableSpace();
-
-    // Buffer to trigger before actual collision
     const buffer = 10;
-
+    const availableSpace: number = this.getAvailableSpace();
     return textWidth > (availableSpace - buffer);
   }
 }

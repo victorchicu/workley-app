@@ -8,7 +8,7 @@
         (onPressEnter)="sendPrompt()"
         [deactivated]="prompt.isSubmitting"
       >
-        <div class="flex items-center gap-1" [class.justify-end]="prompt.isLineWrapped">
+        <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="prompt.isLineWrapped">
           <app-prompt-file-upload/>
           <app-prompt-send-button
             aria-label="Create my resume"

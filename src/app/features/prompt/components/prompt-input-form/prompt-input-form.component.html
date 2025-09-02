@@ -24,7 +24,9 @@
           ></textarea>
         </div>
         <div [class]="prompt.isLinedWrapped ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
-          <ng-content/>
+          <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="prompt.isLinedWrapped">
+            <ng-content/>
+          </div>
         </div>
       </div>
     </fieldset>

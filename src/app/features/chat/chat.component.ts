@@ -35,7 +35,7 @@ export class ChatComponent {
 
   viewModel = computed(() => ({
     form: this.prompt.form,
-    hasLineBreaks: this.prompt.hasLineBreaks()
+    hasLineBreaks: this.prompt.lineBreakDetected()
   }));
 
   error$: Observable<string | null> = this.chat.error$;

@@ -31,8 +31,8 @@ export class PromptComponent {
   viewModel = computed(() => ({
     form: this.prompt.form,
     error: this.prompt.error(),
-    submitting: this.prompt.submitting(),
-    hasLineBreaks: this.prompt.hasLineBreaks(),
+    submitting: this.prompt.isSubmitting(),
+    hasLineBreaks: this.prompt.lineBreakDetected(),
   }));
 
   handlePrompt() {

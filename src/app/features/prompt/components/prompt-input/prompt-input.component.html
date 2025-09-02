@@ -2,14 +2,14 @@
 <div class="relative w-full mx-auto">
   <form [formGroup]="prompt.form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!prompt.hasLineBreaks"
-        [class.rounded-3xl]="prompt.hasLineBreaks"
-        [class.opacity-50]="prompt.submitting || deactivated"
-        [class.pointer-events-none]="prompt.submitting || deactivated"
+        [class.rounded-full]="!prompt.lineBreakDetected"
+        [class.rounded-3xl]="prompt.lineBreakDetected"
+        [class.opacity-50]="prompt.isSubmitting || deactivated"
+        [class.pointer-events-none]="prompt.isSubmitting || deactivated"
   >
-    <fieldset [disabled]="prompt.submitting || deactivated">
-      <div [class]="prompt.hasLineBreaks ? 'w-full' : 'flex items-stretch w-full p-2'">
-        <div [class]="prompt.hasLineBreaks ? 'flex items-center w-full px-2 py-2' : 'flex items-center flex-1'">
+    <fieldset [disabled]="prompt.isSubmitting || deactivated">
+      <div [class]="prompt.lineBreakDetected ? 'w-full' : 'w-full flex items-stretch p-2'">
+        <div [class]="prompt.lineBreakDetected ? 'w-full flex items-center px-1 py-3' : 'w-full flex flex-1 items-center'">
           <textarea
             #promptRef
             id="message"
@@ -23,7 +23,7 @@
             [placeholder]="placeholder"
           ></textarea>
         </div>
-        <div [class]="prompt.hasLineBreaks ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+        <div [class]="prompt.lineBreakDetected ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
           <ng-content/>
         </div>
       </div>

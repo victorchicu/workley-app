@@ -4,7 +4,6 @@
     <div class="relative">
       <app-prompt-headline/>
       <app-prompt-input
-        #promptRef
         placeholder="What job are you applying for?"
         (onKeyDown)="handlePrompt()">
         <div class="flex items-center gap-1" [class.justify-end]="prompt.hasLineBreaks">

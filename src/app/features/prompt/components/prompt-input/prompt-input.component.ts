@@ -26,8 +26,8 @@ export class PromptInputComponent {
   viewModel = computed(() => ({
     form: this.facade.form,
     error: this.facade.error(),
-    submitting: this.facade.submitting(),
-    hasLineBreaks: this.facade.hasLineBreaks(),
+    isSubmitting: this.facade.isSubmitting(),
+    lineBreakDetected: this.facade.lineBreakDetected(),
   }));
 
   handleKeyDown(event: KeyboardEvent): void {
@@ -54,7 +54,7 @@ export class PromptInputComponent {
 
     this.facade.setHasLineBreaks(hasLineBreaks || wouldCollide);
 
-    if (this.facade.hasLineBreaks()) {
+    if (this.facade.lineBreakDetected()) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;

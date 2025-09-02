@@ -27,13 +27,13 @@ export class PromptState {
   private _hasLineBreaks: WritableSignal<boolean> = signal(false);
 
   readonly error: Signal<string | null> = this._error.asReadonly();
-  readonly submitting: WritableSignal<boolean> = signal(false);
-  readonly hasLineBreaks: Signal<boolean> = this._hasLineBreaks.asReadonly();
+  readonly isSubmitting: WritableSignal<boolean> = signal(false);
+  readonly lineBreakDetected: Signal<boolean> = this._hasLineBreaks.asReadonly();
 
   createChat(): Observable<CreateChatCommandResult> {
-    if (this.submitting() || this.form.invalid)
+    if (this.isSubmitting() || this.form.invalid)
       return EMPTY;
-    this.submitting.set(true);
+    this.isSubmitting.set(true);
     const text: string = this.form.controls.text.value;
     return this.command.execute(new CreateChatCommand(text))
       .pipe(
@@ -46,7 +46,7 @@ export class PromptState {
           }
         }),
         finalize(() => {
-          this.submitting.set(false);
+          this.isSubmitting.set(false);
           this.clear();
         }),
         catchError((err) => {

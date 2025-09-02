@@ -22,7 +22,7 @@ export class PromptSubmitComponent {
   private readonly facade: PromptState = inject(PromptState);
 
   viewModel = computed(() => ({
-    submitting: this.facade.submitting(),
+    submitting: this.facade.isSubmitting(),
   }));
 
   handleClick() {

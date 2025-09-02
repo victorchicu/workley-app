@@ -14,9 +14,9 @@ export type PromptForm = FormGroup<PromptControl>;
   providedIn: 'root'
 })
 export class PromptState {
-  readonly formBuilder: FormBuilder = inject(FormBuilder);
-  readonly form: PromptForm = this.formBuilder.nonNullable.group({text: ['', [Validators.required, Validators.maxLength(2000)]]});
-  readonly commandService: CommandService = inject(CommandService);
+  readonly builder: FormBuilder = inject(FormBuilder);
+  readonly form: PromptForm = this.builder.nonNullable.group({text: ['', [Validators.required, Validators.maxLength(2000)]]});
+  readonly command: CommandService = inject(CommandService);
 
   private _error: WritableSignal<string | null> = signal<string | null>(null);
   private _lineWrapDetected: WritableSignal<boolean> = signal(false);
@@ -30,7 +30,7 @@ export class PromptState {
       return EMPTY;
     this.isSubmitting.set(true);
     const text: string = this.form.controls.text.value;
-    return this.commandService.execute(new CreateChatCommand(text))
+    return this.command.execute(new CreateChatCommand(text))
       .pipe(
         delay(500),
         map((result: ActionCommandResult) => result as CreateChatCommandResult),

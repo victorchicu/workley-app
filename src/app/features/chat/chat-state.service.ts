@@ -9,33 +9,40 @@ import {QueryService} from '../../shared/services/query.service';
 import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models';
 import {CommandService} from '../../shared/services/command.service';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {PromptForm} from '../prompt/prompt-state.service';
+
+export interface ChatControl {
+  text: FormControl<string>;
+}
+
+export type ChatForm = FormGroup<ChatControl>;
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatState {
-  private readonly query: QueryService = inject(QueryService);
-  private readonly command: CommandService = inject(CommandService);
-  private readonly destroyRef: DestroyRef = inject(DestroyRef);
+  readonly builder: FormBuilder = inject(FormBuilder);
+  readonly form: ChatForm = this.builder.nonNullable.group({text: ['', [Validators.required, Validators.maxLength(2000)]]});
 
-  private readonly _error: WritableSignal<string | null> = signal<string | null>(null);
-  private readonly _messages: WritableSignal<Message[]> = signal<Message[]>([]);
-  private readonly _isLoading: WritableSignal<boolean> = signal(false);
+  readonly query: QueryService = inject(QueryService);
+  readonly command: CommandService = inject(CommandService);
+  readonly destroyRef: DestroyRef = inject(DestroyRef);
+
+  private _error: WritableSignal<string | null> = signal<string | null>(null);
+  private _messages: WritableSignal<Message[]> = signal<Message[]>([]);
+  private _isLoading: WritableSignal<boolean> = signal(false);
 
   readonly error: Signal<string | null> = this._error.asReadonly();
   readonly messages: Signal<Message[]> = this._messages.asReadonly();
-  readonly isLoading: Signal<boolean> = this._isLoading.asReadonly();
-
-  readonly canSend: Signal<boolean> = computed(() => !this._isLoading());
-  readonly hasMessages: Signal<boolean> = computed(() => this._messages().length > 0);
+  readonly isLoading: WritableSignal<boolean> = signal(false);
+  readonly isSubmitting: WritableSignal<boolean> = signal(false);
 
   readonly error$: Observable<string | null> = toObservable(this.error);
   readonly messages$: Observable<Message[]> = toObservable(this.messages);
-  readonly isLoading$: Observable<boolean> = toObservable(this.isLoading);
-
 
   // Add a message locally (UI or optimistic update)
-  addMessage(chatId: string, message: Message) {
+  addChatMessage(chatId: string, message: Message) {
     // NOTE: your original code replaced the list with `[message]`.
     // If you really intend that, replace update(...) with set([message]).
     this._messages.update(list => [...list, message]);
@@ -62,7 +69,7 @@ export class ChatState {
       .subscribe();
   }
 
-  sendMessage(chatId: string, content: string) {
+  sendChatMessage(chatId: string, content: string) {
     if (this._isLoading()) return;
 
     this._isLoading.set(true);
@@ -73,10 +80,9 @@ export class ChatState {
     // Optional: optimistic UI update
     this._messages.update(list => [...list, outgoing]);
 
-    this.command
-      .execute(new SendMessageCommand(chatId, outgoing))
+    this.command.execute(new SendMessageCommand(chatId, outgoing))
       .pipe(
-        delay(1000), // keep if you want the same UX feel
+        delay(500),
         map((r: ActionCommandResult) => r as SendMessageCommandResult),
         tap((response: SendMessageCommandResult) => {
           // Replace the optimistic item with the server message if needed

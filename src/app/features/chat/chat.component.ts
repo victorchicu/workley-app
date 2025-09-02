@@ -35,13 +35,13 @@ export class ChatComponent {
 
   viewModel = computed(() => ({
     form: this.prompt.form,
+    isLoading: this.chat.isLoading(),
     isLineWrapped: this.prompt.lineWrapDetected()
   }));
 
   error$: Observable<string | null> = this.chat.error$;
   chatId: string | null = null;
   messages$: Observable<Message[]> = this.chat.messages$;
-  isLoading$: Observable<boolean> = this.chat.isLoading$;
   protected readonly Date: DateConstructor = Date;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
@@ -73,7 +73,7 @@ export class ChatComponent {
   }
 
   private handleResult(result: CreateChatCommandResult) {
-    this.chat.addMessage(result.chatId, result.message);
+    this.chat.addChatMessage(result.chatId, result.message);
     // Optionally fetch full history to ensure consistency
     // this.loadChatHistory();
   }

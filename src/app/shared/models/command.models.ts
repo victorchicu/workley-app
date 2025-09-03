@@ -1,4 +1,11 @@
 
+export enum Role {
+  USER = "USER",
+  ASSISTANT = "ASSISTANT",
+  UNKNOWN = "UNKNOWN"
+}
+
+
 export abstract class Command {
   abstract readonly type: string;
 }
@@ -39,6 +46,7 @@ export interface SendMessageCommandResult extends CommandResult {
 }
 
 
+
 export type ActionCommand =
   | CreateChatCommand
   | SendMessageCommand;
@@ -49,6 +57,7 @@ export type ActionCommandResult =
 
 export interface Message {
   id?: string;
-  actor?: string;
+  role?: Role;
   content: string;
+  createdAt?: Date;
 }

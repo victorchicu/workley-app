@@ -5,14 +5,17 @@
       <app-prompt-headline/>
       <app-prompt-input-form
         placeholder="What job are you applying for?"
-        (onPressEnter)="sendPrompt()"
+        [state]="prompt"
         [deactivated]="prompt.isSubmitting"
+        (onPressEnter)="sendPrompt()"
+        (lineWrapDetected)="handleLineWrapChange($event)"
       >
         <app-prompt-file-upload/>
         <app-prompt-send-button
           aria-label="Create my resume"
           (clicked)="sendPrompt()"
           [deactivated]="prompt.form.invalid"
+          [isSubmitting]="prompt.isSubmitting"
         />
       </app-prompt-input-form>
     </div>

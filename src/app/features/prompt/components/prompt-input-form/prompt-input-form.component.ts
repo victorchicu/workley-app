@@ -1,9 +1,10 @@
-import {Component, computed, ElementRef, EventEmitter, inject, Input, Output, Signal, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {
+  FormGroup,
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
-import {PromptState} from '../../prompt-state.service';
+import {PromptControl} from '../../prompt.component';
 
 @Component({
   selector: 'app-prompt-input-form',
@@ -16,19 +17,17 @@ import {PromptState} from '../../prompt-state.service';
   styleUrl: './prompt-input-form.component.css'
 })
 export class PromptInputFormComponent {
+  @Input() state!: {
+    form: FormGroup<PromptControl>;
+    error: string | null;
+    isSubmitting: boolean;
+    isLineWrapped: boolean
+  };
   @Input() placeholder: string = "What job are you applying for?";
   @Input() deactivated: boolean = false;
   @Output() onPressEnter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() lineWrapDetected: EventEmitter<boolean> = new EventEmitter<boolean>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
-
-  private readonly prompt: PromptState = inject(PromptState);
-
-  viewModel = computed(() => ({
-    form: this.prompt.form,
-    error: this.prompt.error(),
-    isSubmitting: this.prompt.isSubmitting(),
-    isLinedWrapped: this.prompt.lineWrapDetected(),
-  }));
 
   handlePressEnter(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -36,28 +35,25 @@ export class PromptInputFormComponent {
       this.onPressEnter.emit();
       return;
     }
-
-    if (this.prompt.form.invalid) {
-      this.prompt.form.markAsDirty();
-      this.prompt.form.markAllAsTouched();
+    if (this.state?.form.invalid) {
+      this.state.form.markAsDirty();
+      this.state.form.markAllAsTouched();
       return;
     }
   }
 
-  handleTextWrapToNewLive(): void {
+  handleLineWrapChange(): void {
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
     const content: string = textarea.value;
+    const wouldCollide: boolean = this.wouldTextCollideWithActionButtons(content);
 
-    const hasNewLine: boolean = content.includes('\n');
-    const wouldCollide: boolean = this.wouldTextCollideWithActions(content);
+    this.state.isLineWrapped = content.includes('\n') || wouldCollide;
+    this.lineWrapDetected.emit(this.state.isLineWrapped);
 
-    this.prompt.setLineWrapped(hasNewLine || wouldCollide);
-
-    if (this.prompt.lineWrapDetected()) {
+    if (this.state.isLineWrapped) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;
-
       if (naturalHeight <= maxHeight) {
         textarea.style.height = `${naturalHeight}px`;
         textarea.style.overflowY = 'hidden';
@@ -81,7 +77,6 @@ export class PromptInputFormComponent {
       // Try to find the actions element
       const actionsElement = form.querySelector('#action-buttons') as HTMLElement;
       if (actionsElement) {
-        console.log("found actions")
         const actionsWidth = actionsElement.offsetWidth;
         const separatorWidth = 20;
         return formWidth - formPadding - actionsWidth - separatorWidth;
@@ -92,7 +87,7 @@ export class PromptInputFormComponent {
     return textareaContainerWidth * 0.65;
   }
 
-  private wouldTextCollideWithActions(text: string): boolean {
+  private wouldTextCollideWithActionButtons(text: string): boolean {
     if (!text.trim())
       return false;
 

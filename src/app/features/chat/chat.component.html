@@ -2,38 +2,38 @@
 <div class="h-full max-h-screen flex flex-col overflow-hidden">
   <div class="flex-1 min-h-0 overflow-y-auto" #messagesContainer>
     <div class="w-full max-w-3xl mx-auto px-4 py-6">
-      <div *ngIf="(isLoading$ | async) && (messages$ | async)?.length === 0"
+      <div *ngIf="chat.isLoading && (messages())?.length === 0"
            class="flex justify-center items-center h-32">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
 
-      <div *ngIf="error$ | async as error"
+      <div *ngIf="chat.error"
            class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
         <div class="flex items-center">
           <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
           </svg>
-          <span class="text-red-800">{{ error }}</span>
+          <span class="text-red-800">{{ chat.error }}</span>
           <button class="ml-auto text-red-600 hover:text-red-800 underline text-sm">
             Retry
           </button>
         </div>
       </div>
 
-      <div *ngFor="let message of messages$ | async"
+      <div *ngFor="let message of messages()"
            class="mb-6 animate-fadeIn">
-        <div *ngIf="message.actor !== 'assistant'" class="flex justify-end mb-4">
+        <div *ngIf="message.role === Role.USER" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg">
             <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2">
               <p class="text-sm">{{ message.content }}</p>
             </div>
             <div class="text-xs text-gray-500 mt-1 text-right">
-              {{ Date() | date:'short' }}
+              {{ message.createdAt | date:'short' }}
             </div>
           </div>
         </div>
 
-        <div *ngIf="message.actor === 'assistant'" class="flex justify-start mb-4">
+        <div *ngIf="message.role === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl">
             <div class="bg-neutral-100 rounded-lg px-4 py-2">
               <div *ngIf="chat.isLoading" class="flex items-center space-x-2">
@@ -44,7 +44,7 @@
               <p *ngIf="chat.isLoading" class="text-sm text-gray-800 whitespace-pre-wrap">{{ message.content }}</p>
             </div>
             <div *ngIf="chat.isLoading" class="text-xs text-gray-500 mt-1">
-              {{ Date() | date:'short' }}
+              {{ message.createdAt | date:'short' }}
             </div>
           </div>
         </div>
@@ -56,11 +56,12 @@
       <app-prompt-input-form
         #promptRef
         placeholder="Reply to Zumely..."
-        (onPressEnter)="onSubmit()">
+        [state]="chat"
+        (onPressEnter)="sendReply()">
         <div class="flex items-center gap-1" [class.justify-end]="chat.isLineWrapped">
           <app-prompt-send-button
             aria-label="Send message"
-            (clicked)="onSubmit()"
+            (clicked)="sendReply()"
             [deactivated]="chat.form.invalid"
           />
         </div>

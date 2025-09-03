@@ -1,6 +1,5 @@
 import {Component, computed, EventEmitter, inject, Input, Output} from '@angular/core';
 import {NgClass} from '@angular/common';
-import {PromptState} from '../../prompt-state.service';
 import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner.component';
 
 @Component({
@@ -16,16 +15,15 @@ import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner
 export class PromptSendButtonComponent {
 
   @Input() deactivated: boolean = true;
+  @Input() isSubmitting: boolean = false;
   @Output() clicked: EventEmitter<void> = new EventEmitter<void>();
 
-  private readonly prompt: PromptState = inject(PromptState);
-
   viewModel = computed(() => ({
-    submitting: this.prompt.isSubmitting(),
+    isSubmitting: this.isSubmitting,
   }));
 
   handleClick() {
-    if (!this.prompt.isSubmitting()) {
+    if (!this.isSubmitting) {
       this.clicked.emit();
     }
   }

@@ -1,15 +1,14 @@
-@let prompt = viewModel();
 <div class="relative w-full mx-auto">
-  <form [formGroup]="prompt.form"
+  <form [formGroup]="state.form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!prompt.isLinedWrapped"
-        [class.rounded-3xl]="prompt.isLinedWrapped"
-        [class.opacity-50]="prompt.isSubmitting || deactivated"
-        [class.pointer-events-none]="prompt.isSubmitting || deactivated"
+        [class.rounded-full]="!state.isLineWrapped"
+        [class.rounded-3xl]="state.isLineWrapped"
+        [class.opacity-50]="state.isSubmitting || deactivated"
+        [class.pointer-events-none]="state.isSubmitting || deactivated"
   >
-    <fieldset [disabled]="prompt.isSubmitting || deactivated">
-      <div [class]="prompt.isLinedWrapped ? 'w-full' : 'w-full flex items-stretch p-2'">
-        <div [class]="prompt.isLinedWrapped ? 'w-full flex items-center px-1 py-3' : 'w-full flex flex-1 items-center'">
+    <fieldset [disabled]="state.isSubmitting || deactivated">
+      <div [class]="state.isLineWrapped ? 'w-full' : 'w-full flex items-stretch p-2'">
+        <div [class]="state.isLineWrapped ? 'w-full flex items-center px-1 py-3' : 'w-full flex flex-1 items-center'">
           <textarea
             #promptRef
             id="message"
@@ -19,12 +18,22 @@
             autocomplete="off"
             formControlName="text"
             (keydown)="handlePressEnter($event)"
-            (input)="handleTextWrapToNewLive()"
+            (input)="handleLineWrapChange()"
             [placeholder]="placeholder"
           ></textarea>
+<!--          @if (prompt.form.get(controlName)?.invalid && form.get(controlName)?.touched) {-->
+<!--            <div class="text-red-500 text-sm mt-1">-->
+<!--              @if (form.get(controlName)?.errors?.['required']) {-->
+<!--                This field is required-->
+<!--              }-->
+<!--              @if (error) {-->
+<!--                {{ error }}-->
+<!--              }-->
+<!--            </div>-->
+<!--          }-->
         </div>
-        <div [class]="prompt.isLinedWrapped ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
-          <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="prompt.isLinedWrapped">
+        <div [class]="state.isLineWrapped ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+          <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="state.isLineWrapped">
             <ng-content/>
           </div>
         </div>

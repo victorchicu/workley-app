@@ -7,10 +7,10 @@
     'bg-neutral-900 text-white': !deactivated,
     'bg-white hover:bg-neutral-100 text-neutral-900': deactivated,
   }"
-  [disabled]="deactivated || prompt.submitting"
+  [disabled]="deactivated || prompt.isSubmitting"
   (click)="handleClick()"
 >
-  @if (prompt.submitting) {
+  @if (prompt.isSubmitting) {
     <app-spinner/>
   } @else {
     <div class="flex items-center justify-center">

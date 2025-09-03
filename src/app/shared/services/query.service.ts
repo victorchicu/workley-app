@@ -13,7 +13,7 @@ export class QueryService {
   constructor(private readonly httpClient: HttpClient) {
   }
 
-  public fetchChat(query: GetQuery): Observable<GetChatQueryResult> {
+  public getChatQuery(query: GetQuery): Observable<GetChatQueryResult> {
     return this.httpClient.get<GetQueryResult>(`${this.baseUrl}/${query.chatId}`, {
       withCredentials: true,
     })

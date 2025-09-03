@@ -1,4 +1,4 @@
-import {Component, computed, DestroyRef, inject} from '@angular/core';
+import {Component, computed, DestroyRef, inject, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {PromptHeadlineComponent} from './components/prompt-headline/prompt-headline.component';
 import {PromptInputFormComponent} from './components/prompt-input-form/prompt-input-form.component';
@@ -33,22 +33,25 @@ export type PromptForm = FormGroup<PromptControl>;
   styleUrl: './prompt.component.css',
 })
 export class PromptComponent {
-  readonly builder: FormBuilder = inject(FormBuilder);
-  private readonly _form: PromptForm = this.builder.nonNullable.group({text: ['', [Validators.required, Validators.maxLength(2000)]]});
-
   readonly router: Router = inject(Router);
+  readonly builder: FormBuilder = inject(FormBuilder);
   readonly command: CommandService = inject(CommandService);
   readonly destroyRef: DestroyRef = inject(DestroyRef);
 
-  private _error: string | null = null;
-  private _isSubmitting: boolean = false;
-  private _isLineWrapped: boolean = false;
+  private readonly form = signal<PromptForm>(
+    this.builder.nonNullable.group({
+      text: ['', [Validators.required, Validators.maxLength(2000)]]
+    })
+  );
+  private readonly error = signal<string | null>(null);
+  private readonly isSubmitting = signal(false);
+  private readonly isLineWrapped = signal(false);
 
   viewModel = computed(() => ({
-    form: this._form,
-    error: this._error,
-    isSubmitting: this._isSubmitting,
-    isLineWrapped: this._isLineWrapped
+    form: this.form(),
+    error: this.error(),
+    isSubmitting: this.isSubmitting(),
+    isLineWrapped: this.isLineWrapped()
   }));
 
   sendPrompt() {
@@ -67,26 +70,26 @@ export class PromptComponent {
   }
 
   createChat(): Observable<CreateChatCommandResult> {
-    if (this._form.invalid || this._isSubmitting)
+    const state = this.viewModel();
+    if (state.form.invalid || state.isSubmitting)
       return EMPTY;
-    this._isSubmitting = true;
-    const text: string = this._form.controls.text.value;
+    this.isSubmitting.set(true);
+    const text: string = state.form.controls.text.value;
     return this.command.execute(new CreateChatCommand(text))
       .pipe(
         delay(500),
         map((actionCommandResult: ActionCommandResult) => actionCommandResult as CreateChatCommandResult),
         tap((createChatCommandResult: CreateChatCommandResult) => {
-          this._error = null;
+          this.error.set(null);
           console.log(`CreateChatCommandResult: ${createChatCommandResult}`)
         }),
         finalize(() => {
-          this._form.reset();
-          this._error = null;
-          this._isSubmitting = false;
-          this._isLineWrapped = false;
+          this.form().reset();
+          this.isSubmitting.set(false);
+          this.isLineWrapped.set(false);
         }),
         catchError((err) => {
-          this._error = "Oops! Something went wrong, please try again.";
+          this.error.set("Oops! Something went wrong, please try again.");
           console.error(`Chat creation failed: ${err}`)
           return throwError(() => new Error("Chat creation failed"));
         })
@@ -94,8 +97,6 @@ export class PromptComponent {
   }
 
   handleLineWrapChange(isWrapped: boolean): void {
-    console.log(`Handle line wrap change:
-      Is wrapped: ${isWrapped}`)
-    this._isLineWrapped = isWrapped;
+    this.isLineWrapped.set(isWrapped);
   }
 }

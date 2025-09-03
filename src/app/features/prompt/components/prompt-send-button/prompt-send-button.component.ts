@@ -1,4 +1,4 @@
-import {Component, computed, EventEmitter, inject, Input, Output} from '@angular/core';
+import {Component, computed, EventEmitter, inject, input, Input, output, Output} from '@angular/core';
 import {NgClass} from '@angular/common';
 import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner.component';
 
@@ -14,12 +14,13 @@ import {SpinnerComponent} from '../../../../shared/ui/components/spinner/spinner
 })
 export class PromptSendButtonComponent {
 
-  @Input() deactivated: boolean = true;
-  @Input() isSubmitting: boolean = false;
-  @Output() clicked: EventEmitter<void> = new EventEmitter<void>();
+  readonly deactivated = input(false);
+  readonly isSubmitting = input(false);
+  readonly clicked = output<void>()
 
   viewModel = computed(() => ({
-    isSubmitting: this.isSubmitting,
+    deactivated: this.deactivated(),
+    isSubmitting: this.isSubmitting()
   }));
 
   handleClick() {

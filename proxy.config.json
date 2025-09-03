@@ -4,5 +4,11 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/api/chats/**": {
+    "target": "http://localhost:8443",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

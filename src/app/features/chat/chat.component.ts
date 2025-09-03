@@ -1,5 +1,6 @@
 import {
-  Component, computed, DestroyRef, ElementRef, inject, Signal, signal, ViewChild, WritableSignal
+  AfterViewChecked,
+  Component, computed, DestroyRef, ElementRef, inject, OnInit, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {Navigation, Router} from '@angular/router';
@@ -37,7 +38,7 @@ export type ChatForm = FormGroup<ChatControl>;
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
-export class ChatComponent {
+export class ChatComponent implements OnInit, AfterViewChecked  {
   readonly router: Router = inject(Router);
   readonly builder: FormBuilder = inject(FormBuilder);
   readonly query: QueryService = inject(QueryService);
@@ -55,6 +56,8 @@ export class ChatComponent {
   private readonly isLoading = signal<boolean>(false);
   private readonly isSubmitting = signal<boolean>(false);
   private readonly isLineWrapped = signal<boolean>(false);
+
+  private _shouldScrollToBottom: boolean = false;
 
   viewModel = computed(() => ({
     form: this.form(),
@@ -75,6 +78,20 @@ export class ChatComponent {
       const result = navigation.extras.state as CreateChatCommandResult;
       this.chatId.set(result.chatId);
       this.handleResult(result);
+    }
+  }
+
+  ngOnInit(): void {
+    const state = this.viewModel();
+    if (state.chatId && this._messages().length === 0) {
+      this.loadChatHistory();
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    if (this._shouldScrollToBottom) {
+      this.scrollToBottom();
+      this._shouldScrollToBottom = false;
     }
   }
 
@@ -118,10 +135,12 @@ export class ChatComponent {
       .pipe(
         tap((getChatQueryResult: GetChatQueryResult) => {
           this.error.set(null);
+          console.log('Chat history loaded:', getChatQueryResult)
         }),
         catchError(err => {
+          console.error('Failed to load chat history:', err);
           this.error.set('Failed to load chat history. Please refresh the page.');
-          return throwError(() => new Error('Failed to load chat history. Please refresh the page.'));
+          return throwError(() => new Error('Failed to load chat history'));
         }),
         finalize(() => this.isLoading.set(false))
       );
@@ -143,6 +162,7 @@ export class ChatComponent {
         map((actionCommandResult: ActionCommandResult) => actionCommandResult as SendMessageCommandResult),
         tap((sendMessageCommandResult: SendMessageCommandResult) => {
           this.error.set(null);
+          console.log('Send chat message successfully:', sendMessageCommandResult);
         }),
         finalize(() => {
           this.form().reset();
@@ -151,6 +171,7 @@ export class ChatComponent {
           this.isLineWrapped.set(false);
         }),
         catchError((err) => {
+          console.error('Send chat message failed:', err);
           this.error.set("Oops! Something went wrong, please try again.");
           return throwError(() => new Error("Send chat message failed"));
         }),
@@ -160,8 +181,7 @@ export class ChatComponent {
 
   private handleResult(result: CreateChatCommandResult) {
     this.addChatMessage(result.chatId, result.message);
-    // Optionally fetch full history to ensure consistency
-    // this.loadChatHistory();
+    this.loadChatHistory();
   }
 
   private loadChatHistory() {
@@ -169,13 +189,32 @@ export class ChatComponent {
     if (!state.chatId)
       return;
     console.log('Loading chat history for:', this.chatId);
-    return this.getChatQuery(state.chatId);
+    this.getChatQuery(state.chatId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result: GetChatQueryResult) => {
+          if (result.messages && result.messages.length > 0) {
+            this._messages.set(result.messages);
+            this._shouldScrollToBottom = true;
+          }
+          if (result.chatId) {
+            this.chatId.set(result.chatId);
+          }
+        },
+        error: (err) => {
+          console.error('Error loading chat history:', err);
+        }
+      });
   }
 
   private scrollToBottom(): void {
     if (this.messagesContainer) {
-      const element = this.messagesContainer.nativeElement;
-      element.scrollTop = element.scrollHeight;
+      try {
+        const element = this.messagesContainer.nativeElement;
+        element.scrollTop = element.scrollHeight;
+      } catch (err) {
+        console.error('Error scrolling to bottom:', err);
+      }
     }
   }
 

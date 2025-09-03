@@ -2,9 +2,9 @@
 <div class="relative w-full mx-auto">
   <form [formGroup]="input.form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!input.isLineWrapped"
-        [class.rounded-3xl]="input.isLineWrapped"
         [class.opacity-50]="input.isSubmitting || input.isDeactivated"
+        [class.rounded-3xl]="input.isLineWrapped"
+        [class.rounded-full]="!input.isLineWrapped"
         [class.pointer-events-none]="input.isSubmitting || input.isDeactivated"
   >
     <fieldset [disabled]="input.isSubmitting || input.isDeactivated">
@@ -18,20 +18,9 @@
             class="w-full text-neutral-950 bg-transparent focus:outline-none placeholder-neutral-400 resize-none overflow-y-auto pl-3 pr-2 custom-scrollbar smooth-scroll"
             autocomplete="off"
             formControlName="text"
-            (input)="handleLineWrapChange()"
-            (keydown)="handlePressEnter($event)"
             [placeholder]="input.placeholder"
-          ></textarea>
-<!--          @if (prompt.form.get(controlName)?.invalid && form.get(controlName)?.touched) {-->
-<!--            <div class="text-red-500 text-sm mt-1">-->
-<!--              @if (form.get(controlName)?.errors?.['required']) {-->
-<!--                This field is required-->
-<!--              }-->
-<!--              @if (error) {-->
-<!--                {{ error }}-->
-<!--              }-->
-<!--            </div>-->
-<!--          }-->
+            (input)="handleLineWrapChange()"
+            (keydown)="handlePressEnter($event)"></textarea>
         </div>
         <div [class]="input.isLineWrapped ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
           <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="input.isLineWrapped">

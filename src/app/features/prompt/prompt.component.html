@@ -5,9 +5,9 @@
       <app-prompt-headline/>
       <app-prompt-input-form
         [form]="prompt.form"
-        [isDeactivated]="prompt.isSubmitting"
         [placeholder]="'What job are you applying for?'"
         [isSubmitting]="prompt.isSubmitting"
+        [isDeactivated]="prompt.isSubmitting"
         [isLineWrapped]="prompt.isLineWrapped"
         (onPressEnter)="sendPrompt()"
         (lineWrapDetected)="handleLineWrapChange($event)"

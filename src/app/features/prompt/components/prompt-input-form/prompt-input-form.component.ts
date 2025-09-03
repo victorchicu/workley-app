@@ -1,4 +1,12 @@
-import {Component, computed, ElementRef, EventEmitter, input, Input, output, Output, ViewChild} from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  input,
+  output,
+  ViewChild
+} from '@angular/core';
 import {
   FormGroup,
   FormsModule,
@@ -35,6 +43,23 @@ export class PromptInputFormComponent {
     isDeactivated: this.isDeactivated(),
     isLineWrapped: this.isLineWrapped(),
   }));
+
+  constructor() {
+    effect(() => {
+      const isSubmitting: boolean = this.isSubmitting();
+      if (!isSubmitting && !this.isDeactivated()) {
+        this.focusInput();
+      }
+    });
+  }
+
+  focusInput(): void {
+    setTimeout(() => {
+      if (this.promptRef && this.promptRef.nativeElement) {
+        this.promptRef.nativeElement.focus();
+      }
+    }, 0);
+  }
 
   handlePressEnter(event: KeyboardEvent): void {
     const state = this.viewModel();

@@ -81,7 +81,6 @@ export class PromptComponent {
         map((actionCommandResult: ActionCommandResult) => actionCommandResult as CreateChatCommandResult),
         tap((createChatCommandResult: CreateChatCommandResult) => {
           this.error.set(null);
-          console.log(`CreateChatCommandResult: ${createChatCommandResult}`)
         }),
         finalize(() => {
           this.form().reset();

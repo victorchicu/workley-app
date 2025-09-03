@@ -73,7 +73,6 @@ export class ChatComponent {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatCommandResult;
-      console.log("CreateChatCommandResult: ", result);
       this.chatId.set(result.chatId);
       this.handleResult(result);
     }

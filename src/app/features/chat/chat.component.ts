@@ -16,6 +16,7 @@ import {catchError, delay, EMPTY, finalize, map, Observable, tap, throwError} fr
 import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models';
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
+import {PromptForm} from '../prompt/prompt.component';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -38,26 +39,31 @@ export type ChatForm = FormGroup<ChatControl>;
   styleUrl: './chat.component.css',
 })
 export class ChatComponent {
-  readonly builder: FormBuilder = inject(FormBuilder);
-  private readonly _form: ChatForm = this.builder.nonNullable.group({text: ['', [Validators.required, Validators.maxLength(2000)]]});
-
   readonly router: Router = inject(Router);
+  readonly builder: FormBuilder = inject(FormBuilder);
   readonly query: QueryService = inject(QueryService);
   readonly command: CommandService = inject(CommandService);
   readonly destroyRef: DestroyRef = inject(DestroyRef);
 
-  private _error: string | null = null;
-  private _chatId: string | null = null;
-  private _isLoading: boolean = false;
-  private _isSubmitting: boolean = false;
-  private _isLineWrapped: boolean = false;
+  private readonly form = signal<ChatForm>(
+    this.builder.nonNullable.group({
+      text: ['', [Validators.required, Validators.maxLength(2000)]]
+    })
+  );
+
+  private readonly error = signal<string | null>(null);
+  private readonly chatId = signal<string | null>(null);
+  private readonly isLoading = signal<boolean>(false);
+  private readonly isSubmitting = signal<boolean>(false);
+  private readonly isLineWrapped = signal<boolean>(false);
 
   viewModel = computed(() => ({
-    form: this._form,
-    error: this._error,
-    isLoading: this._isLoading,
-    isSubmitting: this._isSubmitting,
-    isLineWrapped: this._isLineWrapped
+    form: this.form(),
+    error: this.error(),
+    chatId: this.chatId(),
+    isLoading: this.isLoading(),
+    isSubmitting: this.isSubmitting(),
+    isLineWrapped: this.isLineWrapped()
   }));
 
   private _messages: WritableSignal<Message[]> = signal<Message[]>([]);
@@ -69,20 +75,21 @@ export class ChatComponent {
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatCommandResult;
       console.log("CreateChatCommandResult: ", result);
+      this.chatId.set(result.chatId);
       this.handleResult(result);
-      this._chatId = result.chatId;
     }
   }
 
   sendReply() {
-    if (!this._chatId)
+    const state = this.viewModel();
+    if (!state.chatId)
       return;
-    const text: string = this._form.controls.text.value;
+    const text: string = state.form.controls.text.value;
     if (!text || text.length === 0) {
       return;
     }
-    console.log(`Send reply to chat: ${this._chatId} with content: ${text}`)
-    this.sendChatMessage(this._chatId, text)
+    console.log(`Send reply to chat: ${this.chatId} with content: ${text}`)
+    this.sendChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (sendMessageCommandResult: SendMessageCommandResult) => {
@@ -97,37 +104,38 @@ export class ChatComponent {
       });
   }
 
-  // Add a message locally (UI or optimistic update)
   addChatMessage(chatId: string, message: Message) {
-    // NOTE: your original code replaced the list with `[message]`.
-    // If you really intend that, replace update(...) with set([message]).
     this._messages.update(list => [...list, message]);
   }
 
   getChatQuery(chatId: string): Observable<GetChatQueryResult> {
-    if (this._isLoading)
+    const state = this.viewModel();
+
+    if (state.isLoading)
       return EMPTY;
 
-    this._isLoading = true;
+    this.isLoading.set(true)
 
     return this.query.getChatQuery(new GetChatQuery(chatId))
       .pipe(
         tap((getChatQueryResult: GetChatQueryResult) => {
-          this._error = null;
+          this.error.set(null);
         }),
         catchError(err => {
-          this._error = 'Failed to load chat history. Please refresh the page.';
+          this.error.set('Failed to load chat history. Please refresh the page.');
           return throwError(() => new Error('Failed to load chat history. Please refresh the page.'));
         }),
-        finalize(() => this._isLoading = false)
+        finalize(() => this.isLoading.set(false))
       );
   }
 
   sendChatMessage(chatId: string, content: string): Observable<SendMessageCommandResult> {
-    if (this._isSubmitting)
+    const state = this.viewModel();
+
+    if (state.isSubmitting)
       return EMPTY;
 
-    this._isSubmitting = true;
+    this.isSubmitting.set(true);
 
     const message: Message = {content};
 
@@ -136,18 +144,19 @@ export class ChatComponent {
         delay(500),
         map((actionCommandResult: ActionCommandResult) => actionCommandResult as SendMessageCommandResult),
         tap((sendMessageCommandResult: SendMessageCommandResult) => {
-          this._error = null;
+          this.error.set(null);
         }),
         finalize(() => {
-          this._error = null;
-          this._isSubmitting = false;
-          this._isLineWrapped = false;
+          this.form().reset();
+          this.error.set(null);
+          this.isSubmitting.set(false);
+          this.isLineWrapped.set(false);
         }),
         catchError((err) => {
-          this._error = "Oops! Something went wrong, please try again.";
+          this.error.set("Oops! Something went wrong, please try again.");
           return throwError(() => new Error("Send chat message failed"));
         }),
-        finalize(() => this._isSubmitting = false)
+        finalize(() => this.isSubmitting.set(false))
       );
   }
 
@@ -158,9 +167,11 @@ export class ChatComponent {
   }
 
   private loadChatHistory() {
-    if (!this._chatId) return;
-    console.log('Loading chat history for:', this._chatId);
-    return this.getChatQuery(this._chatId);
+    const state = this.viewModel();
+    if (!state.chatId)
+      return;
+    console.log('Loading chat history for:', this.chatId);
+    return this.getChatQuery(state.chatId);
   }
 
   private scrollToBottom(): void {

@@ -1,16 +1,16 @@
-@let prompt = viewModel();
+@let button = viewModel();
 <button
   type="submit"
   class="relative px-2 py-2 flex items-center justify-center rounded-full cursor-pointer group"
   aria-label="Create my resume"
   [ngClass]="{
-    'bg-neutral-900 text-white': !deactivated,
-    'bg-white hover:bg-neutral-100 text-neutral-900': deactivated,
+    'bg-neutral-900 text-white': !button.deactivated,
+    'bg-white hover:bg-neutral-100 text-neutral-900': button.deactivated,
   }"
-  [disabled]="deactivated || prompt.isSubmitting"
+  [disabled]="button.deactivated || button.isSubmitting"
   (click)="handleClick()"
 >
-  @if (prompt.isSubmitting) {
+  @if (button.isSubmitting) {
     <app-spinner/>
   } @else {
     <div class="flex items-center justify-center">
@@ -20,8 +20,8 @@
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
         [ngClass]="{
-        'text-white': !deactivated,
-        'text-neutral-900': deactivated
+        'text-white': !button.deactivated,
+        'text-neutral-900': button.deactivated
       }"
       >
         <path d="M12 6V18M12 6L7 11M12 6L17 11" fill="currentColor" stroke="currentColor" stroke-width="2"

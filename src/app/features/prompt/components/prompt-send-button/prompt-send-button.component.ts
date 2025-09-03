@@ -24,8 +24,6 @@ export class PromptSendButtonComponent {
   }));
 
   handleClick() {
-    if (!this.isSubmitting) {
-      this.clicked.emit();
-    }
+    this.clicked.emit();
   }
 }

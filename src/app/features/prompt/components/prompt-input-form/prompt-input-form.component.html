@@ -1,14 +1,15 @@
+@let input = viewModel();
 <div class="relative w-full mx-auto">
-  <form [formGroup]="state.form"
+  <form [formGroup]="input.form"
         class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
-        [class.rounded-full]="!state.isLineWrapped"
-        [class.rounded-3xl]="state.isLineWrapped"
-        [class.opacity-50]="state.isSubmitting || deactivated"
-        [class.pointer-events-none]="state.isSubmitting || deactivated"
+        [class.rounded-full]="!input.isLineWrapped"
+        [class.rounded-3xl]="input.isLineWrapped"
+        [class.opacity-50]="input.isSubmitting || input.isDeactivated"
+        [class.pointer-events-none]="input.isSubmitting || input.isDeactivated"
   >
-    <fieldset [disabled]="state.isSubmitting || deactivated">
-      <div [class]="state.isLineWrapped ? 'w-full' : 'w-full flex items-stretch p-2'">
-        <div [class]="state.isLineWrapped ? 'w-full flex items-center px-1 py-3' : 'w-full flex flex-1 items-center'">
+    <fieldset [disabled]="input.isSubmitting || input.isDeactivated">
+      <div [class]="input.isLineWrapped ? 'w-full' : 'w-full flex items-stretch p-2'">
+        <div [class]="input.isLineWrapped ? 'w-full flex items-center px-1 py-3' : 'w-full flex flex-1 items-center'">
           <textarea
             #promptRef
             id="message"
@@ -19,7 +20,7 @@
             formControlName="text"
             (keydown)="handlePressEnter($event)"
             (input)="handleLineWrapChange()"
-            [placeholder]="placeholder"
+            [placeholder]="input.placeholder"
           ></textarea>
 <!--          @if (prompt.form.get(controlName)?.invalid && form.get(controlName)?.touched) {-->
 <!--            <div class="text-red-500 text-sm mt-1">-->
@@ -32,8 +33,8 @@
 <!--            </div>-->
 <!--          }-->
         </div>
-        <div [class]="state.isLineWrapped ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
-          <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="state.isLineWrapped">
+        <div [class]="input.isLineWrapped ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+          <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="input.isLineWrapped">
             <ng-content/>
           </div>
         </div>

@@ -16,7 +16,6 @@ import {catchError, delay, EMPTY, finalize, map, Observable, tap, throwError} fr
 import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models';
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
-import {PromptForm} from '../prompt/prompt.component';
 
 export interface ChatControl {
   text: FormControl<string>;

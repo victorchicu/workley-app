@@ -54,8 +54,10 @@
   <div class="flex-shrink-0 w-full bg-white">
     <div class="w-full max-w-3xl mx-auto px-4">
       <app-prompt-input-form
-        placeholder="Reply to Zumely..."
-        [state]="chat"
+        [form]="chat.form"
+        [placeholder]="'Reply to Zumely...'"
+        [isSubmitting]="chat.isSubmitting"
+        [isLineWrapped]="chat.isLineWrapped"
         (onPressEnter)="sendReply()">
         <div class="flex items-center gap-1" [class.justify-end]="chat.isLineWrapped">
           <app-prompt-send-button

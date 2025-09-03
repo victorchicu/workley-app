@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {Component, computed, ElementRef, EventEmitter, input, Input, output, Output, ViewChild} from '@angular/core';
 import {
   FormGroup,
   FormsModule,
@@ -17,40 +17,50 @@ import {PromptControl} from '../../prompt.component';
   styleUrl: './prompt-input-form.component.css'
 })
 export class PromptInputFormComponent {
-  @Input() state!: {
-    form: FormGroup<PromptControl>;
-    error: string | null;
-    isSubmitting: boolean;
-    isLineWrapped: boolean
-  };
-  @Input() placeholder: string = "What job are you applying for?";
-  @Input() deactivated: boolean = false;
-  @Output() onPressEnter: EventEmitter<void> = new EventEmitter<void>();
-  @Output() lineWrapDetected: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly form = input.required<FormGroup<PromptControl>>();
+  readonly error = input<string | null>(null);
+  readonly placeholder = input("What job are you applying for?");
+  readonly isSubmitting = input<boolean>(false);
+  readonly isDeactivated = input(false);
+  readonly isLineWrapped = input<boolean>(false);
+  readonly onPressEnter = output<void>()
+  readonly lineWrapDetected = output<boolean>()
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
+  viewModel = computed(() => ({
+    form: this.form(),
+    error: this.error(),
+    placeholder: this.placeholder(),
+    isSubmitting: this.isSubmitting(),
+    isDeactivated: this.isDeactivated(),
+    isLineWrapped: this.isLineWrapped(),
+  }));
+
   handlePressEnter(event: KeyboardEvent): void {
+    const state = this.viewModel();
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       this.onPressEnter.emit();
       return;
     }
-    if (this.state?.form.invalid) {
-      this.state.form.markAsDirty();
-      this.state.form.markAllAsTouched();
+    if (state.form.invalid) {
+      state.form.markAsDirty();
+      state.form.markAllAsTouched();
       return;
     }
   }
 
   handleLineWrapChange(): void {
+    const state = this.viewModel();
+
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
     const content: string = textarea.value;
     const wouldCollide: boolean = this.wouldTextCollideWithActionButtons(content);
 
-    this.state.isLineWrapped = content.includes('\n') || wouldCollide;
-    this.lineWrapDetected.emit(this.state.isLineWrapped);
+    state.isLineWrapped = content.includes('\n') || wouldCollide;
+    this.lineWrapDetected.emit(state.isLineWrapped);
 
-    if (this.state.isLineWrapped) {
+    if (state.isLineWrapped) {
       textarea.style.height = 'auto';
       const naturalHeight = textarea.scrollHeight;
       const maxHeight = 120;

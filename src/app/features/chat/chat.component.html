@@ -57,8 +57,10 @@
         [form]="chat.form"
         [placeholder]="'Reply to Zumely...'"
         [isSubmitting]="chat.isSubmitting"
+        [isDeactivated]="chat.isSubmitting"
         [isLineWrapped]="chat.isLineWrapped"
-        (onPressEnter)="sendReply()">
+        (onPressEnter)="sendReply()"
+        (lineWrapDetected)="handleLineWrapChange($event)">
         <div class="flex items-center gap-1" [class.justify-end]="chat.isLineWrapped">
           <app-prompt-send-button
             aria-label="Send message"

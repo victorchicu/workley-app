@@ -46,9 +46,14 @@ export class PromptInputFormComponent {
 
   constructor() {
     effect(() => {
-      const isSubmitting: boolean = this.isSubmitting();
-      if (!isSubmitting && !this.isDeactivated()) {
+      if (!this.isSubmitting() && !this.isDeactivated()) {
         this.focusInput();
+      }
+    });
+    effect(() => {
+      const formValue = this.form().value;
+      if (!this.isSubmitting() && (!formValue.text || formValue.text === '')) {
+        this.resetTextareaHeight();
       }
     });
   }
@@ -78,74 +83,55 @@ export class PromptInputFormComponent {
   handleLineWrapChange(): void {
     const state = this.viewModel();
 
+    if (state.isSubmitting)
+      return;
+
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
     const content: string = textarea.value;
-    const wouldCollide: boolean = this.wouldTextCollideWithActionButtons(content);
 
-    state.isLineWrapped = content.includes('\n') || wouldCollide;
-    this.lineWrapDetected.emit(state.isLineWrapped);
-
-    if (state.isLineWrapped) {
-      textarea.style.height = 'auto';
-      const naturalHeight = textarea.scrollHeight;
-      const maxHeight = 120;
-      if (naturalHeight <= maxHeight) {
-        textarea.style.height = `${naturalHeight}px`;
-        textarea.style.overflowY = 'hidden';
-      } else {
-        textarea.style.height = `${maxHeight}px`;
-        textarea.style.overflowY = 'auto';
+    if (content.includes('\n')) {
+      if (!state.isLineWrapped) {
+        this.lineWrapDetected.emit(true);
       }
+      this.adjustTextareaHeight();
+      return;
+    }
+
+    const CHAR_THRESHOLD = 35;
+    const wouldCollide = content.length > CHAR_THRESHOLD;
+
+    if (wouldCollide !== state.isLineWrapped) {
+      this.lineWrapDetected.emit(wouldCollide);
+    }
+
+    if (wouldCollide) {
+      this.adjustTextareaHeight();
     } else {
       textarea.style.height = '24px';
       textarea.style.overflowY = 'hidden';
     }
   }
 
-  private getAvailableSpace(): number {
-    const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
-    // Try to find the form and measure actual layout
-    const form: HTMLFormElement | null = textarea.closest('form');
-    if (form) {
-      const formWidth = form.offsetWidth;
-      const formPadding = 32; // px-4 * 2
-      // Try to find the actions element
-      const actionsElement = form.querySelector('#action-buttons') as HTMLElement;
-      if (actionsElement) {
-        const actionsWidth = actionsElement.offsetWidth;
-        const separatorWidth = 20;
-        return formWidth - formPadding - actionsWidth - separatorWidth;
-      }
+  private adjustTextareaHeight(): void {
+    const textarea = this.promptRef.nativeElement;
+    textarea.style.height = 'auto';
+    const naturalHeight = textarea.scrollHeight;
+    const maxHeight = 240;
+    if (naturalHeight <= maxHeight) {
+      textarea.style.height = `${naturalHeight}px`;
+      textarea.style.overflowY = 'hidden';
+    } else {
+      textarea.style.height = `${maxHeight}px`;
+      textarea.style.overflowY = 'auto';
     }
-    // Fallback - use textarea width and estimate
-    const textareaContainerWidth = textarea.parentElement?.offsetWidth || textarea.offsetWidth;
-    return textareaContainerWidth * 0.65;
   }
 
-  private wouldTextCollideWithActionButtons(text: string): boolean {
-    if (!text.trim())
-      return false;
-
-    const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
-    // Create a temporary span to measure the exact text width
-    const styles: CSSStyleDeclaration = window.getComputedStyle(textarea);
-
-    const measureSpan: HTMLSpanElement = document.createElement('span');
-    measureSpan.style.font = styles.font;
-    measureSpan.style.fontSize = styles.fontSize;
-    measureSpan.style.fontFamily = styles.fontFamily;
-    measureSpan.style.fontWeight = styles.fontWeight;
-    measureSpan.style.letterSpacing = styles.letterSpacing;
-    measureSpan.style.visibility = 'hidden';
-    measureSpan.style.position = 'absolute';
-    measureSpan.style.whiteSpace = 'nowrap';
-    measureSpan.textContent = text;
-    document.body.appendChild(measureSpan);
-    const textWidth: number = measureSpan.offsetWidth;
-    document.body.removeChild(measureSpan);
-
-    const buffer = 10;
-    const availableSpace: number = this.getAvailableSpace();
-    return textWidth > (availableSpace - buffer);
+  private resetTextareaHeight(): void {
+    if (this.promptRef && this.promptRef.nativeElement) {
+      const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
+      textarea.style.height = '24px';
+      textarea.style.overflowY = 'hidden';
+      this.lineWrapDetected.emit(false);
+    }
   }
 }

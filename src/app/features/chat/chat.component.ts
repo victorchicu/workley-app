@@ -57,8 +57,6 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
   private readonly isSubmitting = signal<boolean>(false);
   private readonly isLineWrapped = signal<boolean>(false);
 
-  private _shouldScrollToBottom: boolean = false;
-
   viewModel = computed(() => ({
     form: this.form(),
     error: this.error(),
@@ -89,10 +87,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
   }
 
   ngAfterViewChecked(): void {
-    if (this._shouldScrollToBottom) {
-      this.scrollToBottom();
-      this._shouldScrollToBottom = false;
-    }
+    this.scrollToBottom();
   }
 
   sendReply() {
@@ -195,7 +190,6 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
         next: (result: GetChatQueryResult) => {
           if (result.messages && result.messages.length > 0) {
             this._messages.set(result.messages);
-            this._shouldScrollToBottom = true;
           }
           if (result.chatId) {
             this.chatId.set(result.chatId);
@@ -216,6 +210,10 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
         console.error('Error scrolling to bottom:', err);
       }
     }
+  }
+
+  handleLineWrapChange(isWrapped: boolean): void {
+    this.isLineWrapped.set(isWrapped);
   }
 
   protected readonly Role = Role;

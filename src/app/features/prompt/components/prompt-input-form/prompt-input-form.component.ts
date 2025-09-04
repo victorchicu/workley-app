@@ -98,7 +98,11 @@ export class PromptInputFormComponent {
     }
 
     const CHAR_THRESHOLD = 35;
-    const wouldCollide = content.length > CHAR_THRESHOLD;
+
+    const words = content.split(' ');
+    const hasLongWord = words.some(word => word.length > CHAR_THRESHOLD);
+
+    const wouldCollide = content.length > CHAR_THRESHOLD || hasLongWord;
 
     if (wouldCollide !== state.isLineWrapped) {
       this.lineWrapDetected.emit(wouldCollide);
@@ -114,9 +118,15 @@ export class PromptInputFormComponent {
 
   private adjustTextareaHeight(): void {
     const textarea = this.promptRef.nativeElement;
+
+    // Force reflow to ensure proper height calculation
     textarea.style.height = 'auto';
+    textarea.style.minHeight = '24px';
+
+    // Use scrollHeight for accurate height
     const naturalHeight = textarea.scrollHeight;
     const maxHeight = 240;
+
     if (naturalHeight <= maxHeight) {
       textarea.style.height = `${naturalHeight}px`;
       textarea.style.overflowY = 'hidden';

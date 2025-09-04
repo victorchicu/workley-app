@@ -22,10 +22,11 @@
 
       <div *ngFor="let message of messages()"
            class="mb-6 animate-fadeIn">
+        <!-- User Message -->
         <div *ngIf="message.role === Role.USER" class="flex justify-end mb-4">
-          <div class="max-w-xs lg:max-w-md xl:max-w-lg">
-            <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2">
-              <p class="text-sm">{{ message.content }}</p>
+          <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
+            <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 break-all overflow-hidden">
+              <p class="text-sm whitespace-pre-wrap break-all overflow-wrap-anywhere">{{ message.content }}</p>
             </div>
             <div class="text-xs text-gray-500 mt-1 text-right">
               {{ message.createdAt | date:'short' }}
@@ -33,17 +34,18 @@
           </div>
         </div>
 
+        <!-- Assistant Message -->
         <div *ngIf="message.role === Role.ASSISTANT" class="flex justify-start mb-4">
-          <div class="max-w-xs lg:max-w-md xl:max-w-2xl">
-            <div class="bg-neutral-100 rounded-lg px-4 py-2">
-              <div *ngIf="chat.isLoading" class="flex items-center space-x-2">
+          <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
+            <div class="bg-neutral-100 rounded-lg px-4 py-2 break-all overflow-hidden">
+              <div *ngIf="chat.isLoading && !message.content" class="flex items-center space-x-2">
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
               </div>
-              <p *ngIf="chat.isLoading" class="text-sm text-gray-800 whitespace-pre-wrap">{{ message.content }}</p>
+              <p *ngIf="message.content" class="text-sm text-gray-800 whitespace-pre-wrap break-all overflow-wrap-anywhere">{{ message.content }}</p>
             </div>
-            <div *ngIf="chat.isLoading" class="text-xs text-gray-500 mt-1">
+            <div class="text-xs text-gray-500 mt-1">
               {{ message.createdAt | date:'short' }}
             </div>
           </div>
@@ -51,6 +53,8 @@
       </div>
     </div>
   </div>
+
+  <!-- Input Area -->
   <div class="flex-shrink-0 w-full bg-white">
     <div class="w-full max-w-3xl mx-auto px-4">
       <app-prompt-input-form

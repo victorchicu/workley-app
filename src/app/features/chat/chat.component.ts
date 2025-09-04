@@ -153,7 +153,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
 
     return this.command.execute(new SendMessageCommand(chatId, message))
       .pipe(
-        delay(500),
+        delay(100),
         map((actionCommandResult: ActionCommandResult) => actionCommandResult as SendMessageCommandResult),
         tap((sendMessageCommandResult: SendMessageCommandResult) => {
           this.error.set(null);

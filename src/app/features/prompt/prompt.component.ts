@@ -77,7 +77,7 @@ export class PromptComponent {
     const text: string = state.form.controls.text.value;
     return this.command.execute(new CreateChatCommand(text))
       .pipe(
-        delay(500),
+        delay(100),
         map((actionCommandResult: ActionCommandResult) => actionCommandResult as CreateChatCommandResult),
         tap((createChatCommandResult: CreateChatCommandResult) => {
           this.error.set(null);

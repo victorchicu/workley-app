@@ -1,6 +1,7 @@
 
 export enum Role {
-  USER = "USER",
+  ANONYMOUS = "ANONYMOUS",
+  CLIENT = "CLIENT",
   ASSISTANT = "ASSISTANT",
   UNKNOWN = "UNKNOWN"
 }
@@ -57,7 +58,7 @@ export type ActionCommandResult =
 
 export interface Message {
   id?: string;
-  role?: Role;
   content: string;
+  writtenBy?: Role;
   createdAt?: Date;
 }

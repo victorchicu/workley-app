@@ -23,7 +23,7 @@
       <div *ngFor="let message of messages()"
            class="mb-6 animate-fadeIn">
         <!-- User Message -->
-        <div *ngIf="message.role === Role.USER" class="flex justify-end mb-4">
+        <div *ngIf="message.writtenBy === Role.ANONYMOUS" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
             <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 break-all overflow-hidden">
               <p class="text-sm whitespace-pre-wrap break-all overflow-wrap-anywhere">{{ message.content }}</p>
@@ -35,7 +35,7 @@
         </div>
 
         <!-- Assistant Message -->
-        <div *ngIf="message.role === Role.ASSISTANT" class="flex justify-start mb-4">
+        <div *ngIf="message.writtenBy === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
             <div class="bg-neutral-100 rounded-lg px-4 py-2 break-all overflow-hidden">
               <div *ngIf="chat.isLoading && !message.content" class="flex items-center space-x-2">

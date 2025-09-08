@@ -6,23 +6,21 @@
            class="flex justify-center items-center h-32">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
-
-      <div *ngIf="chat.error"
-           class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-        <div class="flex items-center">
-          <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-          </svg>
-          <span class="text-red-800">{{ chat.error }}</span>
-          <button class="ml-auto text-red-600 hover:text-red-800 underline text-sm">
-            Retry
-          </button>
-        </div>
-      </div>
-
       <div *ngFor="let message of messages()"
            class="mb-6 animate-fadeIn">
-        <!-- User Message -->
+        <div *ngIf="chat.error"
+             class="p-4 mb-4">
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-red-800">{{ chat.error }}</span>
+            <button class="ml-auto text-red-600 hover:text-red-800 underline text-sm cursor-pointer">
+              Retry
+            </button>
+          </div>
+        </div>
+
         <div *ngIf="message.writtenBy === Role.ANONYMOUS" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
             <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 break-all overflow-hidden">

@@ -39,6 +39,11 @@ export type ChatForm = FormGroup<ChatControl>;
   styleUrl: './chat.component.css',
 })
 export class ChatComponent implements OnInit, AfterViewChecked  {
+  private readonly FAILED_TO_LOAD_CHAT_HISTORY_ERROR: string
+    = 'Oops! You can’t access the chat history, your session has expired. If you’d like to keep a record of your conversations, please sign up.';
+  private readonly FAILED_TO_SEND_MESSAGE_COMMAND_ERROR: string
+    = "Oops! Something went wrong, please try again.";
+
   readonly router: Router = inject(Router);
   readonly builder: FormBuilder = inject(FormBuilder);
   readonly query: QueryService = inject(QueryService);
@@ -133,9 +138,8 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
           console.log('Chat history loaded:', getChatQueryResult)
         }),
         catchError(err => {
-          console.error('Failed to load chat history:', err);
-          this.error.set('Failed to load chat history. Please refresh the page.');
-          return throwError(() => new Error('Failed to load chat history'));
+          this.error.set(this.FAILED_TO_LOAD_CHAT_HISTORY_ERROR);
+          return throwError(() => new Error('Failed to load chat history ' + chatId));
         }),
         finalize(() => this.isLoading.set(false))
       );
@@ -166,8 +170,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
           this.isLineWrapped.set(false);
         }),
         catchError((err) => {
-          console.error('Send chat message failed:', err);
-          this.error.set("Oops! Something went wrong, please try again.");
+          this.error.set(this.FAILED_TO_SEND_MESSAGE_COMMAND_ERROR);
           return throwError(() => new Error("Send chat message failed"));
         }),
         finalize(() => this.isSubmitting.set(false))

@@ -24,8 +24,8 @@ export class CreateChatCommand extends Command {
   }
 }
 
-export class SendMessageCommand extends Command {
-  readonly type = 'SendMessageCommand' as const;
+export class AddChatMessageCommand extends Command {
+  readonly type = 'AddChatMessageCommand' as const;
 
   constructor(public chatId: string, public message: Message) {
     super();
@@ -40,8 +40,8 @@ export interface CreateChatCommandResult extends CommandResult {
   message: Message;
 }
 
-export interface SendMessageCommandResult extends CommandResult {
-  type: 'SendMessageCommandResult';
+export interface AddChatMessageCommandResult extends CommandResult {
+  type: 'AddChatMessageCommandResult';
   chatId: string;
   message: Message;
 }
@@ -50,11 +50,11 @@ export interface SendMessageCommandResult extends CommandResult {
 
 export type ActionCommand =
   | CreateChatCommand
-  | SendMessageCommand;
+  | AddChatMessageCommand;
 
 export type ActionCommandResult =
   | CreateChatCommandResult
-  | SendMessageCommandResult;
+  | AddChatMessageCommandResult;
 
 export interface Message {
   id?: string;

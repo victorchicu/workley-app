@@ -14,7 +14,7 @@ export class AnalyticsService {
     try {
       this.analyticsProvider.trackEvent(event, params);
     } catch (error) {
-      console.error('Error tracking event:', error);
+      console.error(error);
     }
   }
 }

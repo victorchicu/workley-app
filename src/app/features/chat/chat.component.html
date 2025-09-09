@@ -35,7 +35,7 @@
         <!-- Assistant Message -->
         <div *ngIf="message.writtenBy === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
-            <div class="bg-neutral-100 rounded-lg px-4 py-2 break-all overflow-hidden">
+            <div class="rounded-lg py-2 break-all overflow-hidden">
               <div *ngIf="chat.isLoading && !message.content" class="flex items-center space-x-2">
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
@@ -61,12 +61,12 @@
         [isSubmitting]="chat.isSubmitting"
         [isDeactivated]="chat.isSubmitting"
         [isLineWrapped]="chat.isLineWrapped"
-        (onPressEnter)="sendReply()"
+        (onPressEnter)="replyToZumely()"
         (lineWrapDetected)="handleLineWrapChange($event)">
         <div class="flex items-center gap-1" [class.justify-end]="chat.isLineWrapped">
           <app-prompt-send-button
             aria-label="Send message"
-            (clicked)="sendReply()"
+            (clicked)="replyToZumely()"
             [deactivated]="chat.form.invalid"
             [isSubmitting]="chat.isSubmitting"
           />

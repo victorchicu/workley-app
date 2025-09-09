@@ -89,7 +89,7 @@ export class PromptComponent {
         }),
         catchError((err) => {
           this.error.set("Oops! Something went wrong, please try again.");
-          console.error(`Chat creation failed: ${err}`)
+          console.error()
           return throwError(() => new Error("Chat creation failed"));
         })
       );

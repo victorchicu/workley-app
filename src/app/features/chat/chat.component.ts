@@ -39,11 +39,6 @@ export type ChatForm = FormGroup<ChatControl>;
   styleUrl: './chat.component.css',
 })
 export class ChatComponent implements OnInit, AfterViewChecked  {
-  private readonly FAILED_TO_LOAD_CHAT_HISTORY_ERROR: string
-    = 'Oops! You can’t access the chat history, your session has expired. If you’d like to keep a record of your conversations, please sign up.';
-  private readonly FAILED_TO_SEND_MESSAGE_COMMAND_ERROR: string
-    = "Oops! Something went wrong, please try again.";
-
   readonly router: Router = inject(Router);
   readonly builder: FormBuilder = inject(FormBuilder);
   readonly query: QueryService = inject(QueryService);
@@ -95,7 +90,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
     this.scrollToBottom();
   }
 
-  sendReply() {
+  replyToZumely() {
     const state = this.viewModel();
     if (!state.chatId)
       return;
@@ -104,23 +99,18 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
       return;
     }
     console.log(`Send reply to chat: ${this.chatId} with content: ${text}`)
-    this.sendChatMessage(state.chatId, text)
+    this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (addChatMessageCommandResult: AddChatMessageCommandResult) => {
           console.log(`AddChatMessageCommandResult: ${addChatMessageCommandResult}`)
-          this.addChatMessage(addChatMessageCommandResult.chatId, addChatMessageCommandResult.message);
+          this.updateChatMessage(addChatMessageCommandResult.chatId, addChatMessageCommandResult.message);
         },
-        error: (cause) => {
-          console.error("Send reply failed:", cause);
+        error: () => {
           this.router.navigate(['/error'])
             .then();
         }
       });
-  }
-
-  addChatMessage(chatId: string, message: Message) {
-    this._messages.update(list => [...list, message]);
   }
 
   getChatQuery(chatId: string): Observable<GetChatQueryResult> {
@@ -137,15 +127,16 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
           this.error.set(null);
           console.log('Chat history loaded:', getChatQueryResult)
         }),
-        catchError(err => {
-          this.error.set(this.FAILED_TO_LOAD_CHAT_HISTORY_ERROR);
-          return throwError(() => new Error('Failed to load chat history ' + chatId));
+        catchError((cause: any) => {
+          console.error(cause);
+          this.error.set(cause?.error?.message ?? "Failed to load chat history. Please try again later.");
+          return EMPTY as Observable<GetChatQueryResult>;
         }),
         finalize(() => this.isLoading.set(false))
       );
   }
 
-  sendChatMessage(chatId: string, content: string): Observable<AddChatMessageCommandResult> {
+  addChatMessage(chatId: string, content: string): Observable<AddChatMessageCommandResult> {
     const state = this.viewModel();
 
     if (state.isSubmitting)
@@ -170,15 +161,23 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
           this.isLineWrapped.set(false);
         }),
         catchError((err) => {
-          this.error.set(this.FAILED_TO_SEND_MESSAGE_COMMAND_ERROR);
-          return throwError(() => new Error("Send chat message failed"));
+          this.error.set(err.error?.message ?? "Failed to send message. Please try again later.");
+          return throwError(() => new Error());
         }),
         finalize(() => this.isSubmitting.set(false))
       );
   }
 
+  updateChatMessage(chatId: string, message: Message) {
+    this._messages.update(list => [...list, message]);
+  }
+
+  handleLineWrapChange(isWrapped: boolean): void {
+    this.isLineWrapped.set(isWrapped);
+  }
+
   private handleResult(result: CreateChatCommandResult) {
-    this.addChatMessage(result.chatId, result.message);
+    this.updateChatMessage(result.chatId, result.message);
     this.loadChatHistory();
   }
 
@@ -197,9 +196,6 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
           if (result.chatId) {
             this.chatId.set(result.chatId);
           }
-        },
-        error: (err) => {
-          console.error('Error loading chat history:', err);
         }
       });
   }
@@ -210,13 +206,9 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
         const element = this.messagesContainer.nativeElement;
         element.scrollTop = element.scrollHeight;
       } catch (err) {
-        console.error('Error scrolling to bottom:', err);
+        console.error(err);
       }
     }
-  }
-
-  handleLineWrapChange(isWrapped: boolean): void {
-    this.isLineWrapped.set(isWrapped);
   }
 
   protected readonly Role = Role;

@@ -1,6 +1,6 @@
 import {
-  AfterViewChecked,
-  Component, computed, DestroyRef, ElementRef, inject, OnInit, Signal, signal, ViewChild, WritableSignal
+  ChangeDetectorRef,
+  Component, computed, DestroyRef, ElementRef, inject, NgZone, OnInit, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {Navigation, Router} from '@angular/router';
@@ -13,7 +13,7 @@ import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {catchError, delay, EMPTY, filter, finalize, map, Observable, Subscription, tap, throwError} from 'rxjs';
+import {catchError, delay, EMPTY, filter, finalize, map, Observable, Subscription, take, tap, throwError} from 'rxjs';
 import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models';
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
@@ -39,7 +39,7 @@ export type ChatForm = FormGroup<ChatControl>;
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
-export class ChatComponent implements OnInit, AfterViewChecked  {
+export class ChatComponent implements OnInit {
   readonly router: Router = inject(Router);
   readonly builder: FormBuilder = inject(FormBuilder);
   readonly query: QueryService = inject(QueryService);
@@ -78,7 +78,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
   private currentStreamingMessageId?: string;
   private streamingMessageIds = new Set<string>();
 
-  constructor() {
+  constructor(private zone: NgZone, private changeDetectorRef: ChangeDetectorRef) {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatCommandResult;
@@ -107,10 +107,6 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
       });
   }
 
-  ngAfterViewChecked(): void {
-    this.scrollToBottom();
-  }
-
   replyToZumely() {
     const state = this.viewModel();
     if (!state.chatId)
@@ -125,7 +121,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
       .subscribe({
         next: (addChatMessageCommandResult: AddChatMessageCommandResult) => {
           console.log(`AddChatMessageCommandResult: ${addChatMessageCommandResult}`)
-          this.updateChatMessage(addChatMessageCommandResult.chatId, addChatMessageCommandResult.message);
+          this._messages.update(list => [...list, addChatMessageCommandResult.message]);
         },
         error: () => {
           this.router.navigate(['/error'])
@@ -187,12 +183,12 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
           this.error.set(err.error?.message ?? "Failed to send message. Please try again later.");
           return throwError(() => new Error());
         }),
-        finalize(() => this.isSubmitting.set(false))
+        finalize(() => {
+          this.isSubmitting.set(false);
+          this.changeDetectorRef.detectChanges();
+          this.zone.onStable.pipe(take(1)).subscribe(() => this.scrollToBottom());
+        })
       );
-  }
-
-  updateChatMessage(chatId: string, message: Message) {
-    this._messages.update(list => [...list, message]);
   }
 
   handleLineWrapChange(isWrapped: boolean): void {
@@ -200,7 +196,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
   }
 
   private createChat(result: CreateChatCommandResult) {
-    this.updateChatMessage(result.chatId, result.message);
+    this._messages.update(list => [...list, result.message]);
     this.loadChatHistory();
   }
 
@@ -210,7 +206,11 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
       return;
     console.log('Loading chat history for:', this.chatId);
     this.getChatQuery(state.chatId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.changeDetectorRef.detectChanges();
+          this.zone.onStable.pipe(take(1)).subscribe(() => this.scrollToBottom());
+        }))
       .subscribe({
         next: (result: GetChatQueryResult) => {
           if (result.messages && result.messages.length > 0) {
@@ -269,6 +269,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
 
     // Check if this message is complete (you might need to add a flag from backend)
     // For now, we'll keep the streaming indicator active
+    this.scrollToBottom();
   }
 
   private initializeRSocketStream(chatId: string): void {

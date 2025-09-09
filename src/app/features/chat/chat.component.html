@@ -6,9 +6,9 @@
            class="flex justify-center items-center h-32">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
-      <div *ngFor="let message of messages(); let last = last"
+      <div *ngFor="let message of messages(); let last = last; trackBy: trackByMessageId"
            class="mb-6 animate-fadeIn">
-        <div *ngIf="chat.error"
+        <div *ngIf="chat.error && last"
              class="p-4 mb-4">
           <div class="flex items-center">
             <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -33,15 +33,19 @@
         <div *ngIf="message.writtenBy === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
             <div class="rounded-lg py-2 break-all overflow-hidden">
-              <div *ngIf="!message.content && chat.isStreamingResponse && last" class="flex items-center space-x-2">
-                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
-                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
-                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+              <div *ngIf="!message.content && chat.isStreaming && last" class="flex items-center space-x-2 px-2">
+                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:0ms]"></div>
+                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:150ms]"></div>
+                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:300ms]"></div>
               </div>
-              <p *ngIf="message.content" class="text-md text-gray-800 whitespace-pre-wrap break-all overflow-wrap-anywhere">
-                {{ message.content }}
-<!--                <span *ngIf="chat.isStreamingResponse && last" class="inline-block w-2 h-4 bg-gray-800 animate-pulse ml-1"></span>-->
-              </p>
+              <div *ngIf="message.content" class="relative">
+                <p class="text-md text-gray-800 whitespace-pre-wrap break-all overflow-wrap-anywhere transition-none">
+                  {{ message.content }}
+                </p>
+                <!-- Blinking cursor for active streaming -->
+<!--                <span *ngIf="chat.isStreaming && last"-->
+<!--                      class="inline-block w-0.5 h-5 bg-gray-700 animate-pulse ml-0.5 align-text-bottom"></span>-->
+              </div>
             </div>
             <div class="text-sm text-gray-500 mt-1">
               {{ message.createdAt | date:'short' }}

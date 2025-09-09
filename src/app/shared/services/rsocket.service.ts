@@ -21,12 +21,15 @@ interface Payload<D = Data, M = Metadata> {
 
 interface ReactiveSocket<D = Data, M = Metadata> {
   requestStream(payload: Payload<D, M>): Flowable<Payload<D, M>>;
+
   connectionStatus(): Flowable<any>;
+
   close(): void;
 }
 
 interface ISubscription {
   request(n: number): void;
+
   cancel(): void;
 }
 
@@ -38,10 +41,10 @@ const MAX_REQUEST_N = 0x7fffffff;
 export class RSocketService implements OnDestroy {
   private client: RSocketClient<Data, Metadata> | null = null;
   private socket: ReactiveSocket<Data, Metadata> | null = null;
-  private connectionStatus$ = new BehaviorSubject<boolean>(false);
-  private activeStreams = new Map<string, Subject<Message>>();
-  private subscriptions = new Map<string, ISubscription>();
+  private activeStreams: Map<string, Subject<Message>> = new Map<string, Subject<Message>>();
+  private subscriptions: Map<string, ISubscription> = new Map<string, ISubscription>();
   private reconnectTimeout: any;
+  private connectionStatus$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private currentStreamingMessages: Map<string | undefined, string> = new Map<string, string>();
 
   constructor() {
@@ -89,8 +92,6 @@ export class RSocketService implements OnDestroy {
         this.socket = socket;
         this.connectionStatus$.next(true);
         console.log('RSocket connected successfully');
-
-        // Monitor connection status
         socket.connectionStatus().subscribe({
           onNext: (status: any) => {
             console.log('Connection status:', status);
@@ -119,13 +120,10 @@ export class RSocketService implements OnDestroy {
     console.log('Falling back to direct WebSocket implementation');
     // Implement direct WebSocket as fallback
     const ws = new WebSocket('ws://localhost:8443/rsocket');
-
     ws.binaryType = 'arraybuffer';
-
     ws.onopen = () => {
       console.log('Direct WebSocket connected');
       this.connectionStatus$.next(true);
-
       // Create a simple adapter
       this.socket = this.createWebSocketAdapter(ws);
     };
@@ -184,7 +182,7 @@ export class RSocketService implements OnDestroy {
         const subscribeMessage = {
           type: 'REQUEST_STREAM',
           route: `chat.stream.${chatId}`,
-          data: { chatId }
+          data: {chatId}
         };
 
         if (ws.readyState === WebSocket.OPEN) {
@@ -220,7 +218,7 @@ export class RSocketService implements OnDestroy {
       },
       connectionStatus: () => {
         return new Flowable((subscriber) => {
-          subscriber.onNext({ kind: ws.readyState === WebSocket.OPEN ? 'CONNECTED' : 'CLOSED' });
+          subscriber.onNext({kind: ws.readyState === WebSocket.OPEN ? 'CONNECTED' : 'CLOSED'});
         });
       },
       close: () => {
@@ -280,7 +278,7 @@ export class RSocketService implements OnDestroy {
 
       // Create request payload
       const requestPayload: Payload<Data, Metadata> = {
-        data: Buffer.from(JSON.stringify({ chatId })),
+        data: Buffer.from(JSON.stringify({chatId})),
         metadata,
       };
 

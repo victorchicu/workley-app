@@ -89,7 +89,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   private streamBuffer: string = '';
-  private streamMessageId: string | null = null;
   private streamDebounceTimer?: any;
   private streamSubscription?: Subscription;
 
@@ -276,13 +275,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
     this.streamBuffer = source.content;
-    this.streamMessageId = source?.id ?? "";
 
     // Debounce updates to reduce flickering
     this.streamDebounceTimer = setTimeout(() => {
       this.ngZone.run(() => {
         const messages: Message[] = this._messages();
-        const existingIndex = messages.findIndex(message => message.id === this.streamMessageId);
+        const existingIndex = messages.findIndex(message => message.id === source.id);
         if (existingIndex !== -1) {
           this._messages.update(list => {
             const updatedList: Message[] = [...list];
@@ -330,14 +328,14 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.streamSubscription = this.rsocketService.streamChat(chatId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        filter(message => message.writtenBy === Role.ASSISTANT),
-        // Add buffering to reduce update frequency
-        bufferTime(100), // Buffer messages for 100ms
-        filter(messages => messages.length > 0), // Only process if there are messages
-        map(messages => messages[messages.length - 1]) // Take the latest message
+        filter((message: Message) => message.writtenBy === Role.ASSISTANT),
+        bufferTime(100),
+        filter((messages: Message[]) => messages.length > 0),
+        map((messages: Message[]) => messages[messages.length - 1])
       )
       .subscribe({
-        next: (message: any) => {
+        next: (message: Message) => {
+          console.log('Raw streamed message:', JSON.stringify(message));
           this.handleStreamingMessage(message);
         },
         error: (error) => {
@@ -348,7 +346,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         complete: () => {
           console.log('RSocket stream completed');
           this.isStreaming.set(false);
-          // Clear any pending timers
           if (this.streamDebounceTimer) {
             clearTimeout(this.streamDebounceTimer);
           }

@@ -6,7 +6,7 @@
            class="flex justify-center items-center h-32">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
-      <div *ngFor="let message of messages()"
+      <div *ngFor="let message of messages(); let last = last"
            class="mb-6 animate-fadeIn">
         <div *ngIf="chat.error"
              class="p-4 mb-4">
@@ -20,7 +20,6 @@
             </button>
           </div>
         </div>
-
         <div *ngIf="message.writtenBy === Role.ANONYMOUS" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
             <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 break-all overflow-hidden">
@@ -31,17 +30,18 @@
             </div>
           </div>
         </div>
-
-        <!-- Assistant Message -->
         <div *ngIf="message.writtenBy === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
             <div class="rounded-lg py-2 break-all overflow-hidden">
-              <div *ngIf="chat.isLoading && !message.content" class="flex items-center space-x-2">
+              <div *ngIf="!message.content && chat.isStreamingResponse && last" class="flex items-center space-x-2">
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
               </div>
-              <p *ngIf="message.content" class="text-md text-gray-800 whitespace-pre-wrap break-all overflow-wrap-anywhere">{{ message.content }}</p>
+              <p *ngIf="message.content" class="text-md text-gray-800 whitespace-pre-wrap break-all overflow-wrap-anywhere">
+                {{ message.content }}
+                <span *ngIf="chat.isStreamingResponse && last" class="inline-block w-2 h-4 bg-gray-800 animate-pulse ml-1"></span>
+              </p>
             </div>
             <div class="text-sm text-gray-500 mt-1">
               {{ message.createdAt | date:'short' }}
@@ -51,8 +51,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Input Area -->
   <div class="flex-shrink-0 w-full bg-white">
     <div class="w-full max-w-3xl mx-auto px-4">
       <app-prompt-input-form
@@ -67,7 +65,7 @@
           <app-prompt-send-button
             aria-label="Send message"
             (clicked)="replyToZumely()"
-            [deactivated]="chat.form.invalid"
+            [deactivated]="chat.form.invalid || chat.isSubmitting"
             [isSubmitting]="chat.isSubmitting"
           />
         </div>

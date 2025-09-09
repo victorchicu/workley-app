@@ -13,10 +13,11 @@ import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {catchError, delay, EMPTY, finalize, map, Observable, tap, throwError} from 'rxjs';
+import {catchError, delay, EMPTY, filter, finalize, map, Observable, Subscription, tap, throwError} from 'rxjs';
 import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models';
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
+import {RSocketService} from '../../shared/services/rsocket.service';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -44,6 +45,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
   readonly query: QueryService = inject(QueryService);
   readonly command: CommandService = inject(CommandService);
   readonly destroyRef: DestroyRef = inject(DestroyRef);
+  readonly rsocketService: RSocketService = inject(RSocketService);
 
   private readonly form = signal<ChatForm>(
     this.builder.nonNullable.group({
@@ -56,6 +58,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
   private readonly isLoading = signal<boolean>(false);
   private readonly isSubmitting = signal<boolean>(false);
   private readonly isLineWrapped = signal<boolean>(false);
+  private readonly isStreamingResponse = signal<boolean>(false);
 
   viewModel = computed(() => ({
     form: this.form(),
@@ -63,19 +66,24 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
     chatId: this.chatId(),
     isLoading: this.isLoading(),
     isSubmitting: this.isSubmitting(),
-    isLineWrapped: this.isLineWrapped()
+    isLineWrapped: this.isLineWrapped(),
+    isStreamingResponse: this.isStreamingResponse()
   }));
 
   private _messages: WritableSignal<Message[]> = signal<Message[]>([]);
   readonly messages: Signal<Message[]> = this._messages.asReadonly();
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
+  private streamSubscription?: Subscription;
+  private currentStreamingMessageId?: string;
+  private streamingMessageIds = new Set<string>();
+
   constructor() {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatCommandResult;
       this.chatId.set(result.chatId);
-      this.handleResult(result);
+      this.createChat(result);
     }
   }
 
@@ -84,6 +92,19 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
     if (state.chatId && this._messages().length === 0) {
       this.loadChatHistory();
     }
+    if (state.chatId) {
+      this.initializeRSocketStream(state.chatId);
+    }
+    // Monitor RSocket connection status
+    this.rsocketService.isConnected()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(isConnected => {
+        console.log('RSocket connection status:', isConnected);
+        if (isConnected && state.chatId && !this.streamSubscription) {
+          // Resubscribe to stream if connection is restored
+          this.initializeRSocketStream(state.chatId);
+        }
+      });
   }
 
   ngAfterViewChecked(): void {
@@ -144,7 +165,9 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
 
     this.isSubmitting.set(true);
 
-    const message: Message = {content};
+    const message: Message = {
+      content
+    };
 
     return this.command.execute(new AddChatMessageCommand(chatId, message))
       .pipe(
@@ -176,7 +199,7 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
     this.isLineWrapped.set(isWrapped);
   }
 
-  private handleResult(result: CreateChatCommandResult) {
+  private createChat(result: CreateChatCommandResult) {
     this.updateChatMessage(result.chatId, result.message);
     this.loadChatHistory();
   }
@@ -209,6 +232,72 @@ export class ChatComponent implements OnInit, AfterViewChecked  {
         console.error(err);
       }
     }
+  }
+
+  private handleStreamingMessage(message: any): void {
+    const messageId = message.id;
+
+    // Check if we already have this message in our list
+    const messages = this._messages();
+    const existingIndex = messages.findIndex(m => m.id === messageId);
+
+    if (existingIndex !== -1) {
+      // Update existing message with new content
+      this._messages.update(list => {
+        const updatedList = [...list];
+        updatedList[existingIndex] = {
+          ...updatedList[existingIndex],
+          content: message.content // RSocket service already accumulates content
+        };
+        return updatedList;
+      });
+    } else {
+      this.isStreamingResponse.set(true);
+      this.streamingMessageIds.add(messageId);
+
+      const newMessage: Message = {
+        id: messageId,
+        chatId: message.chatId,
+        authorId: message.authorId,
+        writtenBy: Role.ASSISTANT,
+        createdAt: message.createdAt || new Date(),
+        content: message.content,
+      };
+
+      this._messages.update(list => [...list, newMessage]);
+    }
+
+    // Check if this message is complete (you might need to add a flag from backend)
+    // For now, we'll keep the streaming indicator active
+  }
+
+  private initializeRSocketStream(chatId: string): void {
+    // Clean up existing subscription if any
+    if (this.streamSubscription) {
+      this.streamSubscription.unsubscribe();
+    }
+
+    // Subscribe to RSocket stream
+    this.streamSubscription = this.rsocketService.streamChat(chatId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        filter(message => message.writtenBy === Role.ASSISTANT)
+      )
+      .subscribe({
+        next: (message: any) => {
+          this.handleStreamingMessage(message);
+        },
+        error: (error) => {
+          console.error('RSocket stream error:', error);
+          this.isStreamingResponse.set(false);
+          // Don't set error message for connection issues, it will auto-reconnect
+        },
+        complete: () => {
+          console.log('RSocket stream completed');
+          this.isStreamingResponse.set(false);
+          this.streamingMessageIds.clear();
+        }
+      });
   }
 
   protected readonly Role = Role;

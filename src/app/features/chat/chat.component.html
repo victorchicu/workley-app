@@ -25,7 +25,7 @@
         <div *ngIf="message.writtenBy === Role.ANONYMOUS" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
             <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 overflow-hidden">
-              <p class="text-md break-words">{{ message.content }}</p>
+              <p class="text-md whitespace-pre-wrap break-words">{{ message.content }}</p>
             </div>
             <div class="text-sm text-gray-500 mt-1 text-right">
               {{ message.createdAt | date:'short' }}
@@ -41,12 +41,12 @@
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:300ms]"></div>
               </div>
               <div *ngIf="message.content" class="relative">
-                <p class="text-md text-gray-800 break-words transition-none">
+                <p class="text-md text-gray-800 whitespace-pre-wrap break-words transition-none">
                   {{ message.content }}
                 </p>
               </div>
             </div>
-            <div class="text-sm text-gray-500 mt-1">
+            <div class="text-sm text-gray-500 px-1 mt-1">
               {{ message.createdAt | date:'short' }}
             </div>
           </div>

@@ -78,7 +78,7 @@ export class ChatComponent implements OnInit {
   private currentStreamingMessageId?: string;
   private streamingMessageIds = new Set<string>();
 
-  constructor(private zone: NgZone, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private ngZone: NgZone, private changeDetectorRef: ChangeDetectorRef) {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatCommandResult;
@@ -178,15 +178,12 @@ export class ChatComponent implements OnInit {
           this.error.set(null);
           this.isSubmitting.set(false);
           this.isLineWrapped.set(false);
+          this.changeDetectorRef.detectChanges();
+          this.ngZone.onStable.pipe(take(1)).subscribe(() => this.scrollToBottom());
         }),
         catchError((err) => {
           this.error.set(err.error?.message ?? "Failed to send message. Please try again later.");
           return throwError(() => new Error());
-        }),
-        finalize(() => {
-          this.isSubmitting.set(false);
-          this.changeDetectorRef.detectChanges();
-          this.zone.onStable.pipe(take(1)).subscribe(() => this.scrollToBottom());
         })
       );
   }
@@ -209,7 +206,7 @@ export class ChatComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.changeDetectorRef.detectChanges();
-          this.zone.onStable.pipe(take(1)).subscribe(() => this.scrollToBottom());
+          this.ngZone.onStable.pipe(take(1)).subscribe(() => this.scrollToBottom());
         }))
       .subscribe({
         next: (result: GetChatQueryResult) => {

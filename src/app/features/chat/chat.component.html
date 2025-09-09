@@ -22,8 +22,8 @@
         </div>
         <div *ngIf="message.writtenBy === Role.ANONYMOUS" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
-            <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 break-all overflow-hidden">
-              <p class="text-md whitespace-pre-wrap break-all overflow-wrap-anywhere">{{ message.content }}</p>
+            <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 overflow-hidden">
+              <p class="text-md whitespace-pre-wrap break-words">{{ message.content }}</p>
             </div>
             <div class="text-sm text-gray-500 mt-1 text-right">
               {{ message.createdAt | date:'short' }}
@@ -32,19 +32,16 @@
         </div>
         <div *ngIf="message.writtenBy === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
-            <div class="rounded-lg py-2 break-all overflow-hidden">
+            <div class="rounded-lg py-2 overflow-hidden">
               <div *ngIf="!message.content && chat.isStreaming && last" class="flex items-center space-x-2 px-2">
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:0ms]"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:150ms]"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:300ms]"></div>
               </div>
               <div *ngIf="message.content" class="relative">
-                <p class="text-md text-gray-800 whitespace-pre-wrap break-all overflow-wrap-anywhere transition-none">
+                <p class="text-md text-gray-800 whitespace-pre-wrap break-words transition-none">
                   {{ message.content }}
                 </p>
-                <!-- Blinking cursor for active streaming -->
-<!--                <span *ngIf="chat.isStreaming && last"-->
-<!--                      class="inline-block w-0.5 h-5 bg-gray-700 animate-pulse ml-0.5 align-text-bottom"></span>-->
               </div>
             </div>
             <div class="text-sm text-gray-500 mt-1">

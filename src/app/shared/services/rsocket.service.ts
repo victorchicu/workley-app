@@ -247,7 +247,6 @@ export class RSocketService implements OnDestroy {
   }
 
   public streamChat(chatId: string): Observable<Message> {
-    // Check if stream already exists
     if (this.activeStreams.has(chatId)) {
       return this.activeStreams.get(chatId)!.asObservable();
     }
@@ -256,7 +255,6 @@ export class RSocketService implements OnDestroy {
     this.activeStreams.set(chatId, stream$);
 
     if (!this.socket) {
-      console.error('RSocket not connected');
       setTimeout(() => {
         if (this.socket) {
           this.subscribeToStream(chatId, stream$);

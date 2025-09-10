@@ -88,7 +88,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   readonly messages: Signal<Message[]> = this._messages.asReadonly();
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
-  private streamBuffer: string = '';
   private streamDebounceTimer?: any;
   private streamSubscription?: Subscription;
 
@@ -274,7 +273,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       clearTimeout(this.streamDebounceTimer);
     }
 
-    this.streamBuffer = source.content;
+    const streamBuffer: string = source.content;
 
     // Debounce updates to reduce flickering
     this.streamDebounceTimer = setTimeout(() => {
@@ -286,7 +285,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             const updatedList: Message[] = [...list];
             updatedList[existingIndex] = {
               ...updatedList[existingIndex],
-              content: this.streamBuffer
+              content: streamBuffer
             };
             return updatedList;
           });
@@ -297,7 +296,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             authorId: source.authorId,
             writtenBy: Role.ASSISTANT,
             createdAt: source.createdAt || new Date(),
-            content: this.streamBuffer,
+            content: streamBuffer
           };
           this.isStreaming.set(true);
           this._messages.update(list => [...list, message]);

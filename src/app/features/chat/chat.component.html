@@ -42,7 +42,7 @@
               </div>
               <div *ngIf="message.content" class="relative">
                 <div class="markdown-content text-md text-gray-800 whitespace-pre-wrap break-words transition-none"
-                     [innerHTML]="renderMarkdown(message.content)">
+                     [innerHTML]="message.content | markdown">">
                 </div>
               </div>
             </div>

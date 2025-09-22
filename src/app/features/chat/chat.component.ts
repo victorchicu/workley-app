@@ -24,7 +24,6 @@ import {
   map,
   Observable,
   Subscription,
-  take,
   tap,
   throwError
 } from 'rxjs';
@@ -34,6 +33,7 @@ import {CommandService} from '../../shared/services/command.service';
 import {RSocketService} from '../../shared/services/rsocket.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {marked} from 'marked';
+import {MarkdownPipe} from '../../core/pipe/markdown.pipe';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -51,6 +51,7 @@ export type ChatForm = FormGroup<ChatControl>;
     NgForOf,
     PromptSendButtonComponent,
     ChatDisclaimerComponent,
+    MarkdownPipe,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -93,7 +94,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private streamDebounceTimer?: any;
   private streamSubscription?: Subscription;
 
-  constructor(private ngZone: NgZone, private sanitizer: DomSanitizer, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private ngZone: NgZone, private changeDetectorRef: ChangeDetectorRef) {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatCommandResult;
@@ -214,12 +215,6 @@ export class ChatComponent implements OnInit, OnDestroy {
           return throwError(() => new Error());
         })
       );
-  }
-
-  renderMarkdown(content: string): SafeHtml {
-    if (!content) return '';
-    const html = marked.parse(content);
-    return this.sanitizer.sanitize(SecurityContext.HTML, html) || '';
   }
 
   trackByMessageId(index: number, message: Message): string {

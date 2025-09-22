@@ -1,7 +1,7 @@
 import {
   ChangeDetectorRef,
   Component, computed, DestroyRef, ElementRef, inject, NgZone,
-  OnDestroy, OnInit, SecurityContext, Signal, signal, ViewChild, WritableSignal
+  OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {Navigation, Router} from '@angular/router';
@@ -31,8 +31,6 @@ import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
 import {RSocketService} from '../../shared/services/rsocket.service';
-import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {marked} from 'marked';
 import {MarkdownPipe} from '../../core/pipe/markdown.pipe';
 
 export interface ChatControl {
@@ -308,7 +306,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         requestAnimationFrame(() => {
           if (this.messagesContainer) {
             const element = this.messagesContainer.nativeElement;
-            // Only scroll if user is near bottom (within 100px)
             const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
             if (isNearBottom) {
               element.scrollTo({

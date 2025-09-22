@@ -27,7 +27,7 @@ import {PromptControl} from '../../prompt.component';
 export class PromptInputFormComponent {
   readonly form = input.required<FormGroup<PromptControl>>();
   readonly error = input<string | null>(null);
-  readonly placeholder = input("What job are you applying for?");
+  readonly placeholder = input("How can Zumely help you today?");
   readonly isSubmitting = input<boolean>(false);
   readonly isDeactivated = input(false);
   readonly isLineWrapped = input<boolean>(false);

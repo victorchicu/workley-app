@@ -9,17 +9,17 @@ export const routes: Routes = [
   {
     path: '',
     component: PromptComponent,
-    title: 'Free Resume Builder | Create Resume',
+    title: 'AI Job Search | Zumely',
   },
   {
     path: 'chat/:chatId',
     component: ChatComponent,
-    title: 'Free Resume Builder | Agent Chat',
+    title: 'AI Job Search | AI assistant',
   },
   {
     path: 'error',
     component: ErrorComponent,
-    title: 'Free Resume Builder | Oops! Something went wrong.',
+    title: 'AI Job Search | Oops! Something went wrong.',
   },
   {
     path: '**',

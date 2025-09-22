@@ -1,7 +1,7 @@
 import {
   ChangeDetectorRef,
   Component, computed, DestroyRef, ElementRef, inject, NgZone,
-  OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal
+  OnDestroy, OnInit, SecurityContext, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {Navigation, Router} from '@angular/router';
@@ -32,6 +32,8 @@ import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
 import {RSocketService} from '../../shared/services/rsocket.service';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {marked} from 'marked';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -91,7 +93,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private streamDebounceTimer?: any;
   private streamSubscription?: Subscription;
 
-  constructor(private ngZone: NgZone, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private ngZone: NgZone, private sanitizer: DomSanitizer, private changeDetectorRef: ChangeDetectorRef) {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatCommandResult;
@@ -214,13 +216,19 @@ export class ChatComponent implements OnInit, OnDestroy {
       );
   }
 
-  handleLineWrapChange(isWrapped: boolean): void {
-    this.isLineWrapped.set(isWrapped);
-    this.changeDetectorRef.markForCheck();
+  renderMarkdown(content: string): SafeHtml {
+    if (!content) return '';
+    const html = marked.parse(content);
+    return this.sanitizer.sanitize(SecurityContext.HTML, html) || '';
   }
 
   trackByMessageId(index: number, message: Message): string {
     return message.id || index.toString();
+  }
+
+  handleLineWrapChange(isWrapped: boolean): void {
+    this.isLineWrapped.set(isWrapped);
+    this.changeDetectorRef.markForCheck();
   }
 
   private createChat(result: CreateChatCommandResult) {

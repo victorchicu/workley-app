@@ -41,9 +41,9 @@
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:300ms]"></div>
               </div>
               <div *ngIf="message.content" class="relative">
-                <p class="text-md text-gray-800 whitespace-pre-wrap break-words transition-none">
-                  {{ message.content }}
-                </p>
+                <div class="markdown-content text-md text-gray-800 whitespace-pre-wrap break-words transition-none"
+                     [innerHTML]="renderMarkdown(message.content)">
+                </div>
               </div>
             </div>
             <div class="text-sm text-gray-500 px-1 mt-1">

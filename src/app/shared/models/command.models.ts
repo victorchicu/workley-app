@@ -1,7 +1,7 @@
 
 export enum Role {
   ANONYMOUS = "ANONYMOUS",
-  CLIENT = "CLIENT",
+  CUSTOMER = "CUSTOMER",
   ASSISTANT = "ASSISTANT",
   UNKNOWN = "UNKNOWN"
 }
@@ -24,8 +24,8 @@ export class CreateChatCommand extends Command {
   }
 }
 
-export class AddChatMessageCommand extends Command {
-  readonly type = 'AddChatMessageCommand' as const;
+export class AddMessageCommand extends Command {
+  readonly type = 'AddMessageCommand' as const;
 
   constructor(public chatId: string, public message: Message) {
     super();
@@ -40,8 +40,8 @@ export interface CreateChatCommandResult extends CommandResult {
   message: Message;
 }
 
-export interface AddChatMessageCommandResult extends CommandResult {
-  type: 'AddChatMessageCommandResult';
+export interface AddMessageCommandResult extends CommandResult {
+  type: 'AddMessageCommandResult';
   chatId: string;
   message: Message;
 }
@@ -50,11 +50,11 @@ export interface AddChatMessageCommandResult extends CommandResult {
 
 export type ActionCommand =
   | CreateChatCommand
-  | AddChatMessageCommand;
+  | AddMessageCommand;
 
 export type ActionCommandResult =
   | CreateChatCommandResult
-  | AddChatMessageCommandResult;
+  | AddMessageCommandResult;
 
 export interface Message {
   id?: string;

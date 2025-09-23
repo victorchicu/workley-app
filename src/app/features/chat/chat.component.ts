@@ -7,7 +7,7 @@ import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/p
 import {Navigation, Router} from '@angular/router';
 import {
   ActionCommandResult,
-  CreateChatCommandResult, Message, Role, AddChatMessageCommand, AddChatMessageCommandResult
+  CreateChatCommandResult, Message, Role, AddMessageCommand, AddMessageCommandResult
 } from '../../shared/models/command.models';
 import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
@@ -140,9 +140,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (addChatMessageCommandResult: AddChatMessageCommandResult) => {
-          console.log(`AddChatMessageCommandResult: ${addChatMessageCommandResult}`)
-          this._messages.update(list => [...list, addChatMessageCommandResult.message]);
+        next: (addMessageCommandResult: AddMessageCommandResult) => {
+          this._messages.update(list => [...list, addMessageCommandResult.message]);
           this.changeDetectorRef.markForCheck();
         },
         error: () => {
@@ -178,7 +177,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       );
   }
 
-  addChatMessage(chatId: string, content: string): Observable<AddChatMessageCommandResult> {
+  addChatMessage(chatId: string, content: string): Observable<AddMessageCommandResult> {
     const state = this.viewModel();
 
     if (state.isSubmitting)
@@ -191,13 +190,13 @@ export class ChatComponent implements OnInit, OnDestroy {
       content
     };
 
-    return this.command.execute(new AddChatMessageCommand(chatId, message))
+    return this.command.execute(new AddMessageCommand(chatId, message))
       .pipe(
         delay(100),
-        map((actionCommandResult: ActionCommandResult) => actionCommandResult as AddChatMessageCommandResult),
-        tap((addChatMessageCommandResult: AddChatMessageCommandResult) => {
+        map((actionCommandResult: ActionCommandResult) => actionCommandResult as AddMessageCommandResult),
+        tap((addMessageCommandResult: AddMessageCommandResult) => {
           this.error.set(null);
-          console.log('Add chat message successfully:', addChatMessageCommandResult);
+          console.log('Add chat message successfully:', addMessageCommandResult);
         }),
         finalize(() => {
           this.form().reset();

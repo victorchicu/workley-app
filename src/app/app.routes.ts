@@ -9,7 +9,7 @@ export const routes: Routes = [
   {
     path: '',
     component: PromptComponent,
-    title: 'AI Job Search | Zumely',
+    title: 'AI Job Search | jobbortunity',
   },
   {
     path: 'chat/:chatId',

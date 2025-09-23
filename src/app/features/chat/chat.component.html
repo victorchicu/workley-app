@@ -58,16 +58,16 @@
     <div class="w-full max-w-3xl px-4 mx-auto">
       <app-prompt-input-form
         [form]="chat.form"
-        [placeholder]="'Reply to Zumely...'"
+        [placeholder]="'Reply to assistant...'"
         [isSubmitting]="chat.isSubmitting"
         [isDeactivated]="chat.isSubmitting"
         [isLineWrapped]="chat.isLineWrapped"
-        (onPressEnter)="replyToZumely()"
+        (onPressEnter)="replyToAssistant()"
         (lineWrapDetected)="handleLineWrapChange($event)">
         <div class="flex items-center gap-1" [class.justify-end]="chat.isLineWrapped">
           <app-prompt-send-button
             aria-label="Send message"
-            (clicked)="replyToZumely()"
+            (clicked)="replyToAssistant()"
             [deactivated]="chat.form.invalid || chat.isSubmitting"
             [isSubmitting]="chat.isSubmitting"
           />

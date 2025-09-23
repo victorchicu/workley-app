@@ -128,7 +128,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  replyToZumely() {
+  replyToAssistant() {
     const state = this.viewModel();
     if (!state.chatId)
       return;

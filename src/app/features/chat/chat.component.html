@@ -7,7 +7,7 @@
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
       <div *ngFor="let message of messages(); let last = last; trackBy: trackByMessageId"
-           class="mb-6 animate-fadeIn">
+           class="mb-6">
         <div *ngIf="chat.error && last"
              class="p-4 mb-4">
           <div class="flex items-center">

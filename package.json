@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "build": "ng build --configuration production && ngx-sitemap ./dist/jobbortunity-app/browser https://zumely.app",
-    "build:development": "ng build --configuration development && ngx-sitemap ./dist/jobbortunity-app/browser https://zumely.app",
+    "build": "ng build --configuration production && ngx-sitemap ./dist/jobbortunity-app/browser https://jobbortunity.ai",
+    "build:development": "ng build --configuration development && ngx-sitemap ./dist/jobbortunity-app/browser https://jobbortunity.ai",
     "watch": "ng build --watch --configuration development",
     "start": "ng build --configuration production && node dist/jobbortunity-app/server/server.mjs",
     "start:development": "ng serve --proxy-config proxy.config.json --configuration development"

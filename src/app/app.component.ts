@@ -9,7 +9,7 @@ import {MainComponent} from './shared/ui/components/main/main.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   host: {
-    class: 'h-screen grid grid-rows-[auto_1fr_auto] font-inter relative'
+    class: 'h-screen grid grid-rows-[auto_1fr_auto] relative'
   }
 })
 export class AppComponent {

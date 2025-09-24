@@ -58,9 +58,9 @@ export type ActionCommandResult =
 
 export interface Message {
   id?: string;
+  role?: Role;
   chatId?: string;
   authorId?: string;
-  writtenBy?: Role;
   createdAt?: Date;
   content: string;
 }

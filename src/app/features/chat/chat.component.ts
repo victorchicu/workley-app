@@ -294,7 +294,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             id: source.id,
             chatId: source.chatId,
             authorId: source.authorId,
-            writtenBy: Role.ASSISTANT,
+            role: Role.ASSISTANT,
             createdAt: source.createdAt || new Date(),
             content: streamBuffer
           };
@@ -326,7 +326,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.streamSubscription = this.rsocketService.streamChat(chatId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        filter((message: Message) => message.writtenBy === Role.ASSISTANT),
+        filter((message: Message) => message.role === Role.ASSISTANT),
         bufferTime(100),
         filter((messages: Message[]) => messages.length > 0),
         map((messages: Message[]) => messages[messages.length - 1])

@@ -103,9 +103,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const state = this.viewModel();
-    if (state.chatId && this._messages().length === 0) {
-      this.loadChatHistory();
-    }
     if (state.chatId) {
       this.initializeRSocketStream(state.chatId);
     }
@@ -293,7 +290,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           const message: Message = {
             id: source.id,
             chatId: source.chatId,
-            authorId: source.authorId,
+            ownedBy: source.ownedBy,
             role: Role.ASSISTANT,
             createdAt: source.createdAt || new Date(),
             content: streamBuffer

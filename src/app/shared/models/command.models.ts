@@ -60,7 +60,7 @@ export interface Message {
   id?: string;
   role?: Role;
   chatId?: string;
-  authorId?: string;
+  ownedBy?: string;
   createdAt?: Date;
   content: string;
 }

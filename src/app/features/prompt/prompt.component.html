@@ -5,14 +5,14 @@
       <app-prompt-headline/>
       <app-prompt-input-form
         [form]="prompt.form"
-        [placeholder]="'How can I help you today?'"
+        [placeholder]="'Tell me what you\'re looking for?'"
         [isSubmitting]="prompt.isSubmitting"
         [isDeactivated]="prompt.isSubmitting"
         [isLineWrapped]="prompt.isLineWrapped"
         (onPressEnter)="sendPrompt()"
         (lineWrapDetected)="handleLineWrapChange($event)"
       >
-        <app-prompt-file-upload/>
+<!--        <app-prompt-file-upload/>-->
         <app-prompt-send-button
           aria-label="Create my resume"
           (clicked)="sendPrompt()"

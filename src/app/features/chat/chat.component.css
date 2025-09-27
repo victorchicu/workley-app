@@ -21,3 +21,9 @@
   height: 100vh;
   overflow: hidden;
 }
+
+.compact-whitespace {
+  white-space: pre-wrap;
+  line-height: 0.9; /* Reduce line height (default is often 1.5-1.6) */
+  word-break: break-word;
+}

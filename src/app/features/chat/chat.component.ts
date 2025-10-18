@@ -7,7 +7,7 @@ import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/p
 import {Navigation, Router} from '@angular/router';
 import {
   ActionCommandResult,
-  CreateChatCommandResult, Message, Role, AddMessageCommand, AddMessageCommandResult
+  CreateChatResult, Message, Role, AddMessage, AddMessageResult
 } from '../../shared/models/command.models';
 import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
@@ -27,7 +27,7 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {GetChatQuery, GetChatQueryResult} from '../../shared/models/query.models';
+import {GetChat, GetChatResult} from '../../shared/models/query.models';
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
 import {RSocketService} from '../../shared/services/rsocket.service';
@@ -95,7 +95,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   constructor(private ngZone: NgZone, private changeDetectorRef: ChangeDetectorRef) {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
-      const result = navigation.extras.state as CreateChatCommandResult;
+      const result = navigation.extras.state as CreateChatResult;
       this.chatId.set(result.chatId);
       this.createChat(result);
     }
@@ -137,7 +137,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (addMessageCommandResult: AddMessageCommandResult) => {
+        next: (addMessageCommandResult: AddMessageResult) => {
           this._messages.update(list => [...list, addMessageCommandResult.message]);
           this.changeDetectorRef.markForCheck();
         },
@@ -148,7 +148,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
-  getChatQuery(chatId: string): Observable<GetChatQueryResult> {
+  getChatQuery(chatId: string): Observable<GetChatResult> {
     const state = this.viewModel();
 
     if (state.isLoading)
@@ -156,16 +156,16 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.isLoading.set(true)
 
-    return this.query.getChatQuery(new GetChatQuery(chatId))
+    return this.query.getChatQuery(new GetChat(chatId))
       .pipe(
-        tap((getChatQueryResult: GetChatQueryResult) => {
+        tap((getChatResult: GetChatResult) => {
           this.error.set(null);
-          console.log('Chat history loaded:', getChatQueryResult)
+          console.log('Chat history loaded:', getChatResult)
         }),
         catchError((cause: any) => {
           console.error(cause);
           this.error.set(cause?.error?.message ?? "Failed to load chat history. Please try again later.");
-          return EMPTY as Observable<GetChatQueryResult>;
+          return EMPTY as Observable<GetChatResult>;
         }),
         finalize(() => {
           this.isLoading.set(false);
@@ -174,7 +174,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       );
   }
 
-  addChatMessage(chatId: string, content: string): Observable<AddMessageCommandResult> {
+  addChatMessage(chatId: string, content: string): Observable<AddMessageResult> {
     const state = this.viewModel();
 
     if (state.isSubmitting)
@@ -187,11 +187,11 @@ export class ChatComponent implements OnInit, OnDestroy {
       content
     };
 
-    return this.command.execute(new AddMessageCommand(chatId, message))
+    return this.command.execute(new AddMessage(chatId, message))
       .pipe(
         delay(100),
-        map((actionCommandResult: ActionCommandResult) => actionCommandResult as AddMessageCommandResult),
-        tap((addMessageCommandResult: AddMessageCommandResult) => {
+        map((actionCommandResult: ActionCommandResult) => actionCommandResult as AddMessageResult),
+        tap((addMessageCommandResult: AddMessageResult) => {
           this.error.set(null);
           console.log('Add chat message successfully:', addMessageCommandResult);
         }),
@@ -220,7 +220,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.markForCheck();
   }
 
-  private createChat(result: CreateChatCommandResult) {
+  private createChat(result: CreateChatResult) {
     this._messages.update(list => [...list, result.message]);
     this.loadChatHistory();
   }
@@ -239,7 +239,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe({
-        next: (result: GetChatQueryResult) => {
+        next: (result: GetChatResult) => {
           if (result.messages && result.messages.length > 0) {
             this._messages.set(result.messages);
           }

@@ -1,14 +1,14 @@
-@let chat = viewModel();
+@let chatModel = viewModel();
 <div class="h-full max-h-screen flex flex-col overflow-hidden">
   <div class="flex-1 min-h-0 overflow-y-auto" #messagesContainer>
     <div class="w-full max-w-3xl mx-auto px-4 py-6">
-      <div *ngIf="chat.isLoading && (messages())?.length === 0"
+      <div *ngIf="chatModel.isLoading && (messages())?.length === 0"
            class="flex justify-center items-center h-32">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
-      <div *ngFor="let message of messages(); let last = last; trackBy: trackByMessageId"
+      <div *ngFor="let messageModel of messages(); let last = last; trackBy: trackByMessageId"
            class="mb-6">
-        <div *ngIf="chat.error && last"
+        <div *ngIf="chatModel.error && last"
              class="p-4 mb-4">
           <div class="flex items-center">
             <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -16,38 +16,38 @@
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                     clip-rule="evenodd"/>
             </svg>
-            <span class="text-red-800">{{ chat.error }}</span>
+            <span class="text-red-800">{{ chatModel.error }}</span>
             <button class="ml-auto text-red-600 hover:text-red-800 underline text-sm cursor-pointer">
               Retry
             </button>
           </div>
         </div>
-        <div *ngIf="message.role === Role.ANONYMOUS" class="flex justify-end mb-4">
+        <div *ngIf="messageModel.role === Role.ANONYMOUS" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
             <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 overflow-hidden">
-              <p class="text-md whitespace-normal break-words leading-7">{{ message.content }}</p>
+              <p class="text-md whitespace-normal break-words leading-7">{{ messageModel.content }}</p>
             </div>
             <div class="text-sm text-gray-500 mt-1 text-right">
-              {{ message.createdAt | date:'short' }}
+              {{ messageModel.createdAt | date:'short' }}
             </div>
           </div>
         </div>
-        <div *ngIf="message.role === Role.ASSISTANT" class="flex justify-start mb-4">
+        <div *ngIf="messageModel.role === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
             <div class="rounded-lg py-2 overflow-hidden">
-              <div *ngIf="!message.content && chat.isStreaming && last" class="flex items-center space-x-2 px-2">
+              <div *ngIf="!messageModel.content && chatModel.isStreaming && last" class="flex items-center space-x-2 px-2">
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:0ms]"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:150ms]"></div>
                 <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:300ms]"></div>
               </div>
-              <div *ngIf="message.content" class="relative">
+              <div *ngIf="messageModel.content" class="relative">
                 <div class="markdown-content text-md text-gray-800 whitespace-normal break-words leading-7 transition-none"
-                     [innerHTML]="message.content | markdown">">
+                     [innerHTML]="messageModel.content | markdown">">
                 </div>
               </div>
             </div>
             <div class="text-sm text-gray-500 px-1 mt-1">
-              {{ message.createdAt | date:'short' }}
+              {{ messageModel.createdAt | date:'short' }}
             </div>
           </div>
         </div>
@@ -57,19 +57,19 @@
   <div class="flex-shrink-0 w-full bg-white">
     <div class="w-full max-w-3xl px-4 mx-auto">
       <app-prompt-input-form
-        [form]="chat.form"
+        [form]="chatModel.form"
         [placeholder]="'Reply to assistant...'"
-        [isSubmitting]="chat.isSubmitting"
-        [isDeactivated]="chat.isSubmitting"
-        [isLineWrapped]="chat.isLineWrapped"
+        [isSubmitting]="chatModel.isSubmitting"
+        [isDeactivated]="chatModel.isSubmitting"
+        [isLineWrapped]="chatModel.isLineWrapped"
         (onPressEnter)="replyToAssistant()"
         (lineWrapDetected)="handleLineWrapChange($event)">
-        <div class="flex items-center gap-1" [class.justify-end]="chat.isLineWrapped">
+        <div class="flex items-center gap-1" [class.justify-end]="chatModel.isLineWrapped">
           <app-prompt-send-button
-            aria-label="Send message"
+            aria-label="Send messageModel"
             (clicked)="replyToAssistant()"
-            [deactivated]="chat.form.invalid || chat.isSubmitting"
-            [isSubmitting]="chat.isSubmitting"
+            [deactivated]="chatModel.form.invalid || chatModel.isSubmitting"
+            [isSubmitting]="chatModel.isSubmitting"
           />
         </div>
       </app-prompt-input-form>

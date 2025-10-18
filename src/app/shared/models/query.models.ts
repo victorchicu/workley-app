@@ -8,22 +8,22 @@ export interface QueryResult {
   type: string;
 }
 
-export class GetChatQuery extends Query {
-  readonly type = 'GetChatQuery' as const;
+export class GetChat extends Query {
+  readonly type = 'GetChat' as const;
 
   constructor(public chatId: string) {
     super();
   }
 }
 
-export interface GetChatQueryResult extends QueryResult {
-  type: 'GetChatQueryResult';
+export interface GetChatResult extends QueryResult {
+  type: 'GetChatResult';
   chatId: string;
   messages: Message[];
 }
 
-export type GetQuery =
-  GetChatQuery;
+export type ActionQuery =
+  GetChat;
 
-export type GetQueryResult =
-  GetChatQueryResult;
+export type ActionQueryResult =
+  GetChatResult;

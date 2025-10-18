@@ -51,34 +51,64 @@ export class RSocketService implements OnDestroy {
     this.initializeRSocket();
   }
 
-  private initializeRSocket(): void {
-    try {
-      // Create WebSocket transport
-      const transport = new RSocketWebSocketClient(
-        {
-          url: 'ws://localhost:8443/rsocket',
-          wsCreator: (url: string) => new WebSocket(url) as any,
-        },
-        BufferEncoders
-      );
+  public streamChat(chatId: string): Observable<Message> {
+    if (this.activeStreams.has(chatId)) {
+      return this.activeStreams.get(chatId)!.asObservable();
+    }
 
-      // Create RSocket client with proper generic types
-      this.client = new RSocketClient<Data, Metadata>({
-        setup: {
-          keepAlive: 60000,
-          lifetime: 180000,
-          dataMimeType: 'application/json',
-          metadataMimeType: MESSAGE_RSOCKET_COMPOSITE_METADATA.string,
-        },
-        transport,
-      });
+    const stream$ = new Subject<Message>();
+    this.activeStreams.set(chatId, stream$);
 
-      this.connect();
-    } catch (error) {
-      console.error('Failed to initialize RSocket:', error);
-      this.fallbackToDirectWebSocket();
+    if (!this.socket) {
+      setTimeout(() => {
+        if (this.socket) {
+          this.subscribeToStream(chatId, stream$);
+        }
+      }, 1000);
+      return stream$.asObservable();
+    }
+
+    this.subscribeToStream(chatId, stream$);
+    return stream$.asObservable();
+  }
+
+  public closeStream(chatId: string): void {
+    const stream = this.activeStreams.get(chatId);
+    if (stream) {
+      stream.complete();
+      this.activeStreams.delete(chatId);
+    }
+
+    const subscription = this.subscriptions.get(chatId);
+    if (subscription) {
+      subscription.cancel();
+      this.subscriptions.delete(chatId);
     }
   }
+
+  public isConnected(): Observable<boolean> {
+    return this.connectionStatus$.asObservable();
+  }
+
+  ngOnDestroy(): void {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+    }
+
+    this.activeStreams.forEach(stream => stream.complete());
+    this.activeStreams.clear();
+
+    this.subscriptions.forEach(sub => sub.cancel());
+    this.subscriptions.clear();
+
+    this.currentStreamingMessages.clear();
+
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+    }
+  }
+
 
   private connect(): void {
     if (!this.client) {
@@ -116,29 +146,129 @@ export class RSocketService implements OnDestroy {
     });
   }
 
-  private fallbackToDirectWebSocket(): void {
-    console.log('Falling back to direct WebSocket implementation');
-    // Implement direct WebSocket as fallback
-    const ws = new WebSocket('ws://localhost:8443/rsocket');
-    ws.binaryType = 'arraybuffer';
-    ws.onopen = () => {
-      console.log('Direct WebSocket connected');
-      this.connectionStatus$.next(true);
-      // Create a simple adapter
-      this.socket = this.createWebSocketAdapter(ws);
-    };
+  private initializeRSocket(): void {
+    try {
+      // Create WebSocket transport
+      const transport = new RSocketWebSocketClient(
+        {
+          url: 'ws://localhost:8443/rsocket',
+          wsCreator: (url: string) => new WebSocket(url) as any,
+        },
+        BufferEncoders
+      );
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      this.connectionStatus$.next(false);
-      this.scheduleReconnection();
-    };
+      // Create RSocket client with proper generic types
+      this.client = new RSocketClient<Data, Metadata>({
+        setup: {
+          keepAlive: 60000,
+          lifetime: 180000,
+          dataMimeType: 'application/json',
+          metadataMimeType: MESSAGE_RSOCKET_COMPOSITE_METADATA.string,
+        },
+        transport,
+      });
 
-    ws.onclose = () => {
-      console.log('WebSocket closed');
-      this.connectionStatus$.next(false);
-      this.scheduleReconnection();
-    };
+      this.connect();
+    } catch (error) {
+      console.error('Failed to initialize RSocket:', error);
+      this.fallbackToDirectWebSocket();
+    }
+  }
+
+  private subscribeToStream(chatId: string, stream$: Subject<Message>): void {
+    try {
+      // Create routing metadata
+      const route = `chat.stream.${chatId}`;
+      const routingMetadata = encodeRoute(route);
+
+      // Create composite metadata
+      const metadata = encodeCompositeMetadata([
+        [MESSAGE_RSOCKET_ROUTING, routingMetadata],
+      ]);
+
+      // Create request payload
+      const requestPayload: Payload<Data, Metadata> = {
+        data: Buffer.from(JSON.stringify({chatId})),
+        metadata,
+      };
+
+      // Request stream from server
+      const flowable = this.socket!.requestStream(requestPayload);
+
+      flowable.subscribe({
+        onNext: (payload: Payload<Data, Metadata>) => {
+          try {
+            const messageData = payload.data?.toString();
+            if (messageData) {
+              const message: Message = JSON.parse(messageData);
+              console.log('Received message chunk:', message);
+
+              // Handle streaming accumulation
+              this.handleStreamingMessage(message, stream$);
+            }
+          } catch (error) {
+            console.error('Error parsing message:', error);
+          }
+        },
+        onError: (error: Error) => {
+          console.error('Stream error:', error);
+          stream$.error(error);
+          this.activeStreams.delete(chatId);
+        },
+        onComplete: () => {
+          console.log('Stream completed for chat:', chatId);
+          // Clear accumulated content for completed stream
+          this.currentStreamingMessages.clear();
+          stream$.complete();
+          this.activeStreams.delete(chatId);
+        },
+        onSubscribe: (subscription: ISubscription) => {
+          subscription.request(MAX_REQUEST_N);
+          this.subscriptions.set(chatId, subscription);
+        }
+      });
+    } catch (error) {
+      console.error('Error setting up stream:', error);
+      stream$.error(error);
+    }
+  }
+
+  private handleDisconnection(): void {
+    console.log('RSocket disconnected, attempting to reconnect...');
+    this.scheduleReconnection();
+  }
+
+  private scheduleReconnection(): void {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+    }
+
+    this.reconnectTimeout = setTimeout(() => {
+      if (!this.connectionStatus$.value) {
+        this.initializeRSocket();
+      }
+    }, 5000);
+  }
+
+  private handleStreamingMessage(message: Message, stream$: Subject<Message>): void {
+    // Check if this is a continuation of an existing message
+    const existingContent = this.currentStreamingMessages.get(message.id);
+
+    if (existingContent !== undefined) {
+      // Accumulate content
+      const accumulatedContent = existingContent + message.content;
+      this.currentStreamingMessages.set(message.id, accumulatedContent);
+
+      // Emit updated message
+      stream$.next({
+        ...message,
+        content: accumulatedContent
+      });
+    } else {
+      // New message
+      this.currentStreamingMessages.set(message.id, message.content);
+      stream$.next(message);
+    }
   }
 
   private createWebSocketAdapter(ws: WebSocket): ReactiveSocket<Data, Metadata> {
@@ -227,157 +357,28 @@ export class RSocketService implements OnDestroy {
     };
   }
 
-  private handleDisconnection(): void {
-    console.log('RSocket disconnected, attempting to reconnect...');
-    this.scheduleReconnection();
-  }
+  private fallbackToDirectWebSocket(): void {
+    console.log('Falling back to direct WebSocket implementation');
+    // Implement direct WebSocket as fallback
+    const ws = new WebSocket('ws://localhost:8443/rsocket');
+    ws.binaryType = 'arraybuffer';
+    ws.onopen = () => {
+      console.log('Direct WebSocket connected');
+      this.connectionStatus$.next(true);
+      // Create a simple adapter
+      this.socket = this.createWebSocketAdapter(ws);
+    };
 
-  private scheduleReconnection(): void {
-    if (this.reconnectTimeout) {
-      clearTimeout(this.reconnectTimeout);
-    }
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      this.connectionStatus$.next(false);
+      this.scheduleReconnection();
+    };
 
-    this.reconnectTimeout = setTimeout(() => {
-      if (!this.connectionStatus$.value) {
-        this.initializeRSocket();
-      }
-    }, 5000);
-  }
-
-  public streamChat(chatId: string): Observable<Message> {
-    if (this.activeStreams.has(chatId)) {
-      return this.activeStreams.get(chatId)!.asObservable();
-    }
-
-    const stream$ = new Subject<Message>();
-    this.activeStreams.set(chatId, stream$);
-
-    if (!this.socket) {
-      setTimeout(() => {
-        if (this.socket) {
-          this.subscribeToStream(chatId, stream$);
-        }
-      }, 1000);
-      return stream$.asObservable();
-    }
-
-    this.subscribeToStream(chatId, stream$);
-    return stream$.asObservable();
-  }
-
-  private subscribeToStream(chatId: string, stream$: Subject<Message>): void {
-    try {
-      // Create routing metadata
-      const route = `chat.stream.${chatId}`;
-      const routingMetadata = encodeRoute(route);
-
-      // Create composite metadata
-      const metadata = encodeCompositeMetadata([
-        [MESSAGE_RSOCKET_ROUTING, routingMetadata],
-      ]);
-
-      // Create request payload
-      const requestPayload: Payload<Data, Metadata> = {
-        data: Buffer.from(JSON.stringify({chatId})),
-        metadata,
-      };
-
-      // Request stream from server
-      const flowable = this.socket!.requestStream(requestPayload);
-
-      flowable.subscribe({
-        onNext: (payload: Payload<Data, Metadata>) => {
-          try {
-            const messageData = payload.data?.toString();
-            if (messageData) {
-              const message: Message = JSON.parse(messageData);
-              console.log('Received message chunk:', message);
-
-              // Handle streaming accumulation
-              this.handleStreamingMessage(message, stream$);
-            }
-          } catch (error) {
-            console.error('Error parsing message:', error);
-          }
-        },
-        onError: (error: Error) => {
-          console.error('Stream error:', error);
-          stream$.error(error);
-          this.activeStreams.delete(chatId);
-        },
-        onComplete: () => {
-          console.log('Stream completed for chat:', chatId);
-          // Clear accumulated content for completed stream
-          this.currentStreamingMessages.clear();
-          stream$.complete();
-          this.activeStreams.delete(chatId);
-        },
-        onSubscribe: (subscription: ISubscription) => {
-          subscription.request(MAX_REQUEST_N);
-          this.subscriptions.set(chatId, subscription);
-        }
-      });
-    } catch (error) {
-      console.error('Error setting up stream:', error);
-      stream$.error(error);
-    }
-  }
-
-  private handleStreamingMessage(message: Message, stream$: Subject<Message>): void {
-    // Check if this is a continuation of an existing message
-    const existingContent = this.currentStreamingMessages.get(message.id);
-
-    if (existingContent !== undefined) {
-      // Accumulate content
-      const accumulatedContent = existingContent + message.content;
-      this.currentStreamingMessages.set(message.id, accumulatedContent);
-
-      // Emit updated message
-      stream$.next({
-        ...message,
-        content: accumulatedContent
-      });
-    } else {
-      // New message
-      this.currentStreamingMessages.set(message.id, message.content);
-      stream$.next(message);
-    }
-  }
-
-  public closeStream(chatId: string): void {
-    const stream = this.activeStreams.get(chatId);
-    if (stream) {
-      stream.complete();
-      this.activeStreams.delete(chatId);
-    }
-
-    const subscription = this.subscriptions.get(chatId);
-    if (subscription) {
-      subscription.cancel();
-      this.subscriptions.delete(chatId);
-    }
-  }
-
-  public isConnected(): Observable<boolean> {
-    return this.connectionStatus$.asObservable();
-  }
-
-  ngOnDestroy(): void {
-    if (this.reconnectTimeout) {
-      clearTimeout(this.reconnectTimeout);
-    }
-
-    this.activeStreams.forEach(stream => stream.complete());
-    this.activeStreams.clear();
-
-    this.subscriptions.forEach(sub => sub.cancel());
-    this.subscriptions.clear();
-
-    this.currentStreamingMessages.clear();
-
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
-    }
+    ws.onclose = () => {
+      console.log('WebSocket closed');
+      this.connectionStatus$.next(false);
+      this.scheduleReconnection();
+    };
   }
 }

@@ -27,7 +27,7 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {GetChat, GetChatResult} from '../../shared/models/query.models';
+import {GetChat, GetChatOutput} from '../../shared/models/query.models';
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
 import {RSocketService} from '../../shared/services/rsocket.service';
@@ -148,7 +148,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
-  getChatQuery(chatId: string): Observable<GetChatResult> {
+  getChatQuery(chatId: string): Observable<GetChatOutput> {
     const state = this.viewModel();
 
     if (state.isLoading)
@@ -158,14 +158,14 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     return this.query.getChatQuery(new GetChat(chatId))
       .pipe(
-        tap((getChatResult: GetChatResult) => {
+        tap((getChatResult: GetChatOutput) => {
           this.error.set(null);
           console.log('Chat history loaded:', getChatResult)
         }),
         catchError((cause: any) => {
           console.error(cause);
           this.error.set(cause?.error?.message ?? "Failed to load chat history. Please try again later.");
-          return EMPTY as Observable<GetChatResult>;
+          return EMPTY as Observable<GetChatOutput>;
         }),
         finalize(() => {
           this.isLoading.set(false);
@@ -239,7 +239,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe({
-        next: (result: GetChatResult) => {
+        next: (result: GetChatOutput) => {
           if (result.messages && result.messages.length > 0) {
             this._messages.set(result.messages);
           }

@@ -1,14 +1,11 @@
 import {Message} from './command.models';
 
-export abstract class Query {
+
+export abstract class QueryInput {
   abstract readonly type: string;
 }
 
-export interface QueryResult {
-  type: string;
-}
-
-export class GetChat extends Query {
+export class GetChat extends QueryInput {
   readonly type = 'GetChat' as const;
 
   constructor(public chatId: string) {
@@ -16,14 +13,18 @@ export class GetChat extends Query {
   }
 }
 
-export interface GetChatResult extends QueryResult {
-  type: 'GetChatResult';
+export type QueryInputType =
+  GetChat;
+
+export interface QueryOutput {
+  type: string;
+}
+
+export interface GetChatOutput extends QueryOutput {
+  type: 'GetChat';
   chatId: string;
   messages: Message[];
 }
 
-export type ActionQuery =
-  GetChat;
-
-export type ActionQueryResult =
-  GetChatResult;
+export type QueryOutputType =
+  GetChatOutput;

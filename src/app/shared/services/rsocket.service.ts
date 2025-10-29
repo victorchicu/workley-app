@@ -110,7 +110,6 @@ export class RSocketService implements OnDestroy {
     }
   }
 
-
   private connect(): void {
     if (!this.client) {
       console.error('RSocket client not initialized');

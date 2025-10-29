@@ -5,7 +5,8 @@ import {Flowable} from 'rsocket-flowable';
 import {
   BufferEncoders,
   encodeCompositeMetadata,
-  encodeRoute, MESSAGE_RSOCKET_COMPOSITE_METADATA,
+  encodeRoute,
+  MESSAGE_RSOCKET_COMPOSITE_METADATA,
   MESSAGE_RSOCKET_ROUTING,
   RSocketClient
 } from 'rsocket-core';
@@ -148,7 +149,6 @@ export class RSocketService implements OnDestroy {
 
   private initializeRSocket(): void {
     try {
-      // Create WebSocket transport
       const transport = new RSocketWebSocketClient(
         {
           url: 'ws://localhost:8443/rsocket',
@@ -157,7 +157,6 @@ export class RSocketService implements OnDestroy {
         BufferEncoders
       );
 
-      // Create RSocket client with proper generic types
       this.client = new RSocketClient<Data, Metadata>({
         setup: {
           keepAlive: 60000,
@@ -177,22 +176,18 @@ export class RSocketService implements OnDestroy {
 
   private subscribeToStream(chatId: string, stream$: Subject<Message>): void {
     try {
-      // Create routing metadata
       const route = `chat.stream.${chatId}`;
       const routingMetadata = encodeRoute(route);
 
-      // Create composite metadata
       const metadata = encodeCompositeMetadata([
         [MESSAGE_RSOCKET_ROUTING, routingMetadata],
       ]);
 
-      // Create request payload
       const requestPayload: Payload<Data, Metadata> = {
         data: Buffer.from(JSON.stringify({chatId})),
         metadata,
       };
 
-      // Request stream from server
       const flowable = this.socket!.requestStream(requestPayload);
 
       flowable.subscribe({
@@ -202,8 +197,6 @@ export class RSocketService implements OnDestroy {
             if (messageData) {
               const message: Message = JSON.parse(messageData);
               console.log('Received message chunk:', message);
-
-              // Handle streaming accumulation
               this.handleStreamingMessage(message, stream$);
             }
           } catch (error) {
@@ -217,7 +210,6 @@ export class RSocketService implements OnDestroy {
         },
         onComplete: () => {
           console.log('Stream completed for chat:', chatId);
-          // Clear accumulated content for completed stream
           this.currentStreamingMessages.clear();
           stream$.complete();
           this.activeStreams.delete(chatId);
@@ -251,32 +243,25 @@ export class RSocketService implements OnDestroy {
   }
 
   private handleStreamingMessage(message: Message, stream$: Subject<Message>): void {
-    // Check if this is a continuation of an existing message
     const existingContent = this.currentStreamingMessages.get(message.id);
 
     if (existingContent !== undefined) {
-      // Accumulate content
       const accumulatedContent = existingContent + message.content;
       this.currentStreamingMessages.set(message.id, accumulatedContent);
-
-      // Emit updated message
       stream$.next({
         ...message,
         content: accumulatedContent
       });
     } else {
-      // New message
       this.currentStreamingMessages.set(message.id, message.content);
       stream$.next(message);
     }
   }
 
-  private createWebSocketAdapter(ws: WebSocket): ReactiveSocket<Data, Metadata> {
+  private createWebSocketAdapter(websocket: WebSocket): ReactiveSocket<Data, Metadata> {
     const messageHandlers = new Map<string, (data: any) => void>();
-
-    ws.onmessage = (event) => {
+    websocket.onmessage = (event) => {
       try {
-        // Handle incoming messages
         let data: any;
         if (event.data instanceof ArrayBuffer) {
           const decoder = new TextDecoder();
@@ -286,7 +271,6 @@ export class RSocketService implements OnDestroy {
           data = JSON.parse(event.data);
         }
 
-        // Route to appropriate handler
         if (data.chatId) {
           const handler = messageHandlers.get(data.chatId);
           if (handler) {
@@ -300,7 +284,6 @@ export class RSocketService implements OnDestroy {
 
     return {
       requestStream: (payload: Payload<Data, Metadata>) => {
-        // Extract chatId from payload
         const data = payload.data?.toString();
         const chatId = data ? JSON.parse(data).chatId : null;
 
@@ -308,19 +291,17 @@ export class RSocketService implements OnDestroy {
           throw new Error('ChatId is required');
         }
 
-        // Send subscription request
         const subscribeMessage = {
           type: 'REQUEST_STREAM',
           route: `chat.stream.${chatId}`,
           data: {chatId}
         };
 
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify(subscribeMessage));
+        if (websocket.readyState === WebSocket.OPEN) {
+          websocket.send(JSON.stringify(subscribeMessage));
         }
 
-        // Create a flowable for this stream
-        const flowable = new Flowable<Payload<Data, Metadata>>((subscriber) => {
+        return new Flowable<Payload<Data, Metadata>>((subscriber) => {
           messageHandlers.set(chatId, (message) => {
             const payload: Payload<Data, Metadata> = {
               data: Buffer.from(JSON.stringify(message))
@@ -334,38 +315,33 @@ export class RSocketService implements OnDestroy {
             },
             cancel: () => {
               messageHandlers.delete(chatId);
-              // Send unsubscribe message
               const unsubscribeMessage = {
                 type: 'CANCEL',
                 chatId
               };
-              ws.send(JSON.stringify(unsubscribeMessage));
+              websocket.send(JSON.stringify(unsubscribeMessage));
             }
           });
         });
-
-        return flowable;
       },
       connectionStatus: () => {
         return new Flowable((subscriber) => {
-          subscriber.onNext({kind: ws.readyState === WebSocket.OPEN ? 'CONNECTED' : 'CLOSED'});
+          subscriber.onNext({kind: websocket.readyState === WebSocket.OPEN ? 'CONNECTED' : 'CLOSED'});
         });
       },
       close: () => {
-        ws.close();
+        websocket.close();
       }
     };
   }
 
   private fallbackToDirectWebSocket(): void {
     console.log('Falling back to direct WebSocket implementation');
-    // Implement direct WebSocket as fallback
     const ws = new WebSocket('ws://localhost:8443/rsocket');
     ws.binaryType = 'arraybuffer';
     ws.onopen = () => {
       console.log('Direct WebSocket connected');
       this.connectionStatus$.next(true);
-      // Create a simple adapter
       this.socket = this.createWebSocketAdapter(ws);
     };
 

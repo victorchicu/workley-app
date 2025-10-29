@@ -5,7 +5,7 @@ export abstract class QueryInput {
   abstract readonly type: string;
 }
 
-export class GetChat extends QueryInput {
+export class GetChatInput extends QueryInput {
   readonly type = 'GetChat' as const;
 
   constructor(public chatId: string) {
@@ -14,7 +14,7 @@ export class GetChat extends QueryInput {
 }
 
 export type QueryInputType =
-  GetChat;
+  GetChatInput;
 
 export interface QueryOutput {
   type: string;

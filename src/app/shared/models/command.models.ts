@@ -6,56 +6,6 @@ export enum Role {
   UNKNOWN = "UNKNOWN"
 }
 
-
-export abstract class Command {
-  abstract readonly type: string;
-}
-
-export interface CommandResult {
-  type: string;
-}
-
-
-export class CreateChat extends Command {
-  readonly type = 'CreateChat' as const;
-
-  constructor(public prompt: string) {
-    super();
-  }
-}
-
-export class AddMessage extends Command {
-  readonly type = 'AddMessage' as const;
-
-  constructor(public chatId: string, public message: Message) {
-    super();
-  }
-}
-
-
-
-export interface CreateChatResult extends CommandResult {
-  type: 'CreateChatResult';
-  chatId: string;
-  message: Message;
-}
-
-export interface AddMessageResult extends CommandResult {
-  type: 'AddMessageResult';
-  chatId: string;
-  message: Message;
-}
-
-
-
-export type ActionCommand =
-  | CreateChat
-  | AddMessage;
-
-export type ActionCommandResult =
-  | CreateChatResult
-  | AddMessageResult;
-
 export interface Message {
   id?: string;
   role?: Role;
@@ -64,3 +14,48 @@ export interface Message {
   createdAt?: Date;
   content: string;
 }
+
+export abstract class Command {
+  abstract readonly type: string;
+}
+
+export class CreateChatInput extends Command {
+  readonly type = 'CreateChat' as const;
+
+  constructor(public prompt: string) {
+    super();
+  }
+}
+
+export class AddMessageInput extends Command {
+  readonly type = 'AddMessage' as const;
+
+  constructor(public chatId: string, public message: Message) {
+    super();
+  }
+}
+
+export type CommandInputType =
+  | CreateChatInput
+  | AddMessageInput;
+
+
+export interface Output {
+  type: string;
+}
+
+export interface CreateChatOutput extends Output {
+  type: 'CreateChat';
+  chatId: string;
+  message: Message;
+}
+
+export interface AddMessageOutput extends Output {
+  type: 'AddMessage';
+  chatId: string;
+  message: Message;
+}
+
+export type CommandOutputType =
+  | CreateChatOutput
+  | AddMessageOutput;

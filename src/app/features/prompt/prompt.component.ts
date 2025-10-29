@@ -7,7 +7,7 @@ import {
 } from './components/prompt-send-button/prompt-send-button.component';
 import {PromptFileUploadComponent} from './components/prompt-file-upload/prompt-file-upload.component';
 import {Router} from '@angular/router';
-import {ActionCommandResult, CreateChat, CreateChatResult} from '../../shared/models/command.models';
+import {CommandOutputType, CreateChatInput, CreateChatOutput} from '../../shared/models/command.models';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {catchError, delay, EMPTY, finalize, map, Observable, tap, throwError} from 'rxjs';
 import {CommandService} from '../../shared/services/command.service';
@@ -58,7 +58,7 @@ export class PromptComponent {
     this.createChat()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response: CreateChatResult) => {
+        next: (response: CreateChatOutput) => {
           this.router.navigate(['/chat', response.chatId], {state: response})
             .then();
         },
@@ -69,17 +69,17 @@ export class PromptComponent {
       });
   }
 
-  createChat(): Observable<CreateChatResult> {
+  createChat(): Observable<CreateChatOutput> {
     const state = this.viewModel();
     if (state.form.invalid || state.isSubmitting)
       return EMPTY;
     this.isSubmitting.set(true);
     const text: string = state.form.controls.text.value;
-    return this.command.execute(new CreateChat(text))
+    return this.command.execute(new CreateChatInput(text))
       .pipe(
         delay(100),
-        map((actionCommandResult: ActionCommandResult) => actionCommandResult as CreateChatResult),
-        tap((createChatCommandResult: CreateChatResult) => {
+        map((commandOutput: CommandOutputType) => commandOutput as CreateChatOutput),
+        tap((createChatOutput: CreateChatOutput) => {
           this.error.set(null);
         }),
         finalize(() => {

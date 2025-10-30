@@ -3,7 +3,7 @@ import {PromptComponent} from './features/prompt/prompt.component';
 import {ChatComponent} from './features/chat/chat.component';
 import {
   ErrorComponent
-} from './shared/ui/components/error/error.component';
+} from './shared/components/error/error.component';
 
 export const routes: Routes = [
   {

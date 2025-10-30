@@ -110,7 +110,9 @@ export class RSocketService implements OnDestroy {
     }
   }
 
-  private connect(): void {
+  private connectRSocket(): void {
+    console.log('Attempting to connect to RSocket...');
+
     if (!this.client) {
       console.error('RSocket client not initialized');
       this.fallbackToDirectWebSocket();
@@ -148,6 +150,7 @@ export class RSocketService implements OnDestroy {
 
   private initializeRSocket(): void {
     try {
+      console.log('Initializing RSocket...');
       const transport = new RSocketWebSocketClient(
         {
           url: 'ws://localhost:8443/rsocket',
@@ -166,7 +169,7 @@ export class RSocketService implements OnDestroy {
         transport,
       });
 
-      this.connect();
+      this.connectRSocket();
     } catch (error) {
       console.error('Failed to initialize RSocket:', error);
       this.fallbackToDirectWebSocket();
@@ -175,6 +178,8 @@ export class RSocketService implements OnDestroy {
 
   private subscribeToStream(chatId: string, stream$: Subject<Message>): void {
     try {
+      console.log('Subscribing to stream:', chatId);
+
       const route = `chat.stream.${chatId}`;
       const routingMetadata = encodeRoute(route);
 
@@ -187,12 +192,14 @@ export class RSocketService implements OnDestroy {
         metadata,
       };
 
-      const flowable = this.socket!.requestStream(requestPayload);
+      console.log('Requesting stream:', requestPayload);
+      const flowable: Flowable<Payload<Data, Metadata>> = this.socket!.requestStream(requestPayload);
 
       flowable.subscribe({
         onNext: (payload: Payload<Data, Metadata>) => {
           try {
             const messageData = payload.data?.toString();
+            console.log('Received message:', messageData);
             if (messageData) {
               const message: Message = JSON.parse(messageData);
               console.log('Received message chunk:', message);
@@ -230,6 +237,7 @@ export class RSocketService implements OnDestroy {
   }
 
   private scheduleReconnection(): void {
+    console.log('Scheduling reconnection in 5 seconds...');
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
     }
@@ -242,6 +250,7 @@ export class RSocketService implements OnDestroy {
   }
 
   private handleStreamingMessage(message: Message, stream$: Subject<Message>): void {
+    console.log('Handling streaming message:', message);
     const existingContent = this.currentStreamingMessages.get(message.id);
 
     if (existingContent !== undefined) {
@@ -258,6 +267,7 @@ export class RSocketService implements OnDestroy {
   }
 
   private createWebSocketAdapter(websocket: WebSocket): ReactiveSocket<Data, Metadata> {
+    console.log('Creating WebSocket adapter for RSocket...');
     const messageHandlers = new Map<string, (data: any) => void>();
     websocket.onmessage = (event) => {
       try {
@@ -283,8 +293,9 @@ export class RSocketService implements OnDestroy {
 
     return {
       requestStream: (payload: Payload<Data, Metadata>) => {
-        const data = payload.data?.toString();
-        const chatId = data ? JSON.parse(data).chatId : null;
+        const data: string | undefined = payload.data?.toString();
+        const chatId: any = data ? JSON.parse(data).chatId : null;
+        console.log('Requesting stream:', chatId);
 
         if (!chatId) {
           throw new Error('ChatId is required');

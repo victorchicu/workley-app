@@ -19,7 +19,7 @@ export abstract class Command {
   abstract readonly type: string;
 }
 
-export class CreateChatInput extends Command {
+export class CreateChat extends Command {
   readonly type = 'CreateChat' as const;
 
   constructor(public prompt: string) {
@@ -27,7 +27,7 @@ export class CreateChatInput extends Command {
   }
 }
 
-export class AddMessageInput extends Command {
+export class AddMessage extends Command {
   readonly type = 'AddMessage' as const;
 
   constructor(public chatId: string, public message: Message) {
@@ -35,27 +35,27 @@ export class AddMessageInput extends Command {
   }
 }
 
-export type CommandInputType =
-  | CreateChatInput
-  | AddMessageInput;
+export type CommandType =
+  | CreateChat
+  | AddMessage;
 
 
-export interface Output {
+export interface Payload {
   type: string;
 }
 
-export interface CreateChatOutput extends Output {
+export interface CreateChatPayload extends Payload {
   type: 'CreateChat';
   chatId: string;
   message: Message;
 }
 
-export interface AddMessageOutput extends Output {
+export interface AddMessagePayload extends Payload {
   type: 'AddMessage';
   chatId: string;
   message: Message;
 }
 
-export type CommandOutputType =
-  | CreateChatOutput
-  | AddMessageOutput;
+export type PayloadType =
+  | CreateChatPayload
+  | AddMessagePayload;

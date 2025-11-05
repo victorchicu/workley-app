@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {GetChatOutput, QueryInputType, QueryOutputType} from '../models/query.models';
+import {GetChatPayload, QueryType, PayloadType} from '../models/query.models';
 import {Observable} from 'rxjs';
 
 @Injectable({
@@ -13,8 +13,8 @@ export class QueryService {
   constructor(private readonly httpClient: HttpClient) {
   }
 
-  public getChatQuery(query: QueryInputType): Observable<GetChatOutput> {
-    return this.httpClient.get<QueryOutputType>(`${this.baseUrl}/${query.chatId}`, {
+  public getChatQuery(query: QueryType): Observable<GetChatPayload> {
+    return this.httpClient.get<PayloadType>(`${this.baseUrl}/${query.chatId}`, {
       withCredentials: true,
     })
   }

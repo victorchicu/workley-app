@@ -2,8 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {
-  CommandInputType,
-  CommandOutputType,
+  CommandType,
+  PayloadType,
 } from '../models/command.models';
 
 @Injectable({
@@ -16,8 +16,8 @@ export class CommandService {
   constructor(private readonly httpClient: HttpClient) {
   }
 
-  public execute(command: CommandInputType): Observable<CommandOutputType> {
-    return this.httpClient.post<CommandOutputType>(this.apiBaseUrl, command, {
+  public execute(command: CommandType): Observable<PayloadType> {
+    return this.httpClient.post<PayloadType>(this.apiBaseUrl, command, {
       withCredentials: true
     });
   }

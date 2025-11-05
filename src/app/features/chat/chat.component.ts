@@ -75,15 +75,22 @@ export class ChatComponent implements OnInit, OnDestroy {
   private readonly isSubmitting = signal<boolean>(false);
   private readonly isLineWrapped = signal<boolean>(false);
 
-  viewModel = computed(() => ({
-    form: this.form(),
-    error: this.error(),
-    chatId: this.chatId(),
-    isLoading: this.isLoading(),
-    isStreaming: this.isStreaming(),
-    isSubmitting: this.isSubmitting(),
-    isLineWrapped: this.isLineWrapped(),
-  }));
+  viewModel = computed(() => {
+    const messages = this._messages();
+    const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+    const isWaitingForResponse = lastMessage?.role === Role.ANONYMOUS && !this.isStreaming();
+
+    return {
+      form: this.form(),
+      error: this.error(),
+      chatId: this.chatId(),
+      isLoading: this.isLoading(),
+      isStreaming: this.isStreaming(),
+      isSubmitting: this.isSubmitting(),
+      isLineWrapped: this.isLineWrapped(),
+      isWaitingForResponse: isWaitingForResponse
+    };
+  });
 
   private _messages: WritableSignal<Message[]> = signal<Message[]>([]);
   readonly messages: Signal<Message[]> = this._messages.asReadonly();
@@ -324,7 +331,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         filter((message: Message) => message.role === Role.ASSISTANT),
-        bufferTime(100),
+        bufferTime(50),
         filter((messages: Message[]) => messages.length > 0),
         map((messages: Message[]) => messages[messages.length - 1])
       )

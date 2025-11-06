@@ -144,8 +144,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (addMessageCommandResult: AddMessagePayload) => {
-          this._messages.update(list => [...list, addMessageCommandResult.message]);
+        next: (addMessagePayload: AddMessagePayload) => {
+          this._messages.update(list => [...list, addMessagePayload.message]);
           this.changeDetectorRef.markForCheck();
         },
         error: () => {
@@ -197,10 +197,10 @@ export class ChatComponent implements OnInit, OnDestroy {
     return this.command.execute(new AddMessage(chatId, message))
       .pipe(
         delay(100),
-        map((commandOutput: PayloadType) => commandOutput as AddMessagePayload),
-        tap((addMessageOutput: AddMessagePayload) => {
+        map((payloadType: PayloadType) => payloadType as AddMessagePayload),
+        tap((addMessagePayload: AddMessagePayload) => {
           this.error.set(null);
-          console.log('Add chat message successfully:', addMessageOutput);
+          console.log('Add chat message successfully:', addMessagePayload);
         }),
         finalize(() => {
           this.form().reset();

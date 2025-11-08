@@ -167,7 +167,6 @@ export class ChatComponent implements OnInit, OnDestroy {
       .pipe(
         tap((getChatOutput: GetChatPayload) => {
           this.error.set(null);
-          console.log('Chat history loaded:', getChatOutput)
         }),
         catchError((cause: any) => {
           console.error(cause);
@@ -200,7 +199,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         map((payloadType: PayloadType) => payloadType as AddMessagePayload),
         tap((addMessagePayload: AddMessagePayload) => {
           this.error.set(null);
-          console.log('Add chat message successfully:', addMessagePayload);
         }),
         finalize(() => {
           this.form().reset();
@@ -336,7 +334,6 @@ export class ChatComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (message: Message) => {
-          // console.log('Raw streamed message:', JSON.stringify(message));
           this.handleStreamingMessage(message);
         },
         error: (error) => {
@@ -345,7 +342,6 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.changeDetectorRef.markForCheck();
         },
         complete: () => {
-          console.log('RSocket stream completed');
           this.isStreaming.set(false);
           if (this.streamDebounceTimer) {
             clearTimeout(this.streamDebounceTimer);

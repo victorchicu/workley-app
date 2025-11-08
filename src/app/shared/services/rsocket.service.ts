@@ -332,7 +332,6 @@ export class RSocketService implements OnDestroy {
     const ws = new WebSocket('ws://localhost:8443/rsocket');
     ws.binaryType = 'arraybuffer';
     ws.onopen = () => {
-      console.log('Direct WebSocket connected');
       this.connectionStatus$.next(true);
       this.socket = this.createWebSocketAdapter(ws);
     };
@@ -344,7 +343,6 @@ export class RSocketService implements OnDestroy {
     };
 
     ws.onclose = () => {
-      console.log('WebSocket closed');
       this.connectionStatus$.next(false);
       this.scheduleReconnection();
     };

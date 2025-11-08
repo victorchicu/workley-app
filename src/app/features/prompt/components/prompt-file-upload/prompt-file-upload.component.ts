@@ -17,7 +17,6 @@ export class PromptFileUploadComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   handleClick(): void {
-    console.log("Handle upload click");
     this.fileInput?.nativeElement.click();
   }
 

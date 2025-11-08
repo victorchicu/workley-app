@@ -139,6 +139,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (!text || text.length === 0) {
       return;
     }
+    this.isStreaming.set(false);
+    this.changeDetectorRef.markForCheck();
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

@@ -27,3 +27,45 @@
   line-height: 0.9; /* Reduce line height (default is often 1.5-1.6) */
   word-break: break-word;
 }
+
+.markdown-content {
+  font-feature-settings: "liga" 1, "clig" 1;
+}
+
+.markdown-content p {
+  margin-bottom: 0.85rem;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 1.25rem;
+  margin-bottom: 0.85rem;
+}
+
+.markdown-content li {
+  margin-bottom: 0.4rem;
+}
+
+.markdown-content pre {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.markdown-content code {
+  font-family: ui-monospace, SFMono-Regular, SFMono, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95rem;
+}
+
+.markdown-content :last-child {
+  margin-bottom: 0;
+}

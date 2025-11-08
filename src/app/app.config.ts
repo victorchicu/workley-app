@@ -1,6 +1,5 @@
 import {ApplicationConfig, inject, PLATFORM_ID, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter, withComponentInputBinding, withViewTransitions} from '@angular/router';
-
 import {routes} from './app.routes';
 import {provideClientHydration, withEventReplay} from '@angular/platform-browser';
 import {environment} from '../environments/environment';
@@ -9,6 +8,7 @@ import {Ga4AnalyticsProvider} from './shared/services/analytics/ga4-analytics-pr
 import {ConsoleAnalyticsProvider} from './shared/services/analytics/console-analytics-provider';
 import {isPlatformBrowser} from '@angular/common';
 import {provideHttpClient, withFetch} from '@angular/common/http';
+import {provideMarkdown} from 'ngx-markdown';
 
 function provideAnalytics() {
   return {
@@ -40,6 +40,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnalytics(),
     provideHttpClient(withFetch()),
-    provideClientHydration(withEventReplay())
+    provideClientHydration(withEventReplay()),
+    provideMarkdown()
   ]
 };

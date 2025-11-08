@@ -25,7 +25,11 @@
         <div *ngIf="messageModel.role === Role.ANONYMOUS" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
             <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 overflow-hidden">
-              <p class="text-md whitespace-normal break-words leading-7">{{ messageModel.content }}</p>
+              <div
+                markdown
+                class="markdown-content prose prose-slate max-w-none"
+                [data]="messageModel.content">
+              </div>
             </div>
             <div class="text-sm text-gray-500 mt-1 text-right">
               {{ messageModel.createdAt | date:'short' }}
@@ -36,8 +40,10 @@
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
             <div class="rounded-lg py-2 overflow-hidden">
               <div *ngIf="messageModel.content" class="relative">
-                <div class="markdown-content text-md text-gray-800 whitespace-normal break-words leading-7 prose prose-slate max-w-none animate-in fade-in duration-150"
-                     [innerHTML]="messageModel.content | markdown">">
+                <div
+                  markdown
+                  class="markdown-content prose prose-slate max-w-none"
+                  [data]="messageModel.content">
                 </div>
               </div>
             </div>

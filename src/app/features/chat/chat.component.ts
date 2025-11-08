@@ -31,7 +31,7 @@ import {GetChat, GetChatPayload} from '../../shared/models/query.models';
 import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
 import {RSocketService} from '../../shared/services/rsocket.service';
-import {MarkdownPipe} from '../../core/pipe/markdown.pipe';
+import {MarkdownComponent} from 'ngx-markdown';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -49,7 +49,8 @@ export type ChatForm = FormGroup<ChatControl>;
     NgForOf,
     PromptSendButtonComponent,
     ChatDisclaimerComponent,
-    MarkdownPipe,
+    MarkdownComponent,
+
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',

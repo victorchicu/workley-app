@@ -35,11 +35,6 @@
         <div *ngIf="messageModel.role === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
             <div class="rounded-lg py-2 overflow-hidden">
-              <div *ngIf="!messageModel.content && chatModel.isStreaming && last" class="flex items-center space-x-2 px-2">
-                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:0ms]"></div>
-                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:150ms]"></div>
-                <div class="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:300ms]"></div>
-              </div>
               <div *ngIf="messageModel.content" class="relative">
                 <div class="markdown-content text-md text-gray-800 whitespace-normal break-words leading-7 prose prose-slate max-w-none animate-in fade-in duration-150"
                      [innerHTML]="messageModel.content | markdown">">

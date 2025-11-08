@@ -116,7 +116,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.rsocketService.isConnected()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(isConnected => {
-        console.log('RSocket connection status:', isConnected);
         if (isConnected && state.chatId && !this.streamSubscription) {
           this.initializeRSocketStream(state.chatId);
         }
@@ -235,7 +234,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     const state = this.viewModel();
     if (!state.chatId)
       return;
-    console.log('Loading chat history for:', this.chatId());
     this.getChatQuery(state.chatId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),

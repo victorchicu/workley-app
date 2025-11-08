@@ -192,17 +192,16 @@ export class RSocketService implements OnDestroy {
         metadata,
       };
 
-      console.log('Requesting stream:', requestPayload);
       const flowable: Flowable<Payload<Data, Metadata>> = this.socket!.requestStream(requestPayload);
 
       flowable.subscribe({
         onNext: (payload: Payload<Data, Metadata>) => {
           try {
             const messageData = payload.data?.toString();
-            console.log('Received message:', messageData);
+            // console.log('Received message:', messageData);
             if (messageData) {
               const message: Message = JSON.parse(messageData);
-              console.log('Received message chunk:', message);
+              // console.log('Received message chunk:', message);
               this.handleStreamingMessage(message, stream$);
             }
           } catch (error) {
@@ -215,7 +214,7 @@ export class RSocketService implements OnDestroy {
           this.activeStreams.delete(chatId);
         },
         onComplete: () => {
-          console.log('Stream completed for chat:', chatId);
+          // console.log('Stream completed for chat:', chatId);
           this.currentStreamingMessages.clear();
           stream$.complete();
           this.activeStreams.delete(chatId);
@@ -250,7 +249,7 @@ export class RSocketService implements OnDestroy {
   }
 
   private handleStreamingMessage(message: Message, stream$: Subject<Message>): void {
-    console.log('Handling streaming message:', message);
+    // console.log('Handling streaming message:', message);
     const existingContent = this.currentStreamingMessages.get(message.id);
 
     if (existingContent !== undefined) {

@@ -76,9 +76,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   private readonly isLineWrapped = signal<boolean>(false);
 
   viewModel = computed(() => {
-    const messages = this._messages();
-    const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-    const isWaitingForResponse = lastMessage?.role === Role.ANONYMOUS && !this.isStreaming();
+    const messages: Message[] = this._messages();
+    const last: Message | null = messages.length > 0 ? messages[messages.length - 1] : null;
+    const isWaitingForReply: boolean = last?.role === Role.ANONYMOUS && !this.isStreaming();
 
     return {
       form: this.form(),
@@ -88,7 +88,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       isStreaming: this.isStreaming(),
       isSubmitting: this.isSubmitting(),
       isLineWrapped: this.isLineWrapped(),
-      isWaitingForResponse: isWaitingForResponse
+      isWaitingForReply: isWaitingForReply
     };
   });
 
@@ -132,7 +132,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  replyToAssistant() {
+  onAddMessage() {
     const state = this.viewModel();
     if (!state.chatId)
       return;
@@ -140,7 +140,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (!text || text.length === 0) {
       return;
     }
-    console.log(`Send reply to chat: ${this.chatId()} with content: ${text}`)
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -337,7 +336,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (message: Message) => {
-          console.log('Raw streamed message:', JSON.stringify(message));
+          // console.log('Raw streamed message:', JSON.stringify(message));
           this.handleStreamingMessage(message);
         },
         error: (error) => {

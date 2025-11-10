@@ -181,7 +181,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       );
   }
 
-  addChatMessage(chatId: string, content: string): Observable<AddMessagePayload> {
+  addChatMessage(chatId: string, text: string): Observable<AddMessagePayload> {
     const state = this.viewModel();
 
     if (state.isSubmitting)
@@ -191,7 +191,10 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.markForCheck();
 
     const message: Message = {
-      content
+      content: {
+        type: "text",
+        value: text
+      }
     };
 
     return this.command.execute(new AddMessage(chatId, message))
@@ -275,7 +278,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       clearTimeout(this.streamDebounceTimer);
     }
 
-    const streamBuffer: string = source.content;
+    const streamBuffer: string = source.content.value;
 
     // Debounce updates to reduce flickering
     this.streamDebounceTimer = setTimeout(() => {
@@ -287,7 +290,10 @@ export class ChatComponent implements OnInit, OnDestroy {
             const updatedList: Message[] = [...list];
             updatedList[existingIndex] = {
               ...updatedList[existingIndex],
-              content: streamBuffer
+              content: {
+                type: "text",
+                value: streamBuffer
+              }
             };
             return updatedList;
           });
@@ -298,7 +304,10 @@ export class ChatComponent implements OnInit, OnDestroy {
             ownedBy: source.ownedBy,
             role: Role.ASSISTANT,
             createdAt: source.createdAt || new Date(),
-            content: streamBuffer
+            content: {
+              type: "text",
+              value: streamBuffer
+            }
           };
           this.isStreaming.set(true);
           this._messages.update(list => [...list, message]);

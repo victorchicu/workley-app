@@ -1,4 +1,3 @@
-
 export enum Role {
   ANONYMOUS = "ANONYMOUS",
   CUSTOMER = "CUSTOMER",
@@ -6,13 +5,24 @@ export enum Role {
   UNKNOWN = "UNKNOWN"
 }
 
+export interface Content {
+  type: string;
+}
+
+export interface TextContent extends Content {
+  type: 'text';
+  value: string;
+}
+
+export type ContentType = TextContent;
+
 export interface Message {
   id?: string;
   role?: Role;
   chatId?: string;
   ownedBy?: string;
   createdAt?: Date;
-  content: string;
+  content: ContentType;
 }
 
 export abstract class Command {

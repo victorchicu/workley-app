@@ -42,11 +42,11 @@ const MAX_REQUEST_N = 0x7fffffff;
 export class RSocketService implements OnDestroy {
   private client: RSocketClient<Data, Metadata> | null = null;
   private socket: ReactiveSocket<Data, Metadata> | null = null;
-  private activeStreams: Map<string, Subject<Message>> = new Map<string, Subject<Message>>();
   private subscriptions: Map<string, ISubscription> = new Map<string, ISubscription>();
+  private activeStreams: Map<string, Subject<Message>> = new Map<string, Subject<Message>>();
   private reconnectTimeout: any;
   private connectionStatus$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private currentStreamingMessages: Map<string | undefined, string> = new Map<string, string>();
+  private streamingMessageCollector: Map<string | undefined, string> = new Map<string, string>();
 
   constructor() {
     this.initializeRSocket();
@@ -102,7 +102,7 @@ export class RSocketService implements OnDestroy {
     this.subscriptions.forEach(sub => sub.cancel());
     this.subscriptions.clear();
 
-    this.currentStreamingMessages.clear();
+    this.streamingMessageCollector.clear();
 
     if (this.socket) {
       this.socket.close();
@@ -189,10 +189,9 @@ export class RSocketService implements OnDestroy {
       flowable.subscribe({
         onNext: (payload: Payload<Data, Metadata>) => {
           try {
-            const messageData = payload.data?.toString();
-            if (messageData) {
-              const message: Message = JSON.parse(messageData);
-              this.handleStreamingMessage(message, stream$);
+            const json: string | undefined = payload.data?.toString();
+            if (json) {
+              this.handleStreamingMessage(JSON.parse(json), stream$);
             }
           } catch (error) {
             console.error('Error parsing message:', error);
@@ -204,7 +203,7 @@ export class RSocketService implements OnDestroy {
           this.activeStreams.delete(chatId);
         },
         onComplete: () => {
-          this.currentStreamingMessages.clear();
+          this.streamingMessageCollector.clear();
           stream$.complete();
           this.activeStreams.delete(chatId);
         },
@@ -236,17 +235,20 @@ export class RSocketService implements OnDestroy {
   }
 
   private handleStreamingMessage(message: Message, stream$: Subject<Message>): void {
-    const existingContent = this.currentStreamingMessages.get(message.id);
-
-    if (existingContent !== undefined) {
-      const accumulatedContent: string = existingContent + message.content;
-      this.currentStreamingMessages.set(message.id, accumulatedContent);
+    console.log('Received streaming message:', message.content);
+    const prev: string | undefined = this.streamingMessageCollector.get(message.id);
+    if (prev !== undefined) {
+      const accumulator: string = prev + message.content.value;
+      this.streamingMessageCollector.set(message.id, accumulator);
       stream$.next({
         ...message,
-        content: accumulatedContent
+        content: {
+          type: "text",
+          value: accumulator
+        }
       });
     } else {
-      this.currentStreamingMessages.set(message.id, message.content);
+      this.streamingMessageCollector.set(message.id, message.content.value);
       stream$.next(message);
     }
   }
@@ -258,7 +260,7 @@ export class RSocketService implements OnDestroy {
         let data: any;
         if (event.data instanceof ArrayBuffer) {
           const decoder = new TextDecoder();
-          const text = decoder.decode(event.data);
+          const text: string = decoder.decode(event.data);
           data = JSON.parse(text);
         } else {
           data = JSON.parse(event.data);
@@ -278,20 +280,23 @@ export class RSocketService implements OnDestroy {
     return {
       requestStream: (payload: Payload<Data, Metadata>) => {
         const data: string | undefined = payload.data?.toString();
-        const chatId: any = data ? JSON.parse(data).chatId : null;
+        const chatId: any =
+          data
+            ? JSON.parse(data).chatId
+            : null;
 
         if (!chatId) {
-          throw new Error('ChatId is required');
+          throw new Error('Chat id is required');
         }
 
-        const subscribeMessage = {
+        const requestStream = {
           type: 'REQUEST_STREAM',
           route: `chat.stream.${chatId}`,
           data: {chatId}
         };
 
         if (websocket.readyState === WebSocket.OPEN) {
-          websocket.send(JSON.stringify(subscribeMessage));
+          websocket.send(JSON.stringify(requestStream));
         }
 
         return new Flowable<Payload<Data, Metadata>>((subscriber) => {
@@ -308,18 +313,23 @@ export class RSocketService implements OnDestroy {
             },
             cancel: () => {
               messageHandlers.delete(chatId);
-              const unsubscribeMessage = {
+              const cancelStream = {
                 type: 'CANCEL',
                 chatId
               };
-              websocket.send(JSON.stringify(unsubscribeMessage));
+              websocket.send(JSON.stringify(cancelStream));
             }
           });
         });
       },
       connectionStatus: () => {
         return new Flowable((subscriber) => {
-          subscriber.onNext({kind: websocket.readyState === WebSocket.OPEN ? 'CONNECTED' : 'CLOSED'});
+          subscriber.onNext(
+            {
+              kind: websocket.readyState === WebSocket.OPEN
+                ? 'CONNECTED'
+                : 'CLOSED'
+            });
         });
       },
       close: () => {

@@ -10,11 +10,18 @@ export interface Content {
 }
 
 export interface TextContent extends Content {
-  type: 'text';
+  type: 'TEXT';
   value: string;
 }
 
-export type ContentType = TextContent;
+export interface ErrorContent extends Content {
+  type: 'ERROR';
+  value: string;
+}
+
+export type ContentType =
+  | TextContent
+  | ErrorContent;
 
 export interface Message {
   id?: string;

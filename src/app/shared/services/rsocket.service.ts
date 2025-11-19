@@ -243,8 +243,8 @@ export class RSocketService implements OnDestroy {
       stream$.next({
         ...message,
         content: {
-          type: "text",
-          value: accumulator
+          type: "TEXT",
+          value: accumulator,
         }
       });
     } else {

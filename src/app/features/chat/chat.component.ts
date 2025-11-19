@@ -192,7 +192,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     const message: Message = {
       content: {
-        type: "text",
+        type: "TEXT",
         value: text
       }
     };
@@ -291,7 +291,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             updatedList[existingIndex] = {
               ...updatedList[existingIndex],
               content: {
-                type: "text",
+                type: "TEXT",
                 value: streamBuffer
               }
             };
@@ -305,7 +305,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             role: Role.ASSISTANT,
             createdAt: source.createdAt || new Date(),
             content: {
-              type: "text",
+              type: "TEXT",
               value: streamBuffer
             }
           };

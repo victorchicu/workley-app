@@ -8,7 +8,7 @@
         [class.pointer-events-none]="input.isSubmitting || input.isDeactivated"
   >
     <fieldset [disabled]="input.isSubmitting || input.isDeactivated">
-      <div [class]="input.isLineWrapped ? 'w-full' : 'w-full flex items-stretch p-2'">
+      <div [class]="input.isLineWrapped ? 'w-full bg-neutral-100' : 'w-full flex items-stretch p-2 bg-neutral-100'">
         <div [class]="input.isLineWrapped ? 'w-full flex items-center px-1 pt-3 min-w-0' : 'w-full flex flex-1 items-center min-w-0'">
           <textarea
             #promptRef

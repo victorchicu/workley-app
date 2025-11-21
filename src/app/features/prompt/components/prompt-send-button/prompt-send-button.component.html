@@ -5,7 +5,7 @@
   aria-label="Create my resume"
   [ngClass]="{
     'bg-neutral-900 text-white': !button.deactivated,
-    'bg-white hover:bg-neutral-100 text-neutral-900': button.deactivated,
+    'bg-neutral-100 hover:bg-neutral-200 text-neutral-900': button.deactivated,
   }"
   [disabled]="button.deactivated || button.isSubmitting"
   (click)="handleClick()"

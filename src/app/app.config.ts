@@ -7,8 +7,9 @@ import {ANALYTICS_PROVIDER_TOKEN} from './shared/services/analytics/analytics-pr
 import {Ga4AnalyticsProvider} from './shared/services/analytics/ga4-analytics-provider';
 import {ConsoleAnalyticsProvider} from './shared/services/analytics/console-analytics-provider';
 import {isPlatformBrowser} from '@angular/common';
-import {provideHttpClient, withFetch} from '@angular/common/http';
+import {provideHttpClient, withFetch, withInterceptors} from '@angular/common/http';
 import {provideMarkdown} from 'ngx-markdown';
+import {idempotencyKeyInterceptor} from './shared/idempotency/idempotency-key.interceptor';
 
 function provideAnalytics() {
   return {
@@ -39,7 +40,10 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
     provideAnalytics(),
-    provideHttpClient(withFetch()),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([idempotencyKeyInterceptor])
+    ),
     provideClientHydration(withEventReplay()),
     provideMarkdown()
   ]

@@ -28,7 +28,7 @@
               <div
                 markdown
                 class="markdown-content prose prose-slate max-w-none"
-                [data]="messageModel.content.value">
+                [data]="(messageModel.content | asReplyChunk).text">
               </div>
             </div>
             <div class="text-sm text-gray-500 mt-1 text-right">
@@ -39,13 +39,32 @@
         <div *ngIf="messageModel.role === Role.ASSISTANT" class="flex justify-start mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
             <div class="rounded-lg py-2 overflow-hidden">
-              <div *ngIf="messageModel.content" class="relative">
-                <div
-                  markdown
-                  class="markdown-content prose prose-slate max-w-none"
-                  [data]="messageModel.content.value">
-                </div>
-              </div>
+              <ng-container [ngSwitch]="messageModel.content.type">
+                <!-- REPLY_CHUNK -->
+                <ng-container *ngSwitchCase="'REPLY_CHUNK'">
+                  <div markdown class="markdown-content prose prose-slate max-w-none"
+                       [data]="(messageModel.content | asReplyChunk).text">
+                  </div>
+                </ng-container>
+                <!-- COMPLETED -->
+                <ng-container *ngSwitchCase="'REPLY_COMPLETED'">
+                  <div class="text-gray-400 italic text-xs">
+                    Reply completed
+                  </div>
+                </ng-container>
+                <!-- ERROR -->
+                <ng-container *ngSwitchCase="'REPLY_ERROR'">
+                  <div class="bg-red-100 border border-red-300 text-red-700 p-2 rounded-md">
+                    {{ (messageModel.content | asReplyError).reason }}
+                  </div>
+                </ng-container>
+                <!-- Fallback -->
+                <ng-container *ngSwitchDefault>
+                  <div class="text-gray-300">
+                    Unsupported content type: {{ messageModel.content.type }}
+                  </div>
+                </ng-container>
+              </ng-container>
             </div>
             <div class="text-sm text-gray-500 px-1 mt-1">
               {{ messageModel.createdAt | date:'short' }}
@@ -54,7 +73,7 @@
         </div>
       </div>
       <!-- Loading indicator when waiting for assistant response -->
-      <div *ngIf="chatModel.isWaitingForReply || chatModel.isSubmitting"
+      <div *ngIf="chatModel.isVisitorWaitingForReply || chatModel.isPromptSubmitting"
            class="flex justify-start mb-4">
         <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
           <div class="rounded-lg py-2 overflow-hidden">
@@ -73,8 +92,8 @@
       <app-prompt-input-form
         [form]="chatModel.form"
         [placeholder]="'Reply to Workley...'"
-        [isSubmitting]="chatModel.isSubmitting"
-        [isDeactivated]="chatModel.isSubmitting"
+        [isSubmitting]="chatModel.isPromptSubmitting"
+        [isDeactivated]="chatModel.isPromptSubmitting"
         [isLineWrapped]="chatModel.isLineWrapped"
         (onPressEnter)="onAddMessage()"
         (lineWrapDetected)="handleLineWrapChange($event)">
@@ -82,8 +101,8 @@
           <app-prompt-send-button
             aria-label="Send messageModel"
             (clicked)="onAddMessage()"
-            [deactivated]="chatModel.form.invalid || chatModel.isSubmitting"
-            [isSubmitting]="chatModel.isSubmitting"
+            [deactivated]="chatModel.form.invalid || chatModel.isPromptSubmitting"
+            [isSubmitting]="chatModel.isPromptSubmitting"
           />
         </div>
       </app-prompt-input-form>

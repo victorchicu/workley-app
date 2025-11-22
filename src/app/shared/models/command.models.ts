@@ -5,23 +5,36 @@ export enum Role {
   UNKNOWN = "UNKNOWN"
 }
 
+export enum ErrorCode {
+  AI_MODEL_CIRCUIT_OPEN = "AI_MODEL_CIRCUIT_OPEN",
+  AI_MODEL_BACKEND_UNREACHABLE = "AI_MODEL_BACKEND_UNREACHABLE",
+  AI_MODEL_HTTP_ERROR = "AI_MODEL_HTTP_ERROR",
+  UNKNOWN = "UNKNOWN"
+}
+
 export interface Content {
   type: string;
 }
 
-export interface TextContent extends Content {
-  type: 'TEXT';
-  value: string;
+export interface ReplyChunk extends Content {
+  type: 'REPLY_CHUNK';
+  text: string;
 }
 
-export interface ErrorContent extends Content {
-  type: 'ERROR';
-  value: string;
+export interface ReplyCompleted extends Content {
+  type: 'REPLY_COMPLETED';
+}
+
+export interface ReplyError extends Content {
+  type: 'REPLY_ERROR';
+  code: ErrorCode;
+  reason: string;
 }
 
 export type ContentType =
-  | TextContent
-  | ErrorContent;
+  | ReplyChunk
+  | ReplyCompleted
+  | ReplyError;
 
 export interface Message {
   id?: string;

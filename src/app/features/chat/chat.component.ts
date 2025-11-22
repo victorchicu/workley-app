@@ -7,9 +7,9 @@ import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/p
 import {Navigation, Router} from '@angular/router';
 import {
   PayloadType,
-  CreateChatPayload, Message, Role, AddMessage, AddMessagePayload
+  CreateChatPayload, Message, Role, AddMessage, AddMessagePayload, ReplyError
 } from '../../shared/models/command.models';
-import {DatePipe, NgForOf, NgIf} from '@angular/common';
+import {DatePipe, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -32,6 +32,8 @@ import {QueryService} from '../../shared/services/query.service';
 import {CommandService} from '../../shared/services/command.service';
 import {RSocketService} from '../../shared/services/rsocket.service';
 import {MarkdownComponent} from 'ngx-markdown';
+import {AsReplyChunkPipe} from '../../shared/pipes/as-reply-chunk.pipe';
+import {AsReplyErrorPipe} from '../../shared/pipes/as-reply-error.pipe';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -50,7 +52,11 @@ export type ChatForm = FormGroup<ChatControl>;
     PromptSendButtonComponent,
     ChatDisclaimerComponent,
     MarkdownComponent,
-
+    NgSwitchDefault,
+    NgSwitchCase,
+    NgSwitch,
+    AsReplyChunkPipe,
+    AsReplyErrorPipe,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -72,24 +78,28 @@ export class ChatComponent implements OnInit, OnDestroy {
   private readonly error = signal<string | null>(null);
   private readonly chatId = signal<string | null>(null);
   private readonly isLoading = signal<boolean>(false);
-  private readonly isStreaming = signal<boolean>(false);
-  private readonly isSubmitting = signal<boolean>(false);
   private readonly isLineWrapped = signal<boolean>(false);
+  private readonly isReplyStreaming = signal<boolean>(false);
+  private readonly isPromptSubmitting = signal<boolean>(false);
 
   viewModel = computed(() => {
     const messages: Message[] = this._messages();
-    const last: Message | null = messages.length > 0 ? messages[messages.length - 1] : null;
-    const isWaitingForReply: boolean = last?.role === Role.ANONYMOUS && !this.isStreaming();
+
+    const last: Message | null =
+      messages.length > 0 ? messages[messages.length - 1] : null;
+
+    const isVisitorWaitingForReply: boolean =
+      last?.role === Role.ANONYMOUS && !this.isReplyStreaming();
 
     return {
       form: this.form(),
       error: this.error(),
       chatId: this.chatId(),
       isLoading: this.isLoading(),
-      isStreaming: this.isStreaming(),
-      isSubmitting: this.isSubmitting(),
       isLineWrapped: this.isLineWrapped(),
-      isWaitingForReply: isWaitingForReply
+      isReplyStreaming: this.isReplyStreaming(),
+      isPromptSubmitting: this.isPromptSubmitting(),
+      isVisitorWaitingForReply: isVisitorWaitingForReply,
     };
   });
 
@@ -140,7 +150,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (!text || text.length === 0) {
       return;
     }
-    this.isStreaming.set(false);
+    this.isReplyStreaming.set(false);
     this.changeDetectorRef.markForCheck();
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -184,16 +194,16 @@ export class ChatComponent implements OnInit, OnDestroy {
   addChatMessage(chatId: string, text: string): Observable<AddMessagePayload> {
     const state = this.viewModel();
 
-    if (state.isSubmitting)
+    if (state.isPromptSubmitting)
       return EMPTY;
 
-    this.isSubmitting.set(true);
+    this.isPromptSubmitting.set(true);
     this.changeDetectorRef.markForCheck();
 
     const message: Message = {
       content: {
-        type: "TEXT",
-        value: text
+        type: "REPLY_CHUNK",
+        text: text
       }
     };
 
@@ -207,8 +217,8 @@ export class ChatComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.form().reset();
           this.error.set(null);
-          this.isSubmitting.set(false);
           this.isLineWrapped.set(false);
+          this.isPromptSubmitting.set(false);
           this.changeDetectorRef.markForCheck();
           requestAnimationFrame(() => this.scrollToBottom());
         }),
@@ -277,56 +287,81 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (this.streamDebounceTimer) {
       clearTimeout(this.streamDebounceTimer);
     }
-
-    const streamBuffer: string = source.content.value;
-
-    // Debounce updates to reduce flickering
-    this.streamDebounceTimer = setTimeout(() => {
-      this.ngZone.run(() => {
-        const messages: Message[] = this._messages();
-        const existingIndex = messages.findIndex(message => message.id === source.id);
-        if (existingIndex !== -1) {
-          this._messages.update(list => {
-            const updatedList: Message[] = [...list];
-            updatedList[existingIndex] = {
-              ...updatedList[existingIndex],
-              content: {
-                type: "TEXT",
-                value: streamBuffer
+    switch (source.content.type) {
+      case "REPLY_CHUNK":
+        const chunk: string = source.content.text;
+        this.streamDebounceTimer = setTimeout(() => {
+          this.ngZone.run(() => {
+            const messages: Message[] = this._messages();
+            const existingIndex = messages.findIndex(message => message.id === source.id);
+            if (existingIndex !== -1) {
+              this._messages.update(list => {
+                const updatedList: Message[] = [...list];
+                updatedList[existingIndex] = {
+                  ...updatedList[existingIndex],
+                  content: {
+                    type: "REPLY_CHUNK",
+                    text: chunk
+                  }
+                };
+                return updatedList;
+              });
+            } else {
+              const message: Message = {
+                id: source.id,
+                role: Role.ASSISTANT,
+                chatId: source.chatId,
+                ownedBy: source.ownedBy,
+                createdAt: source.createdAt || new Date(),
+                content: {
+                  type: "REPLY_CHUNK",
+                  text: chunk
+                }
+              };
+              this.isReplyStreaming.set(true);
+              this._messages.update(list => [...list, message]);
+            }
+            this.changeDetectorRef.markForCheck();
+            requestAnimationFrame(() => {
+              if (this.messagesContainer) {
+                const element = this.messagesContainer.nativeElement;
+                const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
+                if (isNearBottom) {
+                  element.scrollTo({
+                    top: element.scrollHeight,
+                    behavior: 'smooth'
+                  });
+                }
               }
-            };
-            return updatedList;
+            });
           });
-        } else {
-          const message: Message = {
+        }, 50);
+        break;
+      case "REPLY_COMPLETED":
+        this.isReplyStreaming.set(false);
+        break;
+      case "REPLY_ERROR":
+        const replyError: ReplyError = source.content;
+        this.error.set(replyError.reason);
+        this.isReplyStreaming.set(false);
+        this._messages.update(list => [
+          ...list,
+          {
             id: source.id,
-            chatId: source.chatId,
-            ownedBy: source.ownedBy,
             role: Role.ASSISTANT,
+            ownedBy: source.ownedBy,
             createdAt: source.createdAt || new Date(),
             content: {
-              type: "TEXT",
-              value: streamBuffer
-            }
-          };
-          this.isStreaming.set(true);
-          this._messages.update(list => [...list, message]);
-        }
-        this.changeDetectorRef.markForCheck();
-        requestAnimationFrame(() => {
-          if (this.messagesContainer) {
-            const element = this.messagesContainer.nativeElement;
-            const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
-            if (isNearBottom) {
-              element.scrollTo({
-                top: element.scrollHeight,
-                behavior: 'smooth'
-              });
+              type: "REPLY_ERROR",
+              code: replyError.code,
+              reason: replyError.reason
             }
           }
-        });
-      });
-    }, 50); // 50ms debounce for smooth updates
+        ]);
+        break;
+    }
+    this.changeDetectorRef.markForCheck();
+    requestAnimationFrame(() => this.scrollToBottom());
   }
 
   private initializeRSocketStream(chatId: string): void {
@@ -348,11 +383,11 @@ export class ChatComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('RSocket stream error:', error);
-          this.isStreaming.set(false);
+          this.isReplyStreaming.set(false);
           this.changeDetectorRef.markForCheck();
         },
         complete: () => {
-          this.isStreaming.set(false);
+          this.isReplyStreaming.set(false);
           if (this.streamDebounceTimer) {
             clearTimeout(this.streamDebounceTimer);
           }

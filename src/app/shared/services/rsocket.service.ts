@@ -1,6 +1,6 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
-import {Message} from '../models/command.models';
+import {ContentType, Message, ReplyChunk, ReplyCompleted, ReplyError} from '../models/command.models';
 import {Flowable} from 'rsocket-flowable';
 import {
   BufferEncoders,
@@ -236,20 +236,38 @@ export class RSocketService implements OnDestroy {
 
   private handleStreamingMessage(message: Message, stream$: Subject<Message>): void {
     console.log('Received streaming message:', message.content);
-    const prev: string | undefined = this.streamingMessageCollector.get(message.id);
-    if (prev !== undefined) {
-      const accumulator: string = prev + message.content.value;
-      this.streamingMessageCollector.set(message.id, accumulator);
-      stream$.next({
-        ...message,
-        content: {
-          type: "TEXT",
-          value: accumulator,
-        }
-      });
-    } else {
-      this.streamingMessageCollector.set(message.id, message.content.value);
+
+    const id: string | undefined = message.id;
+    const content: ContentType = message.content;
+
+    if (!id) {
       stream$.next(message);
+      return;
+    }
+
+    switch (content.type) {
+      case 'REPLY_CHUNK':
+        const prev = this.streamingMessageCollector.get(id) ?? '';
+        const next = content.text;
+        const accumulator = prev + next;
+        this.streamingMessageCollector.set(id, accumulator);
+        stream$.next({
+          ...message,
+          content: {
+            type: 'REPLY_CHUNK',
+            text: accumulator
+          } as ReplyChunk
+        });
+        break;
+      case 'REPLY_ERROR':
+      case 'REPLY_COMPLETED':
+        this.streamingMessageCollector.delete(id);
+        stream$.next(message);
+        break;
+      default: {
+        stream$.next(message);
+        break;
+      }
     }
   }
 

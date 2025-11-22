@@ -7,7 +7,7 @@ import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/p
 import {Navigation, Router} from '@angular/router';
 import {
   PayloadType,
-  CreateChatPayload, Message, Role, AddMessage, AddMessagePayload, ReplyError
+  CreateChatPayload, Message, Role, AddMessage, AddMessagePayload, ReplyError, ErrorCode
 } from '../../shared/command/command.models';
 import {DatePipe, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
@@ -83,23 +83,29 @@ export class ChatComponent implements OnDestroy {
   private readonly isPromptSubmitting = signal<boolean>(false);
 
   viewModel = computed(() => {
-    const messages: Message[] = this._messages();
+    const error = this.error();
+    const chatId = this.chatId();
+    const messages = this._messages();
+    const isLoading = this.isLoading();
+    const isLineWrapped = this.isLineWrapped();
+    const isReplyStreaming = this.isReplyStreaming();
+    const isPromptSubmitting = this.isPromptSubmitting();
 
     const last: Message | null =
       messages.length > 0 ? messages[messages.length - 1] : null;
 
     const isVisitorWaitingForReply: boolean =
-      last?.role === Role.ANONYMOUS && !this.isReplyStreaming();
+      last?.role === Role.ANONYMOUS && !isReplyStreaming;
 
     return {
       form: this.form(),
-      error: this.error(),
-      chatId: this.chatId(),
-      isLoading: this.isLoading(),
-      isLineWrapped: this.isLineWrapped(),
-      isReplyStreaming: this.isReplyStreaming(),
-      isPromptSubmitting: this.isPromptSubmitting(),
-      isVisitorWaitingForReply: isVisitorWaitingForReply,
+      error,
+      chatId,
+      isLoading,
+      isLineWrapped,
+      isReplyStreaming,
+      isPromptSubmitting,
+      isVisitorWaitingForReply,
     };
   });
 
@@ -288,7 +294,6 @@ export class ChatComponent implements OnDestroy {
     switch (source.content.type) {
       case "REPLY_CHUNK":
         const chunk: string = source.content.text;
-        // console.log("Reply chunk", chunk);
         this.streamDebounceTimer = setTimeout(() => {
           this.ngZone.run(() => {
             const messages: Message[] = this._messages();
@@ -339,32 +344,37 @@ export class ChatComponent implements OnDestroy {
         requestAnimationFrame(() => this.scrollToBottom());
         break;
       case "REPLY_COMPLETED":
-        console.log("Reply COMPLETED");
-        this.isReplyStreaming.set(false);
-        this.changeDetectorRef.markForCheck();
-        requestAnimationFrame(() => this.scrollToBottom());
+        this.ngZone.run(() => {
+          console.log("Reply COMPLETED");
+          this.isReplyStreaming.set(false);
+          this.changeDetectorRef.markForCheck();
+          requestAnimationFrame(() => this.scrollToBottom());
+        });
         break;
       case "REPLY_ERROR":
-        console.log("Reply ERROR");
-        const replyError: ReplyError = source.content;
-        this.error.set(replyError.reason);
-        this.isReplyStreaming.set(false);
-        this._messages.update(list => [
-          ...list,
-          {
-            id: source.id,
-            role: Role.ASSISTANT,
-            ownedBy: source.ownedBy,
-            createdAt: source.createdAt || new Date(),
-            content: {
-              type: "REPLY_ERROR",
-              code: replyError.code,
-              reason: replyError.reason
+        const code: ErrorCode = source.content.code;
+        const reason: string = source.content.reason;
+        this.ngZone.run(() => {
+          console.log("Reply ERROR");
+          this.error.set(reason);
+          this.isReplyStreaming.set(false);
+          this._messages.update(list => [
+            ...list,
+            {
+              id: source.id,
+              role: Role.ASSISTANT,
+              ownedBy: source.ownedBy,
+              createdAt: source.createdAt || new Date(),
+              content: {
+                type: "REPLY_ERROR",
+                code: code,
+                reason: reason
+              }
             }
-          }
-        ]);
-        this.changeDetectorRef.markForCheck();
-        requestAnimationFrame(() => this.scrollToBottom());
+          ]);
+          this.changeDetectorRef.markForCheck();
+          requestAnimationFrame(() => this.scrollToBottom());
+        });
         break;
     }
   }

@@ -87,7 +87,7 @@
         [form]="chatModel.form"
         [placeholder]="'Reply to Workley...'"
         [isSubmitting]="chatModel.isPromptSubmitting"
-        [isDeactivated]="chatModel.isPromptSubmitting || chatModel.isReplyStreaming"
+        [isDeactivated]="chatModel.isPromptSubmitting || chatModel.isVisitorWaitingForReply || chatModel.isReplyStreaming"
         [isLineWrapped]="chatModel.isLineWrapped"
         (onPressEnter)="onAddMessage()"
         (lineWrapDetected)="handleLineWrapChange($event)">
@@ -95,7 +95,7 @@
           <app-prompt-send-button
             aria-label="Send messageModel"
             (clicked)="onAddMessage()"
-            [deactivated]="chatModel.form.invalid || chatModel.isPromptSubmitting || chatModel.isReplyStreaming"
+            [deactivated]="chatModel.form.invalid || chatModel.isPromptSubmitting"
             [isSubmitting]="chatModel.isPromptSubmitting"
           />
         </div>

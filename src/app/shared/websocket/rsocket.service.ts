@@ -147,7 +147,7 @@ export class RSocketService implements OnDestroy {
     try {
       const transport = new RSocketWebSocketClient(
         {
-          url: 'ws://localhost:8443/rsocket',
+          url: 'ws://workley.ai:8443/rsocket',
           wsCreator: (url: string) => new WebSocket(url) as any,
         },
         BufferEncoders
@@ -357,7 +357,7 @@ export class RSocketService implements OnDestroy {
   }
 
   private fallbackToDirectWebSocket(): void {
-    const ws = new WebSocket('ws://localhost:8443/rsocket');
+    const ws = new WebSocket('ws://workley:8443/rsocket');
     ws.binaryType = 'arraybuffer';
     ws.onopen = () => {
       this.connectionStatus$.next(true);

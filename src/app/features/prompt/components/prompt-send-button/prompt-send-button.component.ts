@@ -1,4 +1,14 @@
-import {Component, computed, EventEmitter, inject, input, Input, output, Output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  EventEmitter,
+  inject,
+  input,
+  Input,
+  output,
+  Output
+} from '@angular/core';
 import {NgClass} from '@angular/common';
 import {SpinnerComponent} from '../../../../shared/components/spinner/spinner.component';
 
@@ -10,7 +20,8 @@ import {SpinnerComponent} from '../../../../shared/components/spinner/spinner.co
     SpinnerComponent
   ],
   templateUrl: './prompt-send-button.component.html',
-  styleUrl: './prompt-send-button.component.css'
+  styleUrl: './prompt-send-button.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromptSendButtonComponent {
 

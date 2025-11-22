@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -22,7 +23,8 @@ import {PromptControl} from '../../prompt.component';
     ReactiveFormsModule,
   ],
   templateUrl: './prompt-input-form.component.html',
-  styleUrl: './prompt-input-form.component.css'
+  styleUrl: './prompt-input-form.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromptInputFormComponent {
   readonly form = input.required<FormGroup<PromptControl>>();

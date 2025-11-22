@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 
 @Component({
   selector: 'app-prompt-headline',
@@ -8,7 +8,8 @@ import { Component } from '@angular/core';
   styleUrl: './prompt-headline.component.css',
   host: {
     class: 'contents'
-  }
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromptHeadlineComponent {
 

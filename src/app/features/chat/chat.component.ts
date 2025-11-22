@@ -1,13 +1,14 @@
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, computed, DestroyRef, effect, ElementRef, inject, NgZone,
+  Component, computed, DestroyRef, effect, ElementRef, inject,
   OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {Navigation, Router} from '@angular/router';
 import {
   PayloadType,
-  CreateChatPayload, Message, Role, AddMessage, AddMessagePayload, ReplyError, ErrorCode
+  CreateChatPayload, Message, Role, AddMessage, AddMessagePayload, ErrorCode
 } from '../../shared/command/command.models';
 import {DatePipe, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
@@ -60,8 +61,9 @@ export type ChatForm = FormGroup<ChatControl>;
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChatComponent implements OnDestroy {
+export class ChatComponent implements OnInit, OnDestroy {
   readonly router: Router = inject(Router);
   readonly builder: FormBuilder = inject(FormBuilder);
   readonly query: QueryService = inject(QueryService);
@@ -116,25 +118,27 @@ export class ChatComponent implements OnDestroy {
   private streamDebounceTimer?: any;
   private streamSubscription?: Subscription;
 
-  constructor(private ngZone: NgZone, private changeDetectorRef: ChangeDetectorRef) {
+  constructor() {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       const result = navigation.extras.state as CreateChatPayload;
       this.chatId.set(result.chatId);
       this.createChat(result);
     }
-    effect(() => {
-      this.rsocketService.isConnected()
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(isConnected => {
-          if (isConnected) {
-            const chatId: string | null = this.chatId();
-            if (chatId && !this.streamSubscription) {
-              this.initializeRSocketStream(chatId);
-            }
+    this.rsocketService.isConnected()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(isConnected => {
+        if (isConnected) {
+          const chatId: string | null = this.chatId();
+          if (chatId && !this.streamSubscription) {
+            this.initializeRSocketStream(chatId);
           }
-        });
-    });
+        }
+      });
+  }
+
+  ngOnInit(): void {
+
   }
 
   ngOnDestroy(): void {
@@ -155,17 +159,23 @@ export class ChatComponent implements OnDestroy {
       return;
     }
     this.isReplyStreaming.set(false);
-    this.changeDetectorRef.markForCheck();
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (addMessagePayload: AddMessagePayload) => {
           this._messages.update(list => [...list, addMessagePayload.message]);
-          this.changeDetectorRef.markForCheck();
         },
         error: () => {
           this.router.navigate(['/error'])
-            .then();
+            .then(success => {
+              if (!success) {
+                this.error.set('Navigation failed');
+              }
+            })
+            .catch(err => {
+              console.error('Navigation error:', err);
+              this.error.set('Navigation failed');
+            });
         }
       });
   }
@@ -190,7 +200,6 @@ export class ChatComponent implements OnDestroy {
         }),
         finalize(() => {
           this.isLoading.set(false);
-          this.changeDetectorRef.markForCheck();
         })
       );
   }
@@ -202,7 +211,6 @@ export class ChatComponent implements OnDestroy {
       return EMPTY;
 
     this.isPromptSubmitting.set(true);
-    this.changeDetectorRef.markForCheck();
 
     const message: Message = {
       content: {
@@ -213,7 +221,6 @@ export class ChatComponent implements OnDestroy {
 
     return this.command.execute(new AddMessage(chatId, message))
       .pipe(
-        delay(100),
         map((payloadType: PayloadType) => payloadType as AddMessagePayload),
         tap((addMessagePayload: AddMessagePayload) => {
           this.error.set(null);
@@ -223,12 +230,10 @@ export class ChatComponent implements OnDestroy {
           this.error.set(null);
           this.isLineWrapped.set(false);
           this.isPromptSubmitting.set(false);
-          this.changeDetectorRef.markForCheck();
           requestAnimationFrame(() => this.scrollToBottom());
         }),
         catchError((err) => {
           this.error.set(err.error?.message ?? "Failed to send message. Please try again later.");
-          this.changeDetectorRef.markForCheck();
           return throwError(() => new Error());
         })
       );
@@ -240,7 +245,6 @@ export class ChatComponent implements OnDestroy {
 
   handleLineWrapChange(isWrapped: boolean): void {
     this.isLineWrapped.set(isWrapped);
-    this.changeDetectorRef.markForCheck();
   }
 
   private createChat(result: CreateChatPayload) {
@@ -256,7 +260,6 @@ export class ChatComponent implements OnDestroy {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
-          this.changeDetectorRef.markForCheck();
           requestAnimationFrame(() => this.scrollToBottom());
         })
       )
@@ -268,7 +271,6 @@ export class ChatComponent implements OnDestroy {
           if (result.chatId) {
             this.chatId.set(result.chatId);
           }
-          this.changeDetectorRef.markForCheck();
         }
       });
   }
@@ -295,86 +297,76 @@ export class ChatComponent implements OnDestroy {
       case "REPLY_CHUNK":
         const chunk: string = source.content.text;
         this.streamDebounceTimer = setTimeout(() => {
-          this.ngZone.run(() => {
-            const messages: Message[] = this._messages();
-            const existingIndex = messages.findIndex(message => message.id === source.id);
-            if (existingIndex !== -1) {
-              this._messages.update(list => {
-                const updatedList: Message[] = [...list];
-                updatedList[existingIndex] = {
-                  ...updatedList[existingIndex],
-                  content: {
-                    type: "REPLY_CHUNK",
-                    text: chunk
-                  }
-                };
-                return updatedList;
-              });
-            } else {
-              const message: Message = {
-                id: source.id,
-                role: Role.ASSISTANT,
-                chatId: source.chatId,
-                ownedBy: source.ownedBy,
-                createdAt: source.createdAt || new Date(),
+          const messages: Message[] = this._messages();
+          const existingIndex = messages.findIndex(message => message.id === source.id);
+          if (existingIndex !== -1) {
+            this._messages.update(list => {
+              const updatedList: Message[] = [...list];
+              updatedList[existingIndex] = {
+                ...updatedList[existingIndex],
                 content: {
                   type: "REPLY_CHUNK",
                   text: chunk
                 }
               };
-              this.isReplyStreaming.set(true);
-              this._messages.update(list => [...list, message]);
-            }
-            this.changeDetectorRef.markForCheck();
-            requestAnimationFrame(() => {
-              if (this.messagesContainer) {
-                const element = this.messagesContainer.nativeElement;
-                const isNear = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
-                if (isNear) {
-                  element.scrollTo({
-                    top: element.scrollHeight,
-                    behavior: 'smooth'
-                  });
-                }
-              }
+              return updatedList;
             });
+          } else {
+            const message: Message = {
+              id: source.id,
+              role: Role.ASSISTANT,
+              chatId: source.chatId,
+              ownedBy: source.ownedBy,
+              createdAt: source.createdAt || new Date(),
+              content: {
+                type: "REPLY_CHUNK",
+                text: chunk
+              }
+            };
+            this.isReplyStreaming.set(true);
+            this._messages.update(list => [...list, message]);
+          }
+          requestAnimationFrame(() => {
+            if (this.messagesContainer) {
+              const element = this.messagesContainer.nativeElement;
+              const isNear = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
+              if (isNear) {
+                element.scrollTo({
+                  top: element.scrollHeight,
+                  behavior: 'smooth'
+                });
+              }
+            }
           });
         }, 50);
-        this.changeDetectorRef.markForCheck();
         requestAnimationFrame(() => this.scrollToBottom());
         break;
       case "REPLY_COMPLETED":
-        this.ngZone.run(() => {
-          console.log("Reply COMPLETED");
-          this.isReplyStreaming.set(false);
-          this.changeDetectorRef.markForCheck();
-          requestAnimationFrame(() => this.scrollToBottom());
-        });
+        console.log("Reply COMPLETED");
+        this.isReplyStreaming.set(false);
+        requestAnimationFrame(() => this.scrollToBottom());
         break;
       case "REPLY_ERROR":
         const code: ErrorCode = source.content.code;
         const reason: string = source.content.reason;
-        this.ngZone.run(() => {
-          console.log("Reply ERROR");
-          this.error.set(reason);
-          this.isReplyStreaming.set(false);
-          this._messages.update(list => [
-            ...list,
-            {
-              id: source.id,
-              role: Role.ASSISTANT,
-              ownedBy: source.ownedBy,
-              createdAt: source.createdAt || new Date(),
-              content: {
-                type: "REPLY_ERROR",
-                code: code,
-                reason: reason
-              }
+        console.log("Reply ERROR");
+        this.error.set(reason);
+        this.isReplyStreaming.set(false);
+        this._messages.update(list => [
+          ...list,
+          {
+            id: source.id,
+            role: Role.ASSISTANT,
+            ownedBy: source.ownedBy,
+            createdAt: source.createdAt || new Date(),
+            content: {
+              type: "REPLY_ERROR",
+              code: code,
+              reason: reason
             }
-          ]);
-          this.changeDetectorRef.markForCheck();
-          requestAnimationFrame(() => this.scrollToBottom());
-        });
+          }
+        ]);
+        requestAnimationFrame(() => this.scrollToBottom());
         break;
     }
   }
@@ -398,14 +390,12 @@ export class ChatComponent implements OnDestroy {
         error: (error) => {
           console.error('RSocket stream error:', error);
           this.isReplyStreaming.set(false);
-          this.changeDetectorRef.markForCheck();
         },
         complete: () => {
           this.isReplyStreaming.set(false);
           if (this.streamDebounceTimer) {
             clearTimeout(this.streamDebounceTimer);
           }
-          this.changeDetectorRef.markForCheck();
         }
       });
   }

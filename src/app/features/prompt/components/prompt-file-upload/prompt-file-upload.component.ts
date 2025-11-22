@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {TooltipDirective} from '../../../../core/directive/tooltip.directive';
 
 @Component({
@@ -9,7 +9,8 @@ import {TooltipDirective} from '../../../../core/directive/tooltip.directive';
 
   ],
   templateUrl: './prompt-file-upload.component.html',
-  styleUrl: './prompt-file-upload.component.css'
+  styleUrl: './prompt-file-upload.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromptFileUploadComponent {
 

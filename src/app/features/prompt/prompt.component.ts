@@ -1,11 +1,10 @@
-import {Component, computed, DestroyRef, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {PromptHeadlineComponent} from './components/prompt-headline/prompt-headline.component';
 import {PromptInputFormComponent} from './components/prompt-input-form/prompt-input-form.component';
 import {
   PromptSendButtonComponent
 } from './components/prompt-send-button/prompt-send-button.component';
-import {PromptFileUploadComponent} from './components/prompt-file-upload/prompt-file-upload.component';
 import {Router} from '@angular/router';
 import {PayloadType, CreateChat, CreateChatPayload} from '../../shared/command/command.models';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -26,11 +25,11 @@ export type PromptForm = FormGroup<PromptControl>;
     ReactiveFormsModule,
     PromptHeadlineComponent,
     PromptInputFormComponent,
-    PromptSendButtonComponent,
-    PromptFileUploadComponent
+    PromptSendButtonComponent
   ],
   templateUrl: './prompt.component.html',
   styleUrl: './prompt.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromptComponent {
   readonly router: Router = inject(Router);
@@ -60,11 +59,27 @@ export class PromptComponent {
       .subscribe({
         next: (response: CreateChatPayload) => {
           this.router.navigate(['/chat', response.chatId], {state: response})
-            .then();
+            .then(success => {
+              if (!success) {
+                this.error.set('Navigation failed');
+              }
+            })
+            .catch(err => {
+              console.error('Navigation error:', err);
+              this.error.set('Navigation failed');
+            });
         },
         error: (cause) => {
           this.router.navigate(['/error'])
-            .then();
+            .then(success => {
+              if (!success) {
+                this.error.set('Navigation failed');
+              }
+            })
+            .catch(err => {
+              console.error('Navigation error:', err);
+              this.error.set('Navigation failed');
+            });
         }
       });
   }
@@ -77,7 +92,6 @@ export class PromptComponent {
     const text: string = state.form.controls.text.value;
     return this.command.execute(new CreateChat(text))
       .pipe(
-        delay(100),
         map((commandOutput: PayloadType) => commandOutput as CreateChatPayload),
         tap((createChatOutput: CreateChatPayload) => {
           this.error.set(null);
@@ -89,7 +103,6 @@ export class PromptComponent {
         }),
         catchError((err) => {
           this.error.set("Oops! Something went wrong, please try again.");
-          console.error()
           return throwError(() => new Error("Chat creation failed"));
         })
       );

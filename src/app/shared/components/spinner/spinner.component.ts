@@ -1,6 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, input, Input, Signal, signal} from '@angular/core';
-import {NgIf} from "@angular/common";
-import {finalize, from, isObservable, Observable} from 'rxjs';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-spinner',

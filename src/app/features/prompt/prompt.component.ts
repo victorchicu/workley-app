@@ -7,10 +7,10 @@ import {
 } from './components/prompt-send-button/prompt-send-button.component';
 import {PromptFileUploadComponent} from './components/prompt-file-upload/prompt-file-upload.component';
 import {Router} from '@angular/router';
-import {PayloadType, CreateChat, CreateChatPayload} from '../../shared/models/command.models';
+import {PayloadType, CreateChat, CreateChatPayload} from '../../shared/command/command.models';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {catchError, delay, EMPTY, finalize, map, Observable, tap, throwError} from 'rxjs';
-import {CommandService} from '../../shared/services/command.service';
+import {CommandService} from '../../shared/command/command.service';
 
 export interface PromptControl {
   text: FormControl<string>;

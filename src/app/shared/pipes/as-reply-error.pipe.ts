@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ReplyError} from '../models/command.models';
+import {ReplyError} from '../command/command.models';
 
 @Pipe({
   name: 'asReplyError'

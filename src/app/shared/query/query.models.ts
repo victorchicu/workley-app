@@ -1,4 +1,4 @@
-import {Message, Payload} from './command.models';
+import {Message, Payload} from '../command/command.models';
 
 
 export abstract class Query {

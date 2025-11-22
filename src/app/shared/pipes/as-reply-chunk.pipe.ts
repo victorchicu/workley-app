@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ReplyChunk} from '../models/command.models';
+import {ReplyChunk} from '../command/command.models';
 
 @Pipe({
   name: 'asReplyChunk'

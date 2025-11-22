@@ -4,7 +4,7 @@ import {Observable, retry} from 'rxjs';
 import {
   CommandType,
   PayloadType,
-} from '../models/command.models';
+} from './command.models';
 import {v4 as uuidv4} from 'uuid';
 import {retryStrategy} from '../idempotency/retry-strategy';
 

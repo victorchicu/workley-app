@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ReplyCompleted} from '../models/command.models';
+import {ReplyCompleted} from '../command/command.models';
 
 @Pipe({
   name: 'asReplyCompleted'

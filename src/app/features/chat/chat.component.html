@@ -46,12 +46,6 @@
                        [data]="(messageModel.content | asReplyChunk).text">
                   </div>
                 </ng-container>
-                <!-- COMPLETED -->
-                <ng-container *ngSwitchCase="'REPLY_COMPLETED'">
-                  <div class="text-gray-400 italic text-xs">
-                    Reply completed
-                  </div>
-                </ng-container>
                 <!-- ERROR -->
                 <ng-container *ngSwitchCase="'REPLY_ERROR'">
                   <div class="bg-red-100 border border-red-300 text-red-700 p-2 rounded-md">
@@ -61,7 +55,7 @@
                 <!-- Fallback -->
                 <ng-container *ngSwitchDefault>
                   <div class="text-gray-300">
-                    Unsupported content type: {{ messageModel.content.type }}
+                    Oops! Something went wrong, please try again later.
                   </div>
                 </ng-container>
               </ng-container>
@@ -93,7 +87,7 @@
         [form]="chatModel.form"
         [placeholder]="'Reply to Workley...'"
         [isSubmitting]="chatModel.isPromptSubmitting"
-        [isDeactivated]="chatModel.isPromptSubmitting"
+        [isDeactivated]="chatModel.isPromptSubmitting || chatModel.isReplyStreaming"
         [isLineWrapped]="chatModel.isLineWrapped"
         (onPressEnter)="onAddMessage()"
         (lineWrapDetected)="handleLineWrapChange($event)">
@@ -101,7 +95,7 @@
           <app-prompt-send-button
             aria-label="Send messageModel"
             (clicked)="onAddMessage()"
-            [deactivated]="chatModel.form.invalid || chatModel.isPromptSubmitting"
+            [deactivated]="chatModel.form.invalid || chatModel.isPromptSubmitting || chatModel.isReplyStreaming"
             [isSubmitting]="chatModel.isPromptSubmitting"
           />
         </div>

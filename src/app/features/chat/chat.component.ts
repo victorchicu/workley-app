@@ -1,6 +1,6 @@
 import {
   ChangeDetectorRef,
-  Component, computed, DestroyRef, ElementRef, inject, NgZone,
+  Component, computed, DestroyRef, effect, ElementRef, inject, NgZone,
   OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
@@ -8,7 +8,7 @@ import {Navigation, Router} from '@angular/router';
 import {
   PayloadType,
   CreateChatPayload, Message, Role, AddMessage, AddMessagePayload, ReplyError
-} from '../../shared/models/command.models';
+} from '../../shared/command/command.models';
 import {DatePipe, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
@@ -27,10 +27,10 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {GetChat, GetChatPayload} from '../../shared/models/query.models';
-import {QueryService} from '../../shared/services/query.service';
-import {CommandService} from '../../shared/services/command.service';
-import {RSocketService} from '../../shared/services/rsocket.service';
+import {GetChat, GetChatPayload} from '../../shared/query/query.models';
+import {QueryService} from '../../shared/query/query.service';
+import {CommandService} from '../../shared/command/command.service';
+import {RSocketService} from '../../shared/websocket/rsocket.service';
 import {MarkdownComponent} from 'ngx-markdown';
 import {AsReplyChunkPipe} from '../../shared/pipes/as-reply-chunk.pipe';
 import {AsReplyErrorPipe} from '../../shared/pipes/as-reply-error.pipe';
@@ -61,7 +61,7 @@ export type ChatForm = FormGroup<ChatControl>;
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnDestroy {
   readonly router: Router = inject(Router);
   readonly builder: FormBuilder = inject(FormBuilder);
   readonly query: QueryService = inject(QueryService);
@@ -117,20 +117,18 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.chatId.set(result.chatId);
       this.createChat(result);
     }
-  }
-
-  ngOnInit(): void {
-    const state = this.viewModel();
-    if (state.chatId) {
-      this.initializeRSocketStream(state.chatId);
-    }
-    this.rsocketService.isConnected()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(isConnected => {
-        if (isConnected && state.chatId && !this.streamSubscription) {
-          this.initializeRSocketStream(state.chatId);
-        }
-      });
+    effect(() => {
+      this.rsocketService.isConnected()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(isConnected => {
+          if (isConnected) {
+            const chatId: string | null = this.chatId();
+            if (chatId && !this.streamSubscription) {
+              this.initializeRSocketStream(chatId);
+            }
+          }
+        });
+    });
   }
 
   ngOnDestroy(): void {
@@ -290,6 +288,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     switch (source.content.type) {
       case "REPLY_CHUNK":
         const chunk: string = source.content.text;
+        // console.log("Reply chunk", chunk);
         this.streamDebounceTimer = setTimeout(() => {
           this.ngZone.run(() => {
             const messages: Message[] = this._messages();
@@ -325,8 +324,8 @@ export class ChatComponent implements OnInit, OnDestroy {
             requestAnimationFrame(() => {
               if (this.messagesContainer) {
                 const element = this.messagesContainer.nativeElement;
-                const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
-                if (isNearBottom) {
+                const isNear = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
+                if (isNear) {
                   element.scrollTo({
                     top: element.scrollHeight,
                     behavior: 'smooth'
@@ -336,11 +335,17 @@ export class ChatComponent implements OnInit, OnDestroy {
             });
           });
         }, 50);
+        this.changeDetectorRef.markForCheck();
+        requestAnimationFrame(() => this.scrollToBottom());
         break;
       case "REPLY_COMPLETED":
+        console.log("Reply COMPLETED");
         this.isReplyStreaming.set(false);
+        this.changeDetectorRef.markForCheck();
+        requestAnimationFrame(() => this.scrollToBottom());
         break;
       case "REPLY_ERROR":
+        console.log("Reply ERROR");
         const replyError: ReplyError = source.content;
         this.error.set(replyError.reason);
         this.isReplyStreaming.set(false);
@@ -358,17 +363,16 @@ export class ChatComponent implements OnInit, OnDestroy {
             }
           }
         ]);
+        this.changeDetectorRef.markForCheck();
+        requestAnimationFrame(() => this.scrollToBottom());
         break;
     }
-    this.changeDetectorRef.markForCheck();
-    requestAnimationFrame(() => this.scrollToBottom());
   }
 
   private initializeRSocketStream(chatId: string): void {
     if (this.streamSubscription) {
       this.streamSubscription.unsubscribe();
     }
-
     this.streamSubscription = this.rsocketService.streamChat(chatId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),

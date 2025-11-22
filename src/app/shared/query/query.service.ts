@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {GetChatPayload, QueryType, PayloadType} from '../models/query.models';
+import {GetChatPayload, QueryType, PayloadType} from './query.models';
 import {Observable} from 'rxjs';
 
 @Injectable({

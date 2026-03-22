@@ -3,7 +3,7 @@
     <div class="flex items-center h-8">
       <a [routerLink]="['/']"
          class="flex items-center opacity-90 hover:opacity-100">
-        <img src="logo.png" alt="Workley" class="h-14 w-auto -my-3" />
+        <img [src]="themeService.appliedTheme() === 'dark' ? 'logo-d.png' : 'logo-l.png'" alt="Workley" class="h-14 w-auto -my-3" />
       </a>
     </div>
 

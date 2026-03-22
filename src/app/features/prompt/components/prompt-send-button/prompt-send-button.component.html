@@ -4,8 +4,8 @@
   class="relative px-2 py-2 flex items-center justify-center rounded-full cursor-pointer group"
   aria-label="Create my resume"
   [ngClass]="{
-    'bg-neutral-900 text-white': !button.deactivated,
-    'bg-neutral-100 hover:bg-neutral-200 text-neutral-900': button.deactivated,
+    'bg-text-primary text-bg-primary': !button.deactivated,
+    'bg-surface-tertiary hover:bg-surface-hover text-text-primary': button.deactivated,
   }"
   [disabled]="button.deactivated || button.isSubmitting"
   (click)="handleClick()"
@@ -20,8 +20,8 @@
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
         [ngClass]="{
-        'text-white': !button.deactivated,
-        'text-neutral-900': button.deactivated
+        'text-bg-primary': !button.deactivated,
+        'text-text-primary': button.deactivated
       }"
       >
         <path d="M12 6V18M12 6L7 11M12 6L17 11" fill="currentColor" stroke="currentColor" stroke-width="2"

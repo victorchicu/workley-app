@@ -2,11 +2,97 @@
   <nav class="w-full p-4 py-4 flex justify-between items-center">
     <div class="flex items-center">
       <span>
-         <a [routerLink]="['/']"
-            class="flex items-center text-2xl font-bold text-neutral-800 opacity-90 hover:opacity-100 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-100">
-            Workley
+        <a [routerLink]="['/']"
+           class="flex items-center text-2xl font-bold text-text-primary opacity-90 hover:opacity-100 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-100">
+          Workley
         </a>
       </span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- Settings dropdown -->
+      <div class="relative">
+        <button
+          (click)="toggleDropdown()"
+          class="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
+          aria-label="Theme settings"
+        >
+          <!-- Gear SVG -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+
+        @if (dropdownOpen()) {
+          <div class="absolute right-0 mt-2 p-1.5 bg-surface-secondary border border-border-light rounded-xl shadow-lg z-50"
+               role="menu">
+            <div class="flex items-center gap-1">
+              <!-- Light -->
+              <button
+                (click)="selectTheme('light')"
+                class="p-2 rounded-lg transition-colors cursor-pointer"
+                [ngClass]="themeService.theme() === 'light' ? 'bg-surface-tertiary text-text-primary' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'"
+                [attr.aria-pressed]="themeService.theme() === 'light'"
+                aria-label="Light theme"
+              >
+                <!-- Sun SVG -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="1" x2="12" y2="3"/>
+                  <line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/>
+                  <line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+              </button>
+
+              <!-- Dark -->
+              <button
+                (click)="selectTheme('dark')"
+                class="p-2 rounded-lg transition-colors cursor-pointer"
+                [ngClass]="themeService.theme() === 'dark' ? 'bg-surface-tertiary text-text-primary' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'"
+                [attr.aria-pressed]="themeService.theme() === 'dark'"
+                aria-label="Dark theme"
+              >
+                <!-- Moon SVG -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              </button>
+
+              <!-- System -->
+              <button
+                (click)="selectTheme('system')"
+                class="p-2 rounded-lg transition-colors cursor-pointer"
+                [ngClass]="themeService.theme() === 'system' ? 'bg-surface-tertiary text-text-primary' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'"
+                [attr.aria-pressed]="themeService.theme() === 'system'"
+                aria-label="System theme"
+              >
+                <!-- Monitor SVG -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Sign In -->
+      <button class="px-4 py-2 text-sm font-medium text-text-primary border border-border-medium hover:bg-surface-hover rounded-full transition-colors cursor-pointer">
+        Sign in
+      </button>
+
+      <!-- Sign Up -->
+      <button class="px-4 py-2 text-sm font-medium bg-text-primary text-bg-primary rounded-full hover:opacity-90 transition-colors cursor-pointer">
+        Sign up
+      </button>
     </div>
   </nav>
 </header>

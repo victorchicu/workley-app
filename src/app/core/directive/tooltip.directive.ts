@@ -52,7 +52,7 @@ export class TooltipDirective implements OnDestroy {
     // Create tooltip element
     this.tooltip = this.renderer.createElement('div');
 
-    const baseClasses = 'fixed z-[9999] px-3 py-1.5 text-xs font-bold text-white bg-gray-900 rounded-md shadow-lg pointer-events-none whitespace-nowrap transition-opacity duration-200 opacity-0';
+    const baseClasses = 'fixed z-[9999] px-3 py-1.5 text-xs font-bold text-bg-primary bg-text-primary rounded-md shadow-lg pointer-events-none whitespace-nowrap transition-opacity duration-200 opacity-0';
     this.renderer.setAttribute(this.tooltip, 'class', baseClasses);
 
     // Set tooltip text
@@ -191,16 +191,16 @@ export class TooltipDirective implements OnDestroy {
 
     switch (this.position) {
       case 'top':
-        arrowClasses += 'w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-gray-900 -bottom-[6px] left-1/2 -translate-x-1/2';
+        arrowClasses += 'w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-text-primary -bottom-[6px] left-1/2 -translate-x-1/2';
         break;
       case 'bottom':
-        arrowClasses += 'w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[6px] border-b-gray-900 -top-[6px] left-1/2 -translate-x-1/2';
+        arrowClasses += 'w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[6px] border-b-text-primary -top-[6px] left-1/2 -translate-x-1/2';
         break;
       case 'left':
-        arrowClasses += 'w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-l-[6px] border-l-gray-900 -right-[6px] top-1/2 -translate-y-1/2';
+        arrowClasses += 'w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-l-[6px] border-l-text-primary -right-[6px] top-1/2 -translate-y-1/2';
         break;
       case 'right':
-        arrowClasses += 'w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[6px] border-r-gray-900 -left-[6px] top-1/2 -translate-y-1/2';
+        arrowClasses += 'w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[6px] border-r-text-primary -left-[6px] top-1/2 -translate-y-1/2';
         break;
     }
 

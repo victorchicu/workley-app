@@ -3,6 +3,23 @@
 
 @theme {
   --color-neutral-250: oklch(0.68 0.004 0);
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-quaternary: var(--bg-quaternary);
+  --color-surface-primary: var(--surface-primary);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-tertiary: var(--surface-tertiary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-border-light: var(--border-light);
+  --color-border-medium: var(--border-medium);
+  --color-border-heavy: var(--border-heavy);
+  --color-link: var(--link);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-input: var(--surface-input);
+  --color-border-input: var(--border-input);
 }
 
 @layer base {
@@ -10,5 +27,45 @@
     height: 100%;
     margin: 0;
     padding: 0;
+  }
+
+  .light {
+    --bg-primary: #ffffff;
+    --bg-secondary: #e8e8e8;
+    --bg-tertiary: #f3f3f3;
+    --bg-quaternary: #f8f8f8;
+    --surface-primary: #ffffff;
+    --surface-secondary: #f9f9f9;
+    --surface-tertiary: #ececec;
+    --text-primary: #0d0d0d;
+    --text-secondary: #00000099;
+    --text-tertiary: #0000004a;
+    --border-light: #0000001a;
+    --border-medium: #00000026;
+    --border-heavy: #00000033;
+    --link: #2964aa;
+    --surface-hover: #00000012;
+    --surface-input: #ffffff;
+    --border-input: #00000033;
+  }
+
+  .dark {
+    --bg-primary: #212121;
+    --bg-secondary: #303030;
+    --bg-tertiary: #414141;
+    --bg-quaternary: #3a3a3a;
+    --surface-primary: #212121;
+    --surface-secondary: #2f2f2f;
+    --surface-tertiary: #424242;
+    --text-primary: #ececec;
+    --text-secondary: #ffffffb3;
+    --text-tertiary: #ffffff94;
+    --border-light: #ffffff1a;
+    --border-medium: #ffffff26;
+    --border-heavy: #ffffff33;
+    --link: #7ab7ff;
+    --surface-hover: #ffffff26;
+    --surface-input: #303030;
+    --border-input: #ffffff1a;
   }
 }

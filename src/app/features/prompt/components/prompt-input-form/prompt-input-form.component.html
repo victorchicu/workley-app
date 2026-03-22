@@ -1,28 +1,28 @@
 @let input = viewModel();
 <div class="relative w-full mx-auto">
   <form [formGroup]="input.form"
-        class="relative w-full bg-white border border-neutral-200 shadow-xl shadow-neutral-300/50 overflow-hidden"
+        class="relative w-full bg-surface-input border-[0.5px] border-border-input shadow-lg shadow-black/10 overflow-hidden"
         [class.opacity-50]="input.isSubmitting || input.isDeactivated"
         [class.rounded-3xl]="input.isLineWrapped"
         [class.rounded-full]="!input.isLineWrapped"
         [class.pointer-events-none]="input.isSubmitting || input.isDeactivated"
   >
     <fieldset [disabled]="input.isSubmitting || input.isDeactivated">
-      <div [class]="input.isLineWrapped ? 'w-full bg-neutral-100' : 'w-full flex items-stretch p-2 bg-neutral-100'">
+      <div [class]="input.isLineWrapped ? 'w-full bg-surface-input' : 'w-full flex items-stretch p-2 bg-surface-input'">
         <div [class]="input.isLineWrapped ? 'w-full flex items-center px-1 pt-3 min-w-0' : 'w-full flex flex-1 items-center min-w-0'">
           <textarea
             #promptRef
             id="messageModel"
             rows="2"
             style="field-sizing: content; word-break: break-all !important; overflow-wrap: anywhere !important;"
-            class="w-full min-w-0 text-neutral-950 bg-transparent focus:outline-none placeholder-neutral-500 resize-none overflow-y-auto pl-3 pr-2 break-all whitespace-pre-wrap scroll-smooth custom-scrollbar"
+            class="w-full min-w-0 text-text-primary bg-transparent focus:outline-none placeholder-text-tertiary resize-none overflow-y-auto pl-3 pr-2 break-all whitespace-pre-wrap scroll-smooth custom-scrollbar"
             autocomplete="off"
             formControlName="text"
             [placeholder]="input.placeholder"
             (input)="handleLineWrapChange()"
             (keydown)="handlePressEnter($event)"></textarea>
         </div>
-        <div [class]="input.isLineWrapped ? 'px-2 py-2 border-neutral-200' : 'flex items-center'">
+        <div [class]="input.isLineWrapped ? 'px-2 py-2 border-border-medium' : 'flex items-center'">
           <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="input.isLineWrapped">
             <ng-content/>
           </div>

@@ -4,7 +4,7 @@
     <div class="w-full max-w-3xl mx-auto px-4 py-6">
       <div *ngIf="chatModel.isLoading && (messages())?.length === 0"
            class="flex justify-center items-center h-32">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-text-primary"></div>
       </div>
       <div *ngFor="let messageModel of messages(); let last = last; trackBy: trackByMessageId"
            class="mb-6">
@@ -24,14 +24,14 @@
         </div>
         <div *ngIf="messageModel.role === Role.ANONYMOUS" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
-            <div class="bg-neutral-100 text-neutral-950 rounded-lg px-4 py-2 overflow-hidden">
+            <div class="bg-surface-tertiary text-text-primary rounded-lg px-4 py-2 overflow-hidden">
               <div
                 markdown
                 class="markdown-content prose prose-slate max-w-none"
                 [data]="(messageModel.content | asReplyChunk).text">
               </div>
             </div>
-            <div class="text-sm text-gray-500 mt-1 text-right">
+            <div class="text-sm text-text-secondary mt-1 text-right">
               {{ messageModel.createdAt | date:'short' }}
             </div>
           </div>
@@ -54,13 +54,13 @@
                 </ng-container>
                 <!-- Fallback -->
                 <ng-container *ngSwitchDefault>
-                  <div class="text-gray-300">
+                  <div class="text-text-tertiary">
                     Oops! Something went wrong, please try again later.
                   </div>
                 </ng-container>
               </ng-container>
             </div>
-            <div class="text-sm text-gray-500 px-1 mt-1">
+            <div class="text-sm text-text-secondary px-1 mt-1">
               {{ messageModel.createdAt | date:'short' }}
             </div>
           </div>
@@ -72,16 +72,16 @@
         <div class="max-w-xs lg:max-w-md xl:max-w-2xl min-w-0">
           <div class="rounded-lg py-2 overflow-hidden">
             <div class="flex items-center space-x-2 px-2">
-              <div class="w-1.5 h-1.5 bg-neutral-800 rounded-full animate-bounce [animation-delay:0ms]"></div>
-              <div class="w-1.5 h-1.5 bg-neutral-800 rounded-full animate-bounce [animation-delay:150ms]"></div>
-              <div class="w-1.5 h-1.5 bg-neutral-800 rounded-full animate-bounce [animation-delay:300ms]"></div>
+              <div class="w-1.5 h-1.5 bg-text-primary rounded-full animate-bounce [animation-delay:0ms]"></div>
+              <div class="w-1.5 h-1.5 bg-text-primary rounded-full animate-bounce [animation-delay:150ms]"></div>
+              <div class="w-1.5 h-1.5 bg-text-primary rounded-full animate-bounce [animation-delay:300ms]"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="flex-shrink-0 w-full bg-white">
+  <div class="flex-shrink-0 w-full bg-surface-primary">
     <div class="w-full max-w-3xl px-4 mx-auto">
       <app-prompt-input-form
         [form]="chatModel.form"

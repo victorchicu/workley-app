@@ -33,9 +33,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withComponentInputBinding(),
-      withViewTransitions({
-        skipInitialTransition: false,
-      })
+      // withViewTransitions({
+      //   skipInitialTransition: false,
+      // })
     ),
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),

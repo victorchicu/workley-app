@@ -1,12 +1,11 @@
 import { Component, inject, signal, ElementRef, HostListener } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import {NgClass, NgOptimizedImage} from '@angular/common';
+import {NgClass} from '@angular/common';
 import { ThemeService, ThemePreference } from '../../services/theme.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, NgClass, NgOptimizedImage],
+  imports: [NgClass],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })

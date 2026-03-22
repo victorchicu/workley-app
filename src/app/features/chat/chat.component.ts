@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component, computed, DestroyRef, effect, ElementRef, inject,
-  OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal
+  OnDestroy, OnInit, PLATFORM_ID, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {Navigation, Router} from '@angular/router';

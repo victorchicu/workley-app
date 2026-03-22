@@ -3,7 +3,7 @@
     <div class="flex items-center">
       <span>
         <a [routerLink]="['/']"
-           class="flex items-center text-2xl font-bold text-text-primary opacity-90 hover:opacity-100 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current after:origin-right after:scale-x-0 hover:after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-100">
+           class="flex items-center text-2xl font-bold text-text-primary opacity-90 hover:opacity-100">
           Workley
         </a>
       </span>
@@ -14,7 +14,7 @@
       <div class="relative">
         <button
           (click)="toggleDropdown()"
-          class="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
+          class="p-2 rounded-full text-text-secondary hover:text-text-primary hover:bg-surface-hover cursor-pointer"
           aria-label="Theme settings"
         >
           <!-- Gear SVG -->
@@ -31,7 +31,7 @@
               <!-- Light -->
               <button
                 (click)="selectTheme('light')"
-                class="p-2 rounded-lg transition-colors cursor-pointer"
+                class="p-2 rounded-lg cursor-pointer"
                 [ngClass]="themeService.theme() === 'light' ? 'bg-surface-tertiary text-text-primary' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'"
                 [attr.aria-pressed]="themeService.theme() === 'light'"
                 aria-label="Light theme"
@@ -53,7 +53,7 @@
               <!-- Dark -->
               <button
                 (click)="selectTheme('dark')"
-                class="p-2 rounded-lg transition-colors cursor-pointer"
+                class="p-2 rounded-lg cursor-pointer"
                 [ngClass]="themeService.theme() === 'dark' ? 'bg-surface-tertiary text-text-primary' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'"
                 [attr.aria-pressed]="themeService.theme() === 'dark'"
                 aria-label="Dark theme"
@@ -67,7 +67,7 @@
               <!-- System -->
               <button
                 (click)="selectTheme('system')"
-                class="p-2 rounded-lg transition-colors cursor-pointer"
+                class="p-2 rounded-lg cursor-pointer"
                 [ngClass]="themeService.theme() === 'system' ? 'bg-surface-tertiary text-text-primary' : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'"
                 [attr.aria-pressed]="themeService.theme() === 'system'"
                 aria-label="System theme"
@@ -85,12 +85,12 @@
       </div>
 
       <!-- Sign In -->
-      <button class="px-4 py-2 text-sm font-medium text-text-primary border border-border-medium hover:bg-surface-hover rounded-full transition-colors cursor-pointer">
+      <button class="px-4 py-2 text-sm font-medium text-text-primary border border-border-medium hover:bg-surface-hover rounded-full cursor-pointer">
         Sign in
       </button>
 
       <!-- Sign Up -->
-      <button class="px-4 py-2 text-sm font-medium bg-text-primary text-bg-primary rounded-full hover:opacity-90 transition-colors cursor-pointer">
+      <button class="px-4 py-2 text-sm font-medium bg-text-primary text-bg-primary rounded-full hover:opacity-90 cursor-pointer">
         Sign up
       </button>
     </div>

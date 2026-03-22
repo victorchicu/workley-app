@@ -52,7 +52,7 @@ export class TooltipDirective implements OnDestroy {
     // Create tooltip element
     this.tooltip = this.renderer.createElement('div');
 
-    const baseClasses = 'fixed z-[9999] px-3 py-1.5 text-xs font-bold text-bg-primary bg-text-primary rounded-md shadow-lg pointer-events-none whitespace-nowrap transition-opacity duration-200 opacity-0';
+    const baseClasses = 'fixed z-[9999] px-3 py-1.5 text-xs font-bold text-bg-primary bg-text-primary rounded-md shadow-lg pointer-events-none whitespace-nowrap opacity-0';
     this.renderer.setAttribute(this.tooltip, 'class', baseClasses);
 
     // Set tooltip text

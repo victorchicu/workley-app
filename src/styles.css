@@ -69,3 +69,14 @@
     --border-input: #ffffff1a;
   }
 }
+
+.prose {
+  --tw-prose-body: var(--text-primary) !important;
+  --tw-prose-headings: var(--text-primary) !important;
+  --tw-prose-bold: var(--text-primary) !important;
+  --tw-prose-links: var(--link) !important;
+  --tw-prose-code: var(--text-primary) !important;
+  --tw-prose-quotes: var(--text-secondary) !important;
+  --tw-prose-counters: var(--text-secondary) !important;
+  --tw-prose-bullets: var(--text-tertiary) !important;
+}

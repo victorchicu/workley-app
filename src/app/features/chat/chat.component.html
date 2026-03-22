@@ -1,7 +1,7 @@
 @let chatModel = viewModel();
-<div class="min-h-[calc(100vh-4rem)] flex flex-col" #messagesContainer>
+<div class="flex flex-col flex-1" #messagesContainer>
     <div class="flex-1 w-full max-w-3xl mx-auto px-4 py-6">
-      <div *ngIf="chatModel.isLoading && (messages())?.length === 0"
+      <div *ngIf="chatModel.isLoading"
            class="flex justify-center items-center h-32">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-text-primary"></div>
       </div>

@@ -18,7 +18,6 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {
   bufferTime,
   catchError,
-  delay,
   EMPTY,
   filter,
   finalize,
@@ -81,34 +80,42 @@ export class ChatComponent implements OnInit, OnDestroy {
   private readonly error = signal<string | null>(null);
   private readonly chatId = signal<string | null>(null);
   private readonly isLoading = signal<boolean>(false);
+  private readonly showLoadingSpinner = signal<boolean>(false);
   private readonly isLineWrapped = signal<boolean>(false);
   private readonly isReplyStreaming = signal<boolean>(false);
   private readonly isPromptSubmitting = signal<boolean>(false);
 
+  private readonly isWaitingForReply = signal<boolean>(false);
+  private loadingDelayTimer?: any;
+
+  private readonly loadingEffect = effect(() => {
+    const loading = this.isLoading();
+    if (loading) {
+      this.loadingDelayTimer = setTimeout(() => this.showLoadingSpinner.set(true), 300);
+    } else {
+      clearTimeout(this.loadingDelayTimer);
+      this.showLoadingSpinner.set(false);
+    }
+  });
+
   viewModel = computed(() => {
     const error = this.error();
     const chatId = this.chatId();
-    const messages = this._messages();
-    const isLoading = this.isLoading();
+    const showLoadingSpinner = this.showLoadingSpinner();
     const isLineWrapped = this.isLineWrapped();
     const isReplyStreaming = this.isReplyStreaming();
     const isPromptSubmitting = this.isPromptSubmitting();
-
-    const last: Message | null =
-      messages.length > 0 ? messages[messages.length - 1] : null;
-
-    const isVisitorWaitingForReply: boolean =
-      last?.role === Role.ANONYMOUS && !isReplyStreaming;
+    const isWaitingForReply = this.isWaitingForReply();
 
     return {
       form: this.form(),
       error,
       chatId,
-      isLoading,
+      isLoading: showLoadingSpinner,
       isLineWrapped,
       isReplyStreaming,
       isPromptSubmitting,
-      isVisitorWaitingForReply,
+      isVisitorWaitingForReply: isWaitingForReply,
     };
   });
 
@@ -149,6 +156,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    clearTimeout(this.loadingDelayTimer);
     if (this.streamDebounceTimer) {
       clearTimeout(this.streamDebounceTimer);
     }
@@ -166,6 +174,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       return;
     }
     this.isReplyStreaming.set(false);
+    this.isWaitingForReply.set(true);
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -173,6 +182,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           this._messages.update(list => [...list, addMessagePayload.message]);
         },
         error: () => {
+          this.isWaitingForReply.set(false);
           this.router.navigate(['/error'])
             .then(success => {
               if (!success) {
@@ -256,6 +266,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   private createChat(result: CreateChatPayload) {
     this._messages.update(list => [...list, result.message]);
+    this.isWaitingForReply.set(true);
     this.loadChatHistory();
   }
 
@@ -274,6 +285,10 @@ export class ChatComponent implements OnInit, OnDestroy {
         next: (result: GetChatPayload) => {
           if (result.messages && result.messages.length > 0) {
             this._messages.set(result.messages);
+            const lastMessage = result.messages[result.messages.length - 1];
+            if (lastMessage?.role === Role.ASSISTANT) {
+              this.isWaitingForReply.set(false);
+            }
           }
           if (result.chatId) {
             this.chatId.set(result.chatId);
@@ -337,6 +352,7 @@ export class ChatComponent implements OnInit, OnDestroy {
               }
             };
             this.isReplyStreaming.set(true);
+            this.isWaitingForReply.set(false);
             this._messages.update(list => [...list, message]);
           }
         }, 50);
@@ -344,6 +360,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       case "REPLY_COMPLETED":
         console.log("Reply COMPLETED");
         this.isReplyStreaming.set(false);
+        this.isWaitingForReply.set(false);
         break;
       case "REPLY_ERROR":
         const code: ErrorCode = source.content.code;
@@ -351,6 +368,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         console.log("Reply ERROR");
         this.error.set(reason);
         this.isReplyStreaming.set(false);
+        this.isWaitingForReply.set(false);
         this._messages.update(list => [
           ...list,
           {

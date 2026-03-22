@@ -1,6 +1,6 @@
-<main class="h-screen flex flex-col">
-  <app-header/>
-  <div class="flex-1 overflow-hidden flex flex-col">
+<main class="h-screen overflow-y-auto overscroll-none">
+  <app-header class="sticky top-0 z-40 bg-bg-primary"/>
+  <div class="min-h-0">
     <router-outlet/>
   </div>
   <app-footer/>

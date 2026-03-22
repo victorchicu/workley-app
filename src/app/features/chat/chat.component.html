@@ -1,8 +1,6 @@
-@defer {
 @let chatModel = viewModel();
-<div class="h-full max-h-screen flex flex-col overflow-hidden">
-  <div class="flex-1 min-h-0 overflow-y-auto" #messagesContainer>
-    <div class="w-full max-w-3xl mx-auto px-4 py-6">
+<div class="min-h-[calc(100vh-4rem)] flex flex-col" #messagesContainer>
+    <div class="flex-1 w-full max-w-3xl mx-auto px-4 py-6">
       <div *ngIf="chatModel.isLoading && (messages())?.length === 0"
            class="flex justify-center items-center h-32">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-text-primary"></div>
@@ -107,8 +105,7 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="flex-shrink-0 w-full bg-surface-primary">
+  <div class="sticky bottom-0 w-full bg-bg-primary">
     <div class="w-full max-w-3xl px-4 mx-auto">
       <app-prompt-input-form
         [form]="chatModel.form"
@@ -131,4 +128,3 @@
     </div>
   </div>
 </div>
-}

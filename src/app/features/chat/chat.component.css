@@ -1,29 +1,9 @@
-/* Custom scrollbar for messages container */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
 :host {
   display: block;
-  height: 100vh;
-  overflow: hidden;
 }
 
 .compact-whitespace {
   white-space: pre-wrap;
-  line-height: 0.9; /* Reduce line height (default is often 1.5-1.6) */
+  line-height: 0.9;
   word-break: break-word;
 }

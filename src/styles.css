@@ -70,6 +70,28 @@
   }
 }
 
+main {
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-tertiary) transparent;
+}
+
+main::-webkit-scrollbar {
+  width: 6px;
+}
+
+main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: var(--text-tertiary);
+  border-radius: 3px;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
 .prose {
   --tw-prose-body: var(--text-primary) !important;
   --tw-prose-headings: var(--text-primary) !important;

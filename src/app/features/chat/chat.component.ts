@@ -2,10 +2,10 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component, computed, DestroyRef, effect, ElementRef, inject,
-  OnDestroy, OnInit, PLATFORM_ID, Signal, signal, ViewChild, WritableSignal
+  OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
-import {Navigation, Router} from '@angular/router';
+import {ActivatedRoute, Navigation, Router} from '@angular/router';
 import {
   PayloadType,
   CreateChatPayload, Message, Role, AddMessage, AddMessagePayload, ErrorCode
@@ -69,6 +69,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   readonly query: QueryService = inject(QueryService);
   readonly command: CommandService = inject(CommandService);
   readonly destroyRef: DestroyRef = inject(DestroyRef);
+  readonly route: ActivatedRoute = inject(ActivatedRoute);
   readonly rsocketService: RSocketService = inject(RSocketService);
 
   private readonly form = signal<ChatForm>(
@@ -124,6 +125,12 @@ export class ChatComponent implements OnInit, OnDestroy {
       const result = navigation.extras.state as CreateChatPayload;
       this.chatId.set(result.chatId);
       this.createChat(result);
+    } else {
+      const routeChatId = this.route.snapshot.paramMap.get('chatId');
+      if (routeChatId) {
+        this.chatId.set(routeChatId);
+        this.loadChatHistory();
+      }
     }
     this.rsocketService.isConnected()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -260,7 +267,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
-          requestAnimationFrame(() => this.scrollToBottom());
+          requestAnimationFrame(() => this.scrollToBottom('instant'));
         })
       )
       .subscribe({
@@ -275,18 +282,24 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
-  private scrollToBottom(): void {
-    if (this.messagesContainer) {
-      try {
-        const element = this.messagesContainer.nativeElement;
-        element.scrollTo({
-          top: element.scrollHeight,
-          behavior: 'smooth'
+  private scrollToBottom(behavior: ScrollBehavior = 'smooth'): void {
+    try {
+      const main = document.querySelector('main');
+      if (main) {
+        main.scrollTo({
+          top: main.scrollHeight,
+          behavior
         });
-      } catch (err) {
-        console.error(err);
       }
+    } catch (err) {
+      console.error(err);
     }
+  }
+
+  private isNearBottom(): boolean {
+    const main = document.querySelector('main');
+    if (!main) return false;
+    return main.scrollHeight - main.scrollTop - main.clientHeight < 150;
   }
 
   private handleStreamingMessage(source: Message): void {
@@ -326,25 +339,11 @@ export class ChatComponent implements OnInit, OnDestroy {
             this.isReplyStreaming.set(true);
             this._messages.update(list => [...list, message]);
           }
-          requestAnimationFrame(() => {
-            if (this.messagesContainer) {
-              const element = this.messagesContainer.nativeElement;
-              const isNear = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
-              if (isNear) {
-                element.scrollTo({
-                  top: element.scrollHeight,
-                  behavior: 'smooth'
-                });
-              }
-            }
-          });
         }, 50);
-        requestAnimationFrame(() => this.scrollToBottom());
         break;
       case "REPLY_COMPLETED":
         console.log("Reply COMPLETED");
         this.isReplyStreaming.set(false);
-        requestAnimationFrame(() => this.scrollToBottom());
         break;
       case "REPLY_ERROR":
         const code: ErrorCode = source.content.code;

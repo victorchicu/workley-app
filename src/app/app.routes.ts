@@ -22,6 +22,11 @@ export const routes: Routes = [
     title: 'Find Jobs. Find Talent | Oops! Something went wrong.',
   },
   {
+    path: 'not-found',
+    component: ErrorComponent,
+    title: 'Find Jobs. Find Talent | Page not found',
+  },
+  {
     path: '**',
     redirectTo: 'not-found',
   }

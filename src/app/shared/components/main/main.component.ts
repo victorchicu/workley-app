@@ -3,6 +3,8 @@ import {Router, RouterOutlet, RouterLink, NavigationEnd} from '@angular/router';
 import {NgClass} from '@angular/common';
 import {HeaderComponent} from '../header/header.component';
 import {FooterComponent} from '../footer/footer.component';
+import {UserAvatarComponent} from '../user-avatar/user-avatar.component';
+import {AuthService} from '../../services/auth.service';
 import {filter} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
@@ -15,6 +17,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     NgClass,
     HeaderComponent,
     FooterComponent,
+    UserAvatarComponent,
   ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css'
@@ -22,6 +25,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 export class MainComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  protected readonly authService = inject(AuthService);
   protected readonly isInChat = signal(this.router.url.startsWith('/chat/'));
 
   constructor() {

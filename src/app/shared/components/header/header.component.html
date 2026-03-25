@@ -75,15 +75,23 @@
         }
       </div>
 
-      <!-- Sign In -->
-      <button class="px-4 py-2 text-sm font-medium text-text-primary border border-border-medium hover:bg-surface-hover rounded-full cursor-pointer">
-        Sign in
-      </button>
+      @if (!authService.isAuthenticated()) {
+        <!-- Sign In -->
+        <button (click)="openAuthModal()"
+                class="px-4 py-2 text-sm font-medium text-text-primary border border-border-medium hover:bg-surface-hover rounded-full cursor-pointer">
+          Sign in
+        </button>
 
-      <!-- Sign Up -->
-      <button class="px-4 py-2 text-sm font-medium bg-text-primary text-bg-primary rounded-full hover:opacity-90 cursor-pointer">
-        Sign up
-      </button>
+        <!-- Sign Up -->
+        <button (click)="openAuthModal()"
+                class="px-4 py-2 text-sm font-medium bg-text-primary text-bg-primary rounded-full hover:opacity-90 cursor-pointer">
+          Sign up
+        </button>
+      }
     </div>
   </nav>
 </header>
+
+@if (authModalOpen()) {
+  <app-auth-modal (close)="closeAuthModal()"/>
+}

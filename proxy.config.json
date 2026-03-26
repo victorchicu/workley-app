@@ -10,5 +10,11 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/api/auth/**": {
+    "target": "http://localhost:8443",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

@@ -29,7 +29,9 @@ export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
-  private readonly _isAuthenticated = signal(false);
+  private static readonly AUTH_HINT_KEY = 'auth_hint';
+
+  private readonly _isAuthenticated = signal(this.readAuthHint());
   private readonly _userEmail = signal<string | null>(null);
   private readonly _sessionChecked = signal(false);
 
@@ -43,6 +45,20 @@ export class AuthService {
     }
   }
 
+  private readAuthHint(): boolean {
+    if (!this.isBrowser) return false;
+    return localStorage.getItem(AuthService.AUTH_HINT_KEY) === '1';
+  }
+
+  private writeAuthHint(authenticated: boolean): void {
+    if (!this.isBrowser) return;
+    if (authenticated) {
+      localStorage.setItem(AuthService.AUTH_HINT_KEY, '1');
+    } else {
+      localStorage.removeItem(AuthService.AUTH_HINT_KEY);
+    }
+  }
+
   private checkSession(): void {
     this.http.get<MeResponse>('/api/auth/me', { withCredentials: true })
       .pipe(catchError(() => of(null)))
@@ -50,7 +66,11 @@ export class AuthService {
         if (response) {
           this._isAuthenticated.set(true);
           this._userEmail.set(response.email);
+        } else {
+          this._isAuthenticated.set(false);
+          this._userEmail.set(null);
         }
+        this.writeAuthHint(this._isAuthenticated());
         this._sessionChecked.set(true);
       });
   }
@@ -81,6 +101,7 @@ export class AuthService {
       .subscribe(() => {
         this._isAuthenticated.set(false);
         this._userEmail.set(null);
+        this.writeAuthHint(false);
         this.router.navigate(['/']);
       });
   }

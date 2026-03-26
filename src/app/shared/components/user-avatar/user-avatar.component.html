@@ -5,10 +5,10 @@
   </button>
 
   @if (menuOpen()) {
-    <div class="absolute right-0 top-full mt-2 w-48 bg-surface-secondary border border-border-light rounded-xl shadow-lg z-50 py-1"
+    <div class="absolute right-0 top-full mt-2 w-48 bg-surface-secondary border border-border-light rounded-xl shadow-lg z-50 p-1.5"
          role="menu">
       <!-- Profile -->
-      <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-surface-hover cursor-pointer">
+      <button class="flex items-center gap-3 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-hover rounded-lg cursor-pointer">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
@@ -17,7 +17,7 @@
       </button>
 
       <!-- Settings -->
-      <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-surface-hover cursor-pointer">
+      <button class="flex items-center gap-3 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-hover rounded-lg cursor-pointer">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -26,11 +26,11 @@
       </button>
 
       <!-- Separator -->
-      <div class="my-1 h-px bg-border-light"></div>
+      <div class="my-1 mx-2 h-px bg-border-light"></div>
 
       <!-- Log out -->
       <button (click)="onLogout()"
-              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-primary hover:bg-surface-hover cursor-pointer">
+              class="flex items-center gap-3 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-hover rounded-lg cursor-pointer">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
           <polyline points="16 17 21 12 16 7"/>

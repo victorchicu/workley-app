@@ -10,12 +10,13 @@
     <fieldset [disabled]="input.isSubmitting || input.isDeactivated">
       <div [class]="input.isLineWrapped ? 'w-full bg-surface-input' : 'w-full flex items-stretch p-2 bg-surface-input'">
         <div [class]="input.isLineWrapped ? 'w-full flex items-center px-1 pt-3 min-w-0' : 'w-full flex flex-1 items-center min-w-0'">
+          <ng-content select="[leftActions]"/>
           <textarea
             #promptRef
             id="messageModel"
             rows="2"
             style="field-sizing: content; word-break: break-all !important; overflow-wrap: anywhere !important;"
-            class="w-full min-w-0 text-text-primary bg-transparent focus:outline-none placeholder-text-tertiary resize-none overflow-y-auto pl-3 pr-2 break-all whitespace-pre-wrap scroll-smooth custom-scrollbar"
+            class="w-full min-w-0 text-text-primary bg-transparent focus:outline-none placeholder-text-tertiary resize-none overflow-y-auto pl-1 pr-2 break-all whitespace-pre-wrap scroll-smooth custom-scrollbar"
             autocomplete="off"
             formControlName="text"
             [placeholder]="input.placeholder"

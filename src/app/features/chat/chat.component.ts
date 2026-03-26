@@ -34,6 +34,7 @@ import {RSocketService} from '../../shared/websocket/rsocket.service';
 import {MarkdownComponent} from 'ngx-markdown';
 import {AsReplyChunkPipe} from '../../shared/pipes/as-reply-chunk.pipe';
 import {AsReplyErrorPipe} from '../../shared/pipes/as-reply-error.pipe';
+import {PromptActionsMenuComponent} from '../prompt/components/prompt-actions-menu/prompt-actions-menu.component';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -57,6 +58,7 @@ export type ChatForm = FormGroup<ChatControl>;
     NgSwitch,
     AsReplyChunkPipe,
     AsReplyErrorPipe,
+    PromptActionsMenuComponent,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',

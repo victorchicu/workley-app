@@ -5,6 +5,7 @@ import {PromptInputFormComponent} from './components/prompt-input-form/prompt-in
 import {
   PromptSendButtonComponent
 } from './components/prompt-send-button/prompt-send-button.component';
+import {PromptActionsMenuComponent} from './components/prompt-actions-menu/prompt-actions-menu.component';
 import {Router} from '@angular/router';
 import {PayloadType, CreateChat, CreateChatPayload} from '../../shared/command/command.models';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -25,7 +26,8 @@ export type PromptForm = FormGroup<PromptControl>;
     ReactiveFormsModule,
     PromptHeadlineComponent,
     PromptInputFormComponent,
-    PromptSendButtonComponent
+    PromptSendButtonComponent,
+    PromptActionsMenuComponent
   ],
   templateUrl: './prompt.component.html',
   styleUrl: './prompt.component.css',

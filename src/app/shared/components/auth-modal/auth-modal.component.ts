@@ -1,4 +1,4 @@
-import { Component, inject, signal, output, HostListener } from '@angular/core';
+import { Component, inject, signal, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -39,17 +39,6 @@ export class AuthModalComponent {
     email_exists: 'Email already registered',
     user_not_found: 'User not found',
   };
-
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    this.close.emit();
-  }
-
-  onBackdropClick(event: MouseEvent): void {
-    if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
-      this.close.emit();
-    }
-  }
 
   onContinue(): void {
     this.error.set(null);

@@ -37,6 +37,8 @@ export class PromptInputFormComponent {
   readonly lineWrapDetected = output<boolean>()
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
+  private singleLineWidth = 0;
+
   viewModel = computed(() => ({
     form: this.form(),
     error: this.error(),
@@ -91,27 +93,37 @@ export class PromptInputFormComponent {
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
     const content: string = textarea.value;
 
-    if (content.includes('\n')) {
-      if (!state.isLineWrapped) {
-        this.lineWrapDetected.emit(true);
-      }
-      this.adjustTextareaHeight();
-      return;
+    const prevHeight = textarea.style.height;
+    const prevWidth = textarea.style.width;
+    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight, 10) || 24;
+
+    // Save single-line width before wrapping so we can check against it later
+    if (!state.isLineWrapped) {
+      this.singleLineWidth = textarea.clientWidth;
     }
 
-    const CHAR_THRESHOLD = 35;
+    // When already wrapped, measure against the saved single-line width
+    // to avoid oscillation (multi-line textarea is wider → text fits → unwraps → wraps again)
+    if (state.isLineWrapped && this.singleLineWidth > 0) {
+      textarea.style.width = `${this.singleLineWidth}px`;
+    }
+    textarea.style.height = 'auto';
+    const wouldCollide = content.includes('\n') || textarea.scrollHeight > lineHeight * 1.5;
+    textarea.style.height = prevHeight;
+    textarea.style.width = prevWidth;
 
-    const words = content.split(' ');
-    const hasLongWord = words.some(word => word.length > CHAR_THRESHOLD);
-
-    const wouldCollide = content.length > CHAR_THRESHOLD || hasLongWord;
-
-    if (wouldCollide !== state.isLineWrapped) {
+    const justChanged = wouldCollide !== state.isLineWrapped;
+    if (justChanged) {
       this.lineWrapDetected.emit(wouldCollide);
     }
 
     if (wouldCollide) {
-      this.adjustTextareaHeight();
+      if (justChanged) {
+        // Defer height adjustment until after layout reflows to new multi-line width
+        requestAnimationFrame(() => this.adjustTextareaHeight());
+      } else {
+        this.adjustTextareaHeight();
+      }
     } else {
       textarea.style.height = '24px';
       textarea.style.overflowY = 'hidden';

@@ -9,22 +9,22 @@ export const routes: Routes = [
   {
     path: '',
     component: PromptComponent,
-    title: 'Find Jobs. Find Talent | Workley',
+    title: 'Workley',
   },
   {
     path: 'chat/:chatId',
     component: ChatComponent,
-    title: 'Find Jobs. Find Talent | AI assistant',
+    title: 'Workley',
   },
   {
     path: 'error',
     component: ErrorComponent,
-    title: 'Find Jobs. Find Talent | Oops! Something went wrong.',
+    title: 'Workley | Oops! Something went wrong.',
   },
   {
     path: 'not-found',
     component: ErrorComponent,
-    title: 'Find Jobs. Find Talent | Page not found',
+    title: 'Workley | Page not found',
   },
   {
     path: '**',

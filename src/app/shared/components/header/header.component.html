@@ -97,7 +97,9 @@
         }
       </div>
 
-      @if (authService.isAuthenticated()) {
+      @if (!authService.sessionChecked()) {
+        <div class="w-8 h-8"></div>
+      } @else if (authService.isAuthenticated()) {
         <app-user-avatar/>
       } @else {
         <!-- Sign In -->

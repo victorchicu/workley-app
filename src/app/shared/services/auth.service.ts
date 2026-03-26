@@ -31,9 +31,11 @@ export class AuthService {
 
   private readonly _isAuthenticated = signal(false);
   private readonly _userEmail = signal<string | null>(null);
+  private readonly _sessionChecked = signal(false);
 
   readonly isAuthenticated = this._isAuthenticated.asReadonly();
   readonly userEmail = this._userEmail.asReadonly();
+  readonly sessionChecked = this._sessionChecked.asReadonly();
 
   constructor() {
     if (this.isBrowser) {
@@ -49,6 +51,7 @@ export class AuthService {
           this._isAuthenticated.set(true);
           this._userEmail.set(response.email);
         }
+        this._sessionChecked.set(true);
       });
   }
 

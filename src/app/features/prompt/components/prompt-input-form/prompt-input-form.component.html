@@ -8,9 +8,9 @@
         [class.pointer-events-none]="input.isSubmitting || input.isDeactivated"
   >
     <fieldset [disabled]="input.isSubmitting || input.isDeactivated">
-      <div [class]="input.isLineWrapped ? 'w-full bg-surface-input' : 'w-full flex items-stretch p-2 bg-surface-input'">
-        <div [class]="input.isLineWrapped ? 'w-full flex items-center px-1 pt-3 min-w-0' : 'w-full flex flex-1 items-center min-w-0'">
-          <ng-content select="[leftActions]"/>
+      <div class="w-full flex flex-wrap p-2 bg-surface-input" [class.items-center]="!input.isLineWrapped">
+        <!-- Textarea row -->
+        <div class="flex items-center min-w-0 order-1" [class]="input.isLineWrapped ? 'w-full px-1 pt-1 pb-2' : 'flex-1'">
           <textarea
             #promptRef
             id="messageModel"
@@ -23,8 +23,13 @@
             (input)="handleLineWrapChange()"
             (keydown)="handlePressEnter($event)"></textarea>
         </div>
-        <div [class]="input.isLineWrapped ? 'px-2 py-2 border-border-medium' : 'flex items-center'">
-          <div id="action-buttons" class="flex items-center gap-1" [class.justify-end]="input.isLineWrapped">
+        <!-- Left actions (+ button) -->
+        <div class="flex items-center" [class]="input.isLineWrapped ? 'order-2' : 'order-first'">
+          <ng-content select="[leftActions]"/>
+        </div>
+        <!-- Right actions (send button) -->
+        <div class="flex items-center order-3" [class.ml-auto]="input.isLineWrapped">
+          <div id="action-buttons" class="flex items-center gap-1">
             <ng-content/>
           </div>
         </div>

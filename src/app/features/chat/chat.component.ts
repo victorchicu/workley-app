@@ -48,7 +48,6 @@ export type ChatForm = FormGroup<ChatControl>;
   imports: [
     PromptInputFormComponent,
     NgIf,
-    DatePipe,
     NgForOf,
     PromptSendButtonComponent,
     ChatDisclaimerComponent,

@@ -34,7 +34,7 @@
             "outputMode": "server",
             "ssr": {
               "entry": "src/server.ts"
-            }
+            },
           },
           "configurations": {
             "production": {
@@ -68,6 +68,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "allowedHosts": ["localhost", "workley.ai"]
+          },
           "configurations": {
             "production": {
               "buildTarget": "workley-app:build:production"

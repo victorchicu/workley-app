@@ -10,14 +10,24 @@ export class UserAvatarComponent {
   private readonly elementRef = inject(ElementRef);
   protected readonly authService = inject(AuthService);
   protected readonly menuOpen = signal(false);
+  protected readonly logoutDialogOpen = signal(false);
 
   toggleMenu(): void {
     this.menuOpen.update(v => !v);
   }
 
-  onLogout(): void {
+  onLogoutClick(): void {
     this.menuOpen.set(false);
+    this.logoutDialogOpen.set(true);
+  }
+
+  confirmLogout(): void {
+    this.logoutDialogOpen.set(false);
     this.authService.logout();
+  }
+
+  cancelLogout(): void {
+    this.logoutDialogOpen.set(false);
   }
 
   @HostListener('document:click', ['$event'])

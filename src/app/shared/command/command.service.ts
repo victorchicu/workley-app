@@ -1,11 +1,10 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Observable, retry} from 'rxjs';
 import {
   CommandType,
   PayloadType,
 } from './command.models';
-import {v4 as uuidv4} from 'uuid';
 import {retryStrategy} from '../idempotency/retry-strategy';
 
 @Injectable({
@@ -19,18 +18,9 @@ export class CommandService {
   }
 
   public execute(command: CommandType): Observable<PayloadType> {
-    const idempotencyKey = uuidv4();
-
-    const headers = new HttpHeaders({
-      'Idempotency-Key': idempotencyKey
-    });
-
-    const observable: Observable<PayloadType> = this.httpClient.post<PayloadType>(this.apiBaseUrl, command, {
-      headers: headers,
+    return this.httpClient.post<PayloadType>(this.apiBaseUrl, command, {
       withCredentials: true
-    });
-
-    return observable.pipe(
+    }).pipe(
       retry(retryStrategy())
     );
   }

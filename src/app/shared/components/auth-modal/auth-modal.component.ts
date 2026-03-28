@@ -1,11 +1,11 @@
-import { Component, inject, signal, output } from '@angular/core';
+import { Component, computed, inject, signal, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService, AuthErrorResponse } from '../../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
-type Step = 'email' | 'login' | 'register' | 'verify_otp';
+type Step = 'email' | 'login' | 'register' | 'verify_otp' | 'profile';
 
 @Component({
   selector: 'app-auth-modal',
@@ -23,16 +23,19 @@ export class AuthModalComponent {
   protected readonly step = signal<Step>('email');
   protected readonly email = signal('');
   protected readonly password = signal('');
-  protected readonly passwordConfirmation = signal('');
-  protected readonly otpDigits = signal(['', '', '', '']);
+  protected readonly otpDigits = signal(['', '', '', '', '', '']);
+  protected readonly showPassword = signal(false);
+  protected readonly fullName = signal('');
+  protected readonly age = signal('');
+  protected readonly isOtpComplete = computed(() => this.otpDigits().every(d => d.length === 1));
   protected readonly error = signal<string | null>(null);
   protected readonly isLoading = signal(false);
   protected readonly preAuthToken = signal<string | null>(null);
+  private otpSource: 'login' | 'register' = 'login';
 
   private static readonly ERROR_MESSAGES: Record<string, string> = {
     invalid_email: 'Invalid email format',
     invalid_credentials: 'Wrong password',
-    passwords_mismatch: "Passwords don't match",
     password_too_short: 'Password must be at least 8 characters',
     invalid_otp: 'Invalid verification code',
     invalid_pre_auth: 'Session expired, please start over',
@@ -63,6 +66,7 @@ export class AuthModalComponent {
     this.authService.login(this.email(), this.password()).subscribe({
       next: (response) => {
         this.preAuthToken.set(response.pre_auth_token);
+        this.otpSource = 'login';
         this.step.set('verify_otp');
         this.isLoading.set(false);
       },
@@ -77,10 +81,32 @@ export class AuthModalComponent {
     this.error.set(null);
     this.isLoading.set(true);
 
-    this.authService.register(this.email(), this.password(), this.passwordConfirmation()).subscribe({
+    this.authService.register(this.email(), this.password(), this.password()).subscribe({
       next: (response) => {
         this.preAuthToken.set(response.pre_auth_token);
+        this.otpSource = 'register';
         this.step.set('verify_otp');
+        this.isLoading.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.handleError(err);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  onResendOtp(): void {
+    this.error.set(null);
+    this.isLoading.set(true);
+    this.otpDigits.set(['', '', '', '', '', '']);
+
+    const request$ = this.otpSource === 'login'
+      ? this.authService.login(this.email(), this.password())
+      : this.authService.register(this.email(), this.password(), this.password());
+
+    request$.subscribe({
+      next: (response) => {
+        this.preAuthToken.set(response.pre_auth_token);
         this.isLoading.set(false);
       },
       error: (err: HttpErrorResponse) => {
@@ -99,13 +125,9 @@ export class AuthModalComponent {
     digits[index] = value;
     this.otpDigits.set(digits);
 
-    if (value && index < 3) {
+    if (value && index < 5) {
       const next = input.parentElement?.children[index + 1] as HTMLInputElement;
       next?.focus();
-    }
-
-    if (digits.every(d => d.length === 1)) {
-      this.onVerifyOtp();
     }
   }
 
@@ -119,18 +141,17 @@ export class AuthModalComponent {
   onOtpPaste(event: ClipboardEvent): void {
     event.preventDefault();
     const pasted = event.clipboardData?.getData('text')?.replace(/\D/g, '') ?? '';
-    if (pasted.length === 4) {
+    if (pasted.length === 6) {
       this.otpDigits.set(pasted.split(''));
       const container = (event.target as HTMLElement).parentElement;
-      (container?.children[3] as HTMLInputElement)?.focus();
-      this.onVerifyOtp();
+      (container?.children[5] as HTMLInputElement)?.focus();
     }
   }
 
-  private onVerifyOtp(): void {
+  protected onVerifyOtp(): void {
     const otp = this.otpDigits().join('');
     const token = this.preAuthToken();
-    if (otp.length !== 4 || !token) return;
+    if (otp.length !== 6 || !token) return;
 
     this.error.set(null);
     this.isLoading.set(true);
@@ -138,17 +159,40 @@ export class AuthModalComponent {
     this.authService.verifyOtp(token, otp).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.close.emit();
-        if (this.router.url.startsWith('/chat/')) {
-          this.router.navigate(['/']);
+        if (this.otpSource === 'register') {
+          this.error.set(null);
+          this.step.set('profile');
+        } else {
+          this.close.emit();
+          if (this.router.url.startsWith('/chat/')) {
+            this.router.navigate(['/']);
+          }
         }
       },
       error: (err: HttpErrorResponse) => {
         this.handleError(err);
         this.isLoading.set(false);
-        this.otpDigits.set(['', '', '', '']);
+        this.otpDigits.set(['', '', '', '', '', '']);
       }
     });
+  }
+
+  onCompleteProfile(): void {
+    this.error.set(null);
+    if (!this.fullName().trim()) {
+      this.error.set('Please enter your name');
+      return;
+    }
+    const ageNum = parseInt(this.age(), 10);
+    if (!ageNum || ageNum < 1 || ageNum > 150) {
+      this.error.set('Please enter a valid age');
+      return;
+    }
+    // TODO: send profile to backend in next iteration
+    this.close.emit();
+    if (this.router.url.startsWith('/chat/')) {
+      this.router.navigate(['/']);
+    }
   }
 
   private handleError(err: HttpErrorResponse): void {
@@ -156,7 +200,6 @@ export class AuthModalComponent {
     if (body?.error === 'invalid_pre_auth') {
       this.step.set('email');
       this.password.set('');
-      this.passwordConfirmation.set('');
       this.preAuthToken.set(null);
     }
     const msg = body?.error

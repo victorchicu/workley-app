@@ -77,19 +77,33 @@
 
     <!-- Register Step -->
     @if (step() === 'register') {
-      <h2 class="text-xl font-semibold text-text-primary mb-6 text-center">Create your password</h2>
+      <h2 class="text-xl font-semibold text-text-primary mb-1 text-center">Create a password</h2>
+      <p class="text-sm text-text-secondary mb-6 text-center">You’ll use this password to access your account</p>
 
-      <input type="password"
-             [value]="password()"
-             (input)="password.set($any($event.target).value)"
-             placeholder="Password"
-             class="w-full px-4 py-2.5 rounded-full border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary mb-3">
-
-      <input type="password"
-             [value]="passwordConfirmation()"
-             (input)="passwordConfirmation.set($any($event.target).value)"
-             placeholder="Confirm password"
-             class="w-full px-4 py-2.5 rounded-full border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary mb-2">
+      <div class="relative mb-2">
+        <input [type]="showPassword() ? 'text' : 'password'"
+               [value]="password()"
+               (input)="password.set($any($event.target).value)"
+               placeholder="Password"
+               class="w-full px-4 py-2.5 pr-11 rounded-full border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary">
+        <button type="button"
+                (click)="showPassword.set(!showPassword())"
+                class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-tertiary hover:text-text-primary cursor-pointer"
+                aria-label="Toggle password visibility">
+          @if (showPassword()) {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          } @else {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          }
+        </button>
+      </div>
 
       @if (error()) {
         <p class="text-red-500 text-xs mb-2">{{ error() }}</p>
@@ -100,14 +114,20 @@
               class="w-full mt-2 px-4 py-2.5 bg-text-primary text-bg-primary rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
         {{ isLoading() ? 'Loading...' : 'Continue' }}
       </button>
+
+      <div class="flex items-center justify-center gap-2 mt-4 text-xs text-text-tertiary">
+        <a href="/terms" class="hover:text-text-secondary">Terms of Use</a>
+        <span class="border-l border-border-medium h-3"></span>
+        <a href="/privacy" class="hover:text-text-secondary">Privacy Policy</a>
+      </div>
     }
 
     <!-- OTP Step -->
     @if (step() === 'verify_otp') {
-      <h2 class="text-xl font-semibold text-text-primary mb-2 text-center">Enter verification code</h2>
-      <p class="text-sm text-text-secondary mb-6 text-center">Enter the code 1234</p>
+      <h2 class="text-xl font-semibold text-text-primary mb-1 text-center">Check your inbox</h2>
+      <p class="text-sm text-text-secondary mb-6 text-center">Enter the verification code we just sent to {{ email() }}</p>
 
-      <div class="flex justify-center gap-3 mb-2">
+      <div class="flex justify-center gap-2 mb-2">
         @for (digit of otpDigits(); track $index) {
           <input type="text"
                  inputmode="numeric"
@@ -116,7 +136,7 @@
                  (input)="onOtpInput($index, $event)"
                  (keydown)="onOtpKeydown($index, $event)"
                  (paste)="onOtpPaste($event)"
-                 class="w-12 h-14 text-center text-xl font-semibold rounded-xl border border-border-input bg-surface-input text-text-primary focus:outline-none focus:border-text-secondary">
+                 class="w-10 h-12 text-center text-lg font-semibold rounded-xl border border-border-input bg-surface-input text-text-primary focus:outline-none focus:border-text-secondary">
         }
       </div>
 
@@ -124,9 +144,55 @@
         <p class="text-red-500 text-xs mb-2 text-center">{{ error() }}</p>
       }
 
-      @if (isLoading()) {
-        <p class="text-sm text-text-secondary text-center mt-4">Verifying...</p>
+      <button (click)="onVerifyOtp()"
+              [disabled]="isLoading() || !isOtpComplete()"
+              class="w-full mt-4 px-4 py-2.5 bg-text-primary text-bg-primary rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+        {{ isLoading() ? 'Verifying...' : 'Continue' }}
+      </button>
+
+      <button (click)="onResendOtp()"
+              [disabled]="isLoading()"
+              class="w-full mt-3 px-4 py-2.5 border border-border-medium rounded-full text-sm font-medium text-text-primary hover:bg-surface-hover cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+        Resend email
+      </button>
+
+      <div class="flex items-center justify-center gap-2 mt-4 text-xs text-text-tertiary">
+        <a href="/terms" class="hover:text-text-secondary">Terms of Use</a>
+        <span class="border-l border-border-medium h-3"></span>
+        <a href="/privacy" class="hover:text-text-secondary">Privacy Policy</a>
+      </div>
+    }
+
+    <!-- Profile Step -->
+    @if (step() === 'profile') {
+      <h2 class="text-xl font-semibold text-text-primary mb-1 text-center">How old are you?</h2>
+      <p class="text-sm text-text-secondary mb-6 text-center">This helps us personalize your experience and provide the right settings, in line with our <a href="/privacy" class="underline hover:text-text-primary">Privacy Policy</a></p>
+
+      <input type="text"
+             [value]="fullName()"
+             (input)="fullName.set($any($event.target).value)"
+             placeholder="Full name"
+             class="w-full px-4 py-2.5 rounded-full border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary mb-3">
+
+      <input type="number"
+             [value]="age()"
+             (input)="age.set($any($event.target).value)"
+             placeholder="Age"
+             min="1"
+             max="150"
+             class="w-full px-4 py-2.5 rounded-full border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary mb-2">
+
+      @if (error()) {
+        <p class="text-red-500 text-xs mb-2">{{ error() }}</p>
       }
+
+      <button (click)="onCompleteProfile()"
+              [disabled]="isLoading()"
+              class="w-full mt-2 px-4 py-2.5 bg-text-primary text-bg-primary rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+        {{ isLoading() ? 'Loading...' : 'Create account' }}
+      </button>
+
+      <p class="text-xs text-text-tertiary text-center mt-4">By clicking "Create account", you agree to our <a href="/terms" class="underline hover:text-text-secondary">Terms</a> and have read our <a href="/privacy" class="underline hover:text-text-secondary">Privacy Policy</a>.</p>
     }
   </div>
 </div>

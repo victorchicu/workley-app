@@ -4,6 +4,8 @@ import {ChatComponent} from './features/chat/chat.component';
 import {
   ErrorComponent
 } from './shared/components/error/error.component';
+import {TermsOfUseComponent} from './features/terms-of-use/terms-of-use.component';
+import {PrivacyPolicyComponent} from './features/privacy-policy/privacy-policy.component';
 
 export const routes: Routes = [
   {
@@ -15,6 +17,16 @@ export const routes: Routes = [
     path: 'chat/:chatId',
     component: ChatComponent,
     title: 'Workley',
+  },
+  {
+    path: 'terms-of-use',
+    component: TermsOfUseComponent,
+    title: 'Workley | Terms of Use',
+  },
+  {
+    path: 'privacy-policy',
+    component: PrivacyPolicyComponent,
+    title: 'Workley | Privacy Policy',
   },
   {
     path: 'error',

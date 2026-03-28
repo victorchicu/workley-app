@@ -58,11 +58,30 @@
     @if (step() === 'login') {
       <h2 class="text-xl font-semibold text-text-primary mb-6 text-center">Enter your password</h2>
 
-      <input type="password"
-             [value]="password()"
-             (input)="password.set($any($event.target).value)"
-             placeholder="Password"
-             class="w-full px-4 py-2.5 rounded-full border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary mb-2">
+      <div class="relative mb-2">
+        <input [type]="showPassword() ? 'text' : 'password'"
+               [value]="password()"
+               (input)="password.set($any($event.target).value)"
+               placeholder="Password"
+               class="w-full px-4 py-2.5 pr-11 rounded-full border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary">
+        <button type="button"
+                (click)="showPassword.set(!showPassword())"
+                class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-tertiary hover:text-text-primary cursor-pointer"
+                aria-label="Toggle password visibility">
+          @if (showPassword()) {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          } @else {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          }
+        </button>
+      </div>
 
       @if (error()) {
         <p class="text-red-500 text-xs mb-2">{{ error() }}</p>
@@ -73,12 +92,20 @@
               class="w-full mt-2 px-4 py-2.5 bg-text-primary text-bg-primary rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
         {{ isLoading() ? 'Loading...' : 'Continue' }}
       </button>
+
+      <a href="/forgot-password" class="block text-sm text-text-secondary hover:text-text-primary text-center mt-3">Forgot password?</a>
+
+      <div class="flex items-center justify-center gap-2 mt-4 text-xs text-text-secondary">
+        <a href="/terms" class="hover:text-text-primary">Terms of Use</a>
+        <span class="border-l border-border-medium h-3"></span>
+        <a href="/privacy" class="hover:text-text-primary">Privacy Policy</a>
+      </div>
     }
 
     <!-- Register Step -->
     @if (step() === 'register') {
       <h2 class="text-xl font-semibold text-text-primary mb-1 text-center">Create a password</h2>
-      <p class="text-sm text-text-secondary mb-6 text-center">You’ll use this password to access your account</p>
+      <p class="text-sm text-text-secondary mb-6 text-center">You’ll use this password to log in to Workley</p>
 
       <div class="relative mb-2">
         <input [type]="showPassword() ? 'text' : 'password'"
@@ -115,10 +142,10 @@
         {{ isLoading() ? 'Loading...' : 'Continue' }}
       </button>
 
-      <div class="flex items-center justify-center gap-2 mt-4 text-xs text-text-tertiary">
-        <a href="/terms" class="hover:text-text-secondary">Terms of Use</a>
+      <div class="flex items-center justify-center gap-2 mt-4 text-xs text-text-secondary">
+        <a href="/terms" class="hover:text-text-primary">Terms of Use</a>
         <span class="border-l border-border-medium h-3"></span>
-        <a href="/privacy" class="hover:text-text-secondary">Privacy Policy</a>
+        <a href="/privacy" class="hover:text-text-primary">Privacy Policy</a>
       </div>
     }
 
@@ -156,10 +183,10 @@
         Resend email
       </button>
 
-      <div class="flex items-center justify-center gap-2 mt-4 text-xs text-text-tertiary">
-        <a href="/terms" class="hover:text-text-secondary">Terms of Use</a>
+      <div class="flex items-center justify-center gap-2 mt-4 text-xs text-text-secondary">
+        <a href="/terms" class="hover:text-text-primary">Terms of Use</a>
         <span class="border-l border-border-medium h-3"></span>
-        <a href="/privacy" class="hover:text-text-secondary">Privacy Policy</a>
+        <a href="/privacy" class="hover:text-text-primary">Privacy Policy</a>
       </div>
     }
 
@@ -192,7 +219,7 @@
         {{ isLoading() ? 'Loading...' : 'Create account' }}
       </button>
 
-      <p class="text-xs text-text-tertiary text-center mt-4">By clicking "Create account", you agree to our <a href="/terms" class="underline hover:text-text-secondary">Terms</a> and have read our <a href="/privacy" class="underline hover:text-text-secondary">Privacy Policy</a>.</p>
+      <p class="text-xs text-text-secondary text-center mt-4">By clicking "Create account", you agree to our <a href="/terms" class="underline hover:text-text-primary">Terms</a> and have read our <a href="/privacy" class="underline hover:text-text-primary">Privacy Policy</a>.</p>
     }
   </div>
 </div>

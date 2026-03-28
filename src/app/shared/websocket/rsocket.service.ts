@@ -1,6 +1,6 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
-import {ContentType, Message, ReplyChunk, ReplyCompleted, ReplyError} from '../command/command.models';
+import {ContentType, Message, ReplyChunk, ReplyCompleted, ReplyError} from '../chat-api/chat-api.models';
 import {Flowable} from 'rsocket-flowable';
 import {
   BufferEncoders,

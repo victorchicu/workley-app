@@ -7,10 +7,10 @@ import {
 } from './components/prompt-send-button/prompt-send-button.component';
 import {PromptActionsMenuComponent} from './components/prompt-actions-menu/prompt-actions-menu.component';
 import {Router, RouterLink} from '@angular/router';
-import {PayloadType, CreateChat, CreateChatPayload} from '../../shared/command/command.models';
+import {ChatApiService} from '../../shared/chat-api/chat-api.service';
+import {CreateChatResponse} from '../../shared/chat-api/chat-api.models';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {catchError, delay, EMPTY, finalize, map, Observable, tap, throwError} from 'rxjs';
-import {CommandService} from '../../shared/command/command.service';
+import {catchError, EMPTY, finalize, Observable, tap, throwError} from 'rxjs';
 
 export interface PromptControl {
   text: FormControl<string>;
@@ -37,7 +37,7 @@ export type PromptForm = FormGroup<PromptControl>;
 export class PromptComponent {
   readonly router: Router = inject(Router);
   readonly builder: FormBuilder = inject(FormBuilder);
-  readonly command: CommandService = inject(CommandService);
+  readonly chatApi: ChatApiService = inject(ChatApiService);
   readonly destroyRef: DestroyRef = inject(DestroyRef);
 
   private readonly form = signal<PromptForm>(
@@ -60,7 +60,7 @@ export class PromptComponent {
     this.createChat()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response: CreateChatPayload) => {
+        next: (response: CreateChatResponse) => {
           this.router.navigate(['/chat', response.chatId], {state: response})
             .then(success => {
               if (!success) {
@@ -87,16 +87,15 @@ export class PromptComponent {
       });
   }
 
-  createChat(): Observable<CreateChatPayload> {
+  createChat(): Observable<CreateChatResponse> {
     const state = this.viewModel();
     if (state.form.invalid || state.isSubmitting)
       return EMPTY;
     this.isSubmitting.set(true);
     const text: string = state.form.controls.text.value;
-    return this.command.execute(new CreateChat(text))
+    return this.chatApi.createChat(text)
       .pipe(
-        map((commandOutput: PayloadType) => commandOutput as CreateChatPayload),
-        tap((createChatOutput: CreateChatPayload) => {
+        tap(() => {
           this.error.set(null);
         }),
         finalize(() => {

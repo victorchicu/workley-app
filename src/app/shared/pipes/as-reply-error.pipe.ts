@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ReplyError} from '../command/command.models';
+import {ReplyError} from '../chat-api/chat-api.models';
 
 @Pipe({
   name: 'asReplyError'

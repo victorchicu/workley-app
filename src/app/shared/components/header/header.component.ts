@@ -36,9 +36,7 @@ export class HeaderComponent {
   }
 
   newChat(): void {
-    if (this.isInChat()) {
-      this.router.navigate(['/']);
-    }
+    this.router.navigate(['/']);
   }
 
   toggleDropdown(): void {

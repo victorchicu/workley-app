@@ -7,9 +7,9 @@ import {
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {ActivatedRoute, Navigation, Router} from '@angular/router';
 import {
-  PayloadType,
-  CreateChatPayload, Message, Role, AddMessage, AddMessagePayload, ErrorCode
-} from '../../shared/command/command.models';
+  Role, Message, ErrorCode, CreateChatResponse, AddMessageResponse, GetChatResponse
+} from '../../shared/chat-api/chat-api.models';
+import {ChatApiService} from '../../shared/chat-api/chat-api.service';
 import {DatePipe, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
@@ -27,9 +27,6 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {GetChat, GetChatPayload} from '../../shared/query/query.models';
-import {QueryService} from '../../shared/query/query.service';
-import {CommandService} from '../../shared/command/command.service';
 import {RSocketService} from '../../shared/websocket/rsocket.service';
 import {MarkdownComponent} from 'ngx-markdown';
 import {AsReplyChunkPipe} from '../../shared/pipes/as-reply-chunk.pipe';
@@ -66,8 +63,7 @@ export type ChatForm = FormGroup<ChatControl>;
 export class ChatComponent implements OnInit, OnDestroy {
   readonly router: Router = inject(Router);
   readonly builder: FormBuilder = inject(FormBuilder);
-  readonly query: QueryService = inject(QueryService);
-  readonly command: CommandService = inject(CommandService);
+  readonly chatApi: ChatApiService = inject(ChatApiService);
   readonly destroyRef: DestroyRef = inject(DestroyRef);
   readonly route: ActivatedRoute = inject(ActivatedRoute);
   readonly rsocketService: RSocketService = inject(RSocketService);
@@ -130,7 +126,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   constructor() {
     const navigation: Navigation | null = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
-      const result = navigation.extras.state as CreateChatPayload;
+      const result = navigation.extras.state as CreateChatResponse;
       this.chatId.set(result.chatId);
       this.createChat(result);
     } else {
@@ -179,8 +175,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (addMessagePayload: AddMessagePayload) => {
-          this._messages.update(list => [...list, addMessagePayload.message]);
+        next: (response: AddMessageResponse) => {
+          this._messages.update(list => [...list, response.message]);
         },
         error: () => {
           this.isWaitingForReply.set(false);
@@ -198,7 +194,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
-  getChatQuery(chatId: string): Observable<GetChatPayload> {
+  getChatQuery(chatId: string): Observable<GetChatResponse> {
     const state = this.viewModel();
 
     if (state.isLoading)
@@ -206,15 +202,15 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.isLoading.set(true)
 
-    return this.query.getChatQuery(new GetChat(chatId))
+    return this.chatApi.getChat(chatId)
       .pipe(
-        tap((getChatOutput: GetChatPayload) => {
+        tap(() => {
           this.error.set(null);
         }),
         catchError((cause: any) => {
           console.error(cause);
           this.error.set(cause?.error?.message ?? "Failed to load chat history. Please try again later.");
-          return EMPTY as Observable<GetChatPayload>;
+          return EMPTY as Observable<GetChatResponse>;
         }),
         finalize(() => {
           this.isLoading.set(false);
@@ -222,7 +218,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       );
   }
 
-  addChatMessage(chatId: string, text: string): Observable<AddMessagePayload> {
+  addChatMessage(chatId: string, text: string): Observable<AddMessageResponse> {
     const state = this.viewModel();
 
     if (state.isPromptSubmitting)
@@ -230,17 +226,9 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.isPromptSubmitting.set(true);
 
-    const message: Message = {
-      content: {
-        type: "REPLY_CHUNK",
-        text: text
-      }
-    };
-
-    return this.command.execute(new AddMessage(chatId, message))
+    return this.chatApi.addMessage(chatId, text)
       .pipe(
-        map((payloadType: PayloadType) => payloadType as AddMessagePayload),
-        tap((addMessagePayload: AddMessagePayload) => {
+        tap(() => {
           this.error.set(null);
         }),
         finalize(() => {
@@ -265,7 +253,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.isLineWrapped.set(isWrapped);
   }
 
-  private createChat(result: CreateChatPayload) {
+  private createChat(result: CreateChatResponse) {
     this._messages.update(list => [...list, result.message]);
     this.isWaitingForReply.set(true);
     this.loadChatHistory();
@@ -283,7 +271,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe({
-        next: (result: GetChatPayload) => {
+        next: (result: GetChatResponse) => {
           if (result.messages && result.messages.length > 0) {
             this._messages.set(result.messages);
             const lastMessage = result.messages[result.messages.length - 1];

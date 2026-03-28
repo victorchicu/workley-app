@@ -1,6 +1,5 @@
 <header>
   <nav class="w-full px-4 py-2 flex items-center overflow-visible">
-    <!-- Left: Logo + New Chat -->
     <div class="flex items-center gap-1">
       <div class="p-2 opacity-90">
         <div class="w-6 h-6 bg-text-primary icon-mask"
@@ -9,8 +8,7 @@
 
       <button
         (click)="newChat()"
-        class="p-2 rounded-lg text-text-secondary"
-        [ngClass]="isInChat() ? 'hover:text-text-primary hover:bg-surface-hover cursor-pointer' : 'opacity-30 cursor-default'"
+        class="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-hover cursor-pointer"
         aria-label="New chat"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

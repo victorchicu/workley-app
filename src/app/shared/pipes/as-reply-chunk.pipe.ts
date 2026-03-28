@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ReplyChunk} from '../command/command.models';
+import {ReplyChunk} from '../chat-api/chat-api.models';
 
 @Pipe({
   name: 'asReplyChunk'

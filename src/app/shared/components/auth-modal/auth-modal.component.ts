@@ -44,6 +44,9 @@ export class AuthModalComponent {
     otp_expired: 'Verification code has expired, please request a new one',
     otp_max_attempts: 'Too many incorrect attempts, please request a new code',
     otp_rate_limited: 'Too many requests, please wait before requesting a new code',
+    invalid_full_name: 'Please enter your name',
+    underage: 'You must be at least 18 years old',
+    profile_already_completed: 'Profile already completed',
   };
 
   onContinue(): void {
@@ -198,11 +201,18 @@ export class AuthModalComponent {
       this.error.set('Please enter a valid age');
       return;
     }
-    // TODO: send profile to backend in next iteration
-    this.close.emit();
-    if (this.router.url.startsWith('/chat/')) {
-      this.router.navigate(['/']);
-    }
+    this.isLoading.set(true);
+    this.authService.completeProfile(this.fullName().trim(), ageNum).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.authService.refreshSession();
+        this.close.emit();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.handleError(err);
+        this.isLoading.set(false);
+      }
+    });
   }
 
   private handleError(err: HttpErrorResponse): void {

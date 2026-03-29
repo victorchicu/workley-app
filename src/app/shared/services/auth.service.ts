@@ -106,6 +106,11 @@ export class AuthService {
       });
   }
 
+  completeProfile(fullName: string, age: number): Observable<void> {
+    return this.http.post<void>('/api/auth/complete',
+      { fullName, age }, { withCredentials: true });
+  }
+
   refreshSession(): void {
     if (this.isBrowser) {
       this.checkSession();

@@ -41,6 +41,9 @@ export class AuthModalComponent {
     invalid_pre_auth: 'Session expired, please start over',
     email_exists: 'Email already registered',
     user_not_found: 'User not found',
+    otp_expired: 'Verification code has expired, please request a new one',
+    otp_max_attempts: 'Too many incorrect attempts, please request a new code',
+    otp_rate_limited: 'Too many requests, please wait before requesting a new code',
   };
 
   onContinue(): void {
@@ -65,14 +68,21 @@ export class AuthModalComponent {
 
     this.authService.login(this.email(), this.password()).subscribe({
       next: (response) => {
-        this.preAuthToken.set(response.pre_auth_token);
-        this.otpSource = 'login';
-        this.step.set('verify_otp');
         this.isLoading.set(false);
+        if (response.next_step === 'authenticated') {
+          this.authService.refreshSession();
+          this.close.emit();
+        } else if (response.next_step === 'verify_otp') {
+          this.preAuthToken.set(response.pre_auth_token);
+          this.otpSource = 'login';
+          this.step.set('verify_otp');
+        } else if (response.next_step === 'PERSONAL_INFORMATION') {
+          this.step.set('profile');
+        }
       },
       error: (err: HttpErrorResponse) => {
-        this.handleError(err);
         this.isLoading.set(false);
+        this.handleError(err);
       }
     });
   }

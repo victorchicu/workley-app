@@ -106,6 +106,12 @@ export class AuthService {
       });
   }
 
+  refreshSession(): void {
+    if (this.isBrowser) {
+      this.checkSession();
+    }
+  }
+
   getInitials(): string {
     const email = this._userEmail();
     if (!email) return '?';

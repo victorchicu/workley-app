@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal, output } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { Component, computed, inject, signal, output, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService, AuthErrorResponse } from '../../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 type Step = 'email' | 'login' | 'register' | 'verify_otp' | 'profile';
 
@@ -32,6 +33,8 @@ export class AuthModalComponent {
   protected readonly isLoading = signal(false);
   protected readonly preAuthToken = signal<string | null>(null);
   private otpSource: 'login' | 'register' = 'login';
+  private readonly document = inject(DOCUMENT);
+  private readonly platformId = inject(PLATFORM_ID);
 
   private static readonly ERROR_MESSAGES: Record<string, string> = {
     invalid_email: 'Invalid email format',
@@ -47,7 +50,17 @@ export class AuthModalComponent {
     invalid_full_name: 'Please enter your name',
     underage: 'You must be at least 18 years old',
     profile_already_completed: 'Profile already completed',
+    no_password_set: 'No password set. Please log in with Google or set a password.',
   };
+
+  constructor() {
+    const oauthName = this.authService.oauthProfileName();
+    if (oauthName) {
+      this.fullName.set(oauthName);
+      this.step.set('profile');
+      this.authService.clearProfileModal();
+    }
+  }
 
   onContinue(): void {
     this.error.set(null);
@@ -63,6 +76,12 @@ export class AuthModalComponent {
         this.isLoading.set(false);
       }
     });
+  }
+
+  onContinueWithGoogle(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.document.location.href = environment.apiBaseUrl + '/oauth2/authorization/google';
+    }
   }
 
   onLogin(): void {

@@ -41,7 +41,10 @@ export class AuthService {
 
   constructor() {
     if (this.isBrowser) {
-      this.checkSession();
+      const handledCallback = this.handleOAuthCallback();
+      if (!handledCallback) {
+        this.checkSession();
+      }
     }
   }
 
@@ -115,6 +118,44 @@ export class AuthService {
     if (this.isBrowser) {
       this.checkSession();
     }
+  }
+
+  private readonly _oauthProfileName = signal<string | null>(null);
+  private readonly _showProfileModal = signal(false);
+  private readonly _oauthError = signal(false);
+
+  private handleOAuthCallback(): boolean {
+    if (!this.isBrowser) return false;
+
+    const params = new URLSearchParams(window.location.search);
+    const authResult = params.get('auth');
+    if (!authResult) return false;
+
+    // Clean up URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('auth');
+    url.searchParams.delete('name');
+    window.history.replaceState({}, '', url.pathname);
+
+    if (authResult === 'success') {
+      this.checkSession();
+    } else if (authResult === 'profile-needed') {
+      this.checkSession();
+      const name = params.get('name');
+      this._oauthProfileName.set(name);
+      this._showProfileModal.set(true);
+    } else if (authResult === 'error') {
+      this._oauthError.set(true);
+    }
+    return true;
+  }
+  readonly oauthProfileName = this._oauthProfileName.asReadonly();
+  readonly showProfileModal = this._showProfileModal.asReadonly();
+  readonly oauthError = this._oauthError.asReadonly();
+
+  clearProfileModal(): void {
+    this._showProfileModal.set(false);
+    this._oauthProfileName.set(null);
   }
 
   getInitials(): string {

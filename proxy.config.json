@@ -10,5 +10,17 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/oauth2/**": {
+    "target": "http://localhost:8443",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/login/oauth2/**": {
+    "target": "http://localhost:8443",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

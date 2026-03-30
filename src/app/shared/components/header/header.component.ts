@@ -1,4 +1,4 @@
-import { Component, inject, signal, ElementRef, DestroyRef, HostListener } from '@angular/core';
+import { Component, inject, signal, ElementRef, DestroyRef, HostListener, effect } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
@@ -32,6 +32,12 @@ export class HeaderComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(e => {
       this.isInChat.set(e.urlAfterRedirects.startsWith('/chat/'));
+    });
+
+    effect(() => {
+      if (this.authService.showProfileModal()) {
+        this.authModalOpen.set(true);
+      }
     });
   }
 

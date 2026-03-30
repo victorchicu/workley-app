@@ -11,32 +11,32 @@ export const routes: Routes = [
   {
     path: '',
     component: PromptComponent,
-    title: 'Workley',
+    title: 'Workley Assistant',
   },
   {
     path: 'chat/:chatId',
     component: ChatComponent,
-    title: 'Workley',
+    title: 'Workley Assistant',
   },
   {
     path: 'terms-of-use',
     component: TermsOfUseComponent,
-    title: 'Workley | Terms of Use',
+    title: 'Workley Assistant | Terms of Use',
   },
   {
     path: 'privacy-policy',
     component: PrivacyPolicyComponent,
-    title: 'Workley | Privacy Policy',
+    title: 'Workley Assistant | Privacy Policy',
   },
   {
     path: 'error',
     component: ErrorComponent,
-    title: 'Workley | Oops! Something went wrong.',
+    title: 'Workley Assistant | Oops! Something went wrong.',
   },
   {
     path: 'not-found',
     component: ErrorComponent,
-    title: 'Workley | Page not found',
+    title: 'Workley Assistant | Page not found',
   },
   {
     path: '**',

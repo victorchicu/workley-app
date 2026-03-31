@@ -71,6 +71,17 @@ export class PromptInputFormComponent {
       if (hasAttachment && !this.isLineWrapped()) {
         this.lineWrapDetected.emit(true);
       }
+      if (!hasAttachment && this.isLineWrapped() && this.promptRef) {
+        const textarea = this.promptRef.nativeElement;
+        const content = textarea.value;
+        const lineHeight = parseInt(getComputedStyle(textarea).lineHeight, 10) || 24;
+        textarea.style.height = 'auto';
+        const needsWrap = content.includes('\n') || textarea.scrollHeight > lineHeight * 1.5;
+        textarea.style.height = needsWrap ? `${textarea.scrollHeight}px` : '24px';
+        if (!needsWrap) {
+          this.lineWrapDetected.emit(false);
+        }
+      }
     });
   }
 

@@ -18,7 +18,7 @@
         <app-prompt-send-button
           aria-label="Create my resume"
           (clicked)="sendPrompt()"
-          [deactivated]="prompt.form.invalid"
+          [deactivated]="prompt.form.invalid && !prompt.attachment?.attachmentId"
           [isSubmitting]="prompt.isSubmitting"
         />
       </app-prompt-input-form>

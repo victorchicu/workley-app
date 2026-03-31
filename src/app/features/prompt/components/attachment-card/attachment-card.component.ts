@@ -39,6 +39,13 @@ export class AttachmentCardComponent {
     return p !== null && p < 100;
   });
 
+  readonly circumference = computed(() => 2 * Math.PI * 18);
+
+  readonly strokeOffset = computed(() => {
+    const p = this.progress() ?? 0;
+    return this.circumference() * (1 - p / 100);
+  });
+
   onRemove(event: Event): void {
     event.stopPropagation();
     this.remove.emit();

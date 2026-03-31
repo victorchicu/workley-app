@@ -127,10 +127,11 @@ export class PromptComponent {
 
   createChat(): Observable<CreateChatResponse> {
     const state = this.viewModel();
-    if (state.form.invalid || state.isSubmitting)
+    const hasAttachment = !!this.attachment()?.attachmentId;
+    if ((state.form.invalid && !hasAttachment) || state.isSubmitting)
       return EMPTY;
     this.isSubmitting.set(true);
-    const text: string = state.form.controls.text.value;
+    const text: string = state.form.controls.text.value || '';
     const attachmentId = this.attachment()?.attachmentId ?? undefined;
     return this.chatApi.createChat(text, attachmentId)
       .pipe(

@@ -134,7 +134,7 @@
           <app-prompt-send-button
             aria-label="Send messageModel"
             (clicked)="onAddMessage()"
-            [deactivated]="chatModel.form.invalid || chatModel.isPromptSubmitting"
+            [deactivated]="(chatModel.form.invalid && !chatModel.attachment?.attachmentId) || chatModel.isPromptSubmitting"
             [isSubmitting]="chatModel.isPromptSubmitting"
           />
         </div>

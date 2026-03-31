@@ -11,7 +11,25 @@
     "changeOrigin": true,
     "logLevel": "debug"
   },
-  "/api/command/**": {
+  "/api/attachments": {
+    "target": "http://host.docker.internal:8443",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/attachments/**": {
+    "target": "http://host.docker.internal:8443",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/oauth2/**": {
+    "target": "http://host.docker.internal:8443",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/login/oauth2/**": {
     "target": "http://host.docker.internal:8443",
     "secure": false,
     "changeOrigin": true,

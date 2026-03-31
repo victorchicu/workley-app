@@ -21,7 +21,19 @@
             </button>
           </div>
         </div>
-        <div *ngIf="messageModel.role === Role.ANONYMOUS" class="flex justify-end mb-4">
+        <div *ngIf="messageModel.content.type === 'ATTACHMENT'" class="flex justify-end mb-2">
+          <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
+            <app-attachment-card
+              [filename]="$any(messageModel.content).filename"
+              [mimeType]="$any(messageModel.content).mimeType"
+              [fileSize]="$any(messageModel.content).fileSize"
+              [clickable]="true"
+              [attachmentId]="$any(messageModel.content).attachmentId"
+              (cardClicked)="onAttachmentCardClicked($any(messageModel.content).attachmentId, $any(messageModel.content).filename, $any(messageModel.content).mimeType)"
+            />
+          </div>
+        </div>
+        <div *ngIf="messageModel.role === Role.ANONYMOUS && messageModel.content.type !== 'ATTACHMENT'" class="flex justify-end mb-4">
           <div class="max-w-xs lg:max-w-md xl:max-w-lg min-w-0">
             <div class="bg-surface-tertiary text-text-primary rounded-3xl px-4 py-2 overflow-hidden">
               <div
@@ -114,8 +126,10 @@
         [isDeactivated]="chatModel.isPromptSubmitting || chatModel.isVisitorWaitingForReply || chatModel.isReplyStreaming"
         [isLineWrapped]="chatModel.isLineWrapped"
         (onPressEnter)="onAddMessage()"
-        (lineWrapDetected)="handleLineWrapChange($event)">
-        <app-prompt-actions-menu leftActions/>
+        (lineWrapDetected)="handleLineWrapChange($event)"
+        [attachment]="chatModel.attachment"
+        (removeAttachment)="onRemoveAttachment()">
+        <app-prompt-actions-menu leftActions (fileSelected)="onFileSelected($event)"/>
         <div class="flex items-center gap-1" [class.justify-end]="chatModel.isLineWrapped">
           <app-prompt-send-button
             aria-label="Send messageModel"
@@ -128,4 +142,11 @@
       <app-chat-disclaimer/>
     </div>
   </div>
+  @if (pdfPreview(); as preview) {
+    <app-pdf-preview-dialog
+      [filename]="preview.filename"
+      [downloadUrl]="preview.downloadUrl"
+      (close)="closePdfPreview()"
+    />
+  }
 </div>

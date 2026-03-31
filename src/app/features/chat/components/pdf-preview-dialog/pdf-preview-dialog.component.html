@@ -1,0 +1,40 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+     (click)="onBackdropClick($event)">
+  <div class="bg-surface-primary rounded-2xl shadow-2xl w-[90vw] h-[85vh] max-w-5xl flex flex-col overflow-hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-border-light">
+      <h3 class="text-sm font-medium text-text-primary truncate">{{ filename() }}</h3>
+      <div class="flex items-center gap-2">
+        <button
+          (click)="onDownload()"
+          class="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-hover cursor-pointer"
+          aria-label="Download file">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <button
+          (click)="onClose()"
+          class="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-hover cursor-pointer"
+          aria-label="Close preview">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- PDF viewer -->
+    <div class="flex-1">
+      @if (blobUrl(); as url) {
+        <iframe [src]="url" class="w-full h-full border-none"></iframe>
+      } @else {
+        <div class="flex items-center justify-center h-full">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-text-primary"></div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

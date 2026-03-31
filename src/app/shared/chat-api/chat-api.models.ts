@@ -31,10 +31,19 @@ export interface ReplyError extends Content {
   reason: string;
 }
 
+export interface Attachment extends Content {
+  type: 'ATTACHMENT';
+  attachmentId: string;
+  filename: string;
+  mimeType: string;
+  fileSize: number;
+}
+
 export type ContentType =
   | ReplyChunk
   | ReplyCompleted
-  | ReplyError;
+  | ReplyError
+  | Attachment;
 
 export interface Message {
   id?: string;

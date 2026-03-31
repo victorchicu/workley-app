@@ -11,6 +11,8 @@ import {ChatApiService} from '../../shared/chat-api/chat-api.service';
 import {CreateChatResponse} from '../../shared/chat-api/chat-api.models';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {catchError, EMPTY, finalize, Observable, tap, throwError} from 'rxjs';
+import {AttachmentApiService} from '../../shared/chat-api/attachment-api.service';
+import {AttachmentUploadState} from '../../shared/chat-api/attachment-api.models';
 
 export interface PromptControl {
   text: FormControl<string>;
@@ -39,6 +41,7 @@ export class PromptComponent {
   readonly builder: FormBuilder = inject(FormBuilder);
   readonly chatApi: ChatApiService = inject(ChatApiService);
   readonly destroyRef: DestroyRef = inject(DestroyRef);
+  readonly attachmentApi: AttachmentApiService = inject(AttachmentApiService);
 
   private readonly form = signal<PromptForm>(
     this.builder.nonNullable.group({
@@ -48,13 +51,48 @@ export class PromptComponent {
   private readonly error = signal<string | null>(null);
   private readonly isSubmitting = signal(false);
   private readonly isLineWrapped = signal(false);
+  private readonly attachment = signal<AttachmentUploadState | null>(null);
 
   viewModel = computed(() => ({
     form: this.form(),
     error: this.error(),
     isSubmitting: this.isSubmitting(),
-    isLineWrapped: this.isLineWrapped()
+    isLineWrapped: this.isLineWrapped(),
+    attachment: this.attachment(),
   }));
+
+  onFileSelected(file: File): void {
+    this.attachment.set({
+      status: 'uploading',
+      progress: 0,
+      attachmentId: null,
+      filename: file.name,
+      mimeType: file.type,
+      fileSize: file.size,
+      errorMessage: null,
+    });
+
+    this.attachmentApi.upload(file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (state) => this.attachment.set(state),
+        error: (err) => this.attachment.set({
+          ...this.attachment()!,
+          status: 'error',
+          errorMessage: err?.error?.message ?? 'Upload failed',
+        }),
+      });
+  }
+
+  onRemoveAttachment(): void {
+    const att = this.attachment();
+    if (att?.attachmentId) {
+      this.attachmentApi.delete(att.attachmentId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe();
+    }
+    this.attachment.set(null);
+  }
 
   sendPrompt() {
     this.createChat()
@@ -93,7 +131,8 @@ export class PromptComponent {
       return EMPTY;
     this.isSubmitting.set(true);
     const text: string = state.form.controls.text.value;
-    return this.chatApi.createChat(text)
+    const attachmentId = this.attachment()?.attachmentId ?? undefined;
+    return this.chatApi.createChat(text, attachmentId)
       .pipe(
         tap(() => {
           this.error.set(null);
@@ -102,6 +141,7 @@ export class PromptComponent {
           this.form().reset();
           this.isSubmitting.set(false);
           this.isLineWrapped.set(false);
+          this.attachment.set(null);
         }),
         catchError((err) => {
           this.error.set("Oops! Something went wrong, please try again.");

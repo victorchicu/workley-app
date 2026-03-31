@@ -8,6 +8,18 @@
         [class.pointer-events-none]="input.isSubmitting || input.isDeactivated"
   >
     <fieldset [disabled]="input.isSubmitting || input.isDeactivated">
+      @if (viewModel().attachment; as att) {
+        <div class="px-3 pt-3">
+          <app-attachment-card
+            [filename]="att.filename"
+            [mimeType]="att.mimeType"
+            [fileSize]="att.fileSize"
+            [progress]="att.status === 'uploading' ? att.progress : null"
+            [removable]="true"
+            (remove)="removeAttachment.emit()"
+          />
+        </div>
+      }
       <div class="w-full flex flex-wrap p-2 bg-surface-input" [class.items-center]="!input.isLineWrapped">
         <!-- Textarea row -->
         <div class="flex items-center min-w-0 order-1" [class]="input.isLineWrapped ? 'w-full px-1 pt-1 pb-2' : 'flex-1'">

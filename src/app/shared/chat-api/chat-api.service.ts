@@ -15,14 +15,14 @@ export class ChatApiService {
 
   constructor(private readonly httpClient: HttpClient) {}
 
-  createChat(prompt: string): Observable<CreateChatResponse> {
-    return this.httpClient.post<CreateChatResponse>(this.baseUrl, {prompt}, {
+  createChat(prompt: string, attachmentId?: string): Observable<CreateChatResponse> {
+    return this.httpClient.post<CreateChatResponse>(this.baseUrl, {prompt, attachmentId}, {
       withCredentials: true
     }).pipe(retry(retryStrategy()));
   }
 
-  addMessage(chatId: string, text: string): Observable<AddMessageResponse> {
-    return this.httpClient.post<AddMessageResponse>(`${this.baseUrl}/${chatId}/messages`, {text}, {
+  addMessage(chatId: string, text: string, attachmentId?: string): Observable<AddMessageResponse> {
+    return this.httpClient.post<AddMessageResponse>(`${this.baseUrl}/${chatId}/messages`, {text, attachmentId}, {
       withCredentials: true
     }).pipe(retry(retryStrategy()));
   }

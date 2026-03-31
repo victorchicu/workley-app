@@ -32,6 +32,10 @@ import {MarkdownComponent} from 'ngx-markdown';
 import {AsReplyChunkPipe} from '../../shared/pipes/as-reply-chunk.pipe';
 import {AsReplyErrorPipe} from '../../shared/pipes/as-reply-error.pipe';
 import {PromptActionsMenuComponent} from '../prompt/components/prompt-actions-menu/prompt-actions-menu.component';
+import {AttachmentApiService} from '../../shared/chat-api/attachment-api.service';
+import {AttachmentUploadState} from '../../shared/chat-api/attachment-api.models';
+import {AttachmentCardComponent} from '../prompt/components/attachment-card/attachment-card.component';
+import {PdfPreviewDialogComponent} from './components/pdf-preview-dialog/pdf-preview-dialog.component';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -55,6 +59,8 @@ export type ChatForm = FormGroup<ChatControl>;
     AsReplyChunkPipe,
     AsReplyErrorPipe,
     PromptActionsMenuComponent,
+    AttachmentCardComponent,
+    PdfPreviewDialogComponent,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -67,6 +73,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   readonly destroyRef: DestroyRef = inject(DestroyRef);
   readonly route: ActivatedRoute = inject(ActivatedRoute);
   readonly rsocketService: RSocketService = inject(RSocketService);
+  readonly attachmentApi: AttachmentApiService = inject(AttachmentApiService);
 
   private readonly form = signal<ChatForm>(
     this.builder.nonNullable.group({
@@ -83,6 +90,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   private readonly isPromptSubmitting = signal<boolean>(false);
 
   private readonly isWaitingForReply = signal<boolean>(false);
+  private readonly attachment = signal<AttachmentUploadState | null>(null);
+  readonly pdfPreview = signal<{filename: string; downloadUrl: string} | null>(null);
   private loadingDelayTimer?: any;
 
   private readonly loadingEffect = effect(() => {
@@ -113,6 +122,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       isReplyStreaming,
       isPromptSubmitting,
       isVisitorWaitingForReply: isWaitingForReply,
+      attachment: this.attachment(),
     };
   });
 
@@ -167,7 +177,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (!state.chatId)
       return;
     const text: string = state.form.controls.text.value;
-    if (!text || text.length === 0) {
+    const hasAttachment = !!this.attachment()?.attachmentId;
+    if ((!text || text.length === 0) && !hasAttachment) {
       return;
     }
     this.isReplyStreaming.set(false);
@@ -226,7 +237,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.isPromptSubmitting.set(true);
 
-    return this.chatApi.addMessage(chatId, text)
+    const attachmentId = this.attachment()?.attachmentId ?? undefined;
+    return this.chatApi.addMessage(chatId, text, attachmentId)
       .pipe(
         tap(() => {
           this.error.set(null);
@@ -236,6 +248,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.error.set(null);
           this.isLineWrapped.set(false);
           this.isPromptSubmitting.set(false);
+          this.attachment.set(null);
           requestAnimationFrame(() => this.scrollToBottom());
         }),
         catchError((err) => {
@@ -404,6 +417,54 @@ export class ChatComponent implements OnInit, OnDestroy {
           }
         }
       });
+  }
+
+  onFileSelected(file: File): void {
+    this.attachment.set({
+      status: 'uploading',
+      progress: 0,
+      attachmentId: null,
+      filename: file.name,
+      mimeType: file.type,
+      fileSize: file.size,
+      errorMessage: null,
+    });
+
+    this.attachmentApi.upload(file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (state) => this.attachment.set(state),
+        error: (err) => this.attachment.set({
+          ...this.attachment()!,
+          status: 'error',
+          errorMessage: err?.error?.message ?? 'Upload failed',
+        }),
+      });
+  }
+
+  onRemoveAttachment(): void {
+    const att = this.attachment();
+    if (att?.attachmentId) {
+      this.attachmentApi.delete(att.attachmentId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe();
+    }
+    this.attachment.set(null);
+  }
+
+  onAttachmentCardClicked(attachmentId: string, filename: string, mimeType: string): void {
+    if (mimeType === 'application/pdf') {
+      this.pdfPreview.set({
+        filename,
+        downloadUrl: this.attachmentApi.getDownloadUrl(attachmentId),
+      });
+    } else {
+      window.open(this.attachmentApi.getDownloadUrl(attachmentId), '_blank');
+    }
+  }
+
+  closePdfPreview(): void {
+    this.pdfPreview.set(null);
   }
 
   protected readonly Role = Role;

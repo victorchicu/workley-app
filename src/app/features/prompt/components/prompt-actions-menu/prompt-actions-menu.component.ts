@@ -1,4 +1,4 @@
-import { Component, signal, ElementRef, inject, HostListener, ViewChild, AfterViewChecked } from '@angular/core';
+import {Component, signal, ElementRef, inject, HostListener, ViewChild, AfterViewChecked, output} from '@angular/core';
 
 @Component({
   selector: 'app-prompt-actions-menu',
@@ -10,10 +10,26 @@ export class PromptActionsMenuComponent implements AfterViewChecked {
   private readonly elementRef = inject(ElementRef);
   protected readonly menuOpen = signal(false);
 
+  readonly fileSelected = output<File>();
+
   @ViewChild('dropdown') dropdownRef?: ElementRef<HTMLElement>;
+  @ViewChild('fileInput') fileInputRef?: ElementRef<HTMLInputElement>;
 
   toggle(): void {
     this.menuOpen.update(v => !v);
+  }
+
+  onUploadResume(): void {
+    this.menuOpen.set(false);
+    this.fileInputRef?.nativeElement.click();
+  }
+
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.fileSelected.emit(input.files[0]);
+      input.value = '';
+    }
   }
 
   ngAfterViewChecked(): void {
@@ -22,7 +38,7 @@ export class PromptActionsMenuComponent implements AfterViewChecked {
 
   private positionDropdown(): void {
     if (!this.menuOpen() || !this.dropdownRef) return;
-    const button = this.elementRef.nativeElement.querySelector('button') as HTMLElement;
+    const button = this.elementRef.nativeElement.querySelector('button:first-child') as HTMLElement;
     const dropdown = this.dropdownRef.nativeElement;
     const rect = button.getBoundingClientRect();
     dropdown.style.left = `${rect.left}px`;

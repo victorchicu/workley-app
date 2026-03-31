@@ -14,6 +14,8 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import {PromptControl} from '../../prompt.component';
+import {AttachmentCardComponent} from '../attachment-card/attachment-card.component';
+import {AttachmentUploadState} from '../../../../shared/chat-api/attachment-api.models';
 
 @Component({
   selector: 'app-prompt-input-form',
@@ -21,6 +23,7 @@ import {PromptControl} from '../../prompt.component';
   imports: [
     FormsModule,
     ReactiveFormsModule,
+    AttachmentCardComponent,
   ],
   templateUrl: './prompt-input-form.component.html',
   styleUrl: './prompt-input-form.component.css',
@@ -35,6 +38,8 @@ export class PromptInputFormComponent {
   readonly isLineWrapped = input<boolean>(false);
   readonly onPressEnter = output<void>()
   readonly lineWrapDetected = output<boolean>()
+  readonly attachment = input<AttachmentUploadState | null>(null);
+  readonly removeAttachment = output<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
   private singleLineWidth = 0;
@@ -46,6 +51,7 @@ export class PromptInputFormComponent {
     isSubmitting: this.isSubmitting(),
     isDeactivated: this.isDeactivated(),
     isLineWrapped: this.isLineWrapped(),
+    attachment: this.attachment(),
   }));
 
   constructor() {
@@ -58,6 +64,12 @@ export class PromptInputFormComponent {
       const formValue = this.form().value;
       if (!this.isSubmitting() && (!formValue.text || formValue.text === '')) {
         this.resetTextareaHeight();
+      }
+    });
+    effect(() => {
+      const hasAttachment = this.attachment() !== null;
+      if (hasAttachment && !this.isLineWrapped()) {
+        this.lineWrapDetected.emit(true);
       }
     });
   }

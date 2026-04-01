@@ -1,6 +1,6 @@
 export enum Role {
   ANONYMOUS = "ANONYMOUS",
-  CUSTOMER = "CUSTOMER",
+  USER = "USER",
   ASSISTANT = "ASSISTANT",
   UNKNOWN = "UNKNOWN"
 }

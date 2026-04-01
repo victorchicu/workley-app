@@ -21,7 +21,6 @@ import {
   EMPTY,
   filter,
   finalize,
-  map,
   Observable,
   Subscription,
   tap,
@@ -130,7 +129,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   readonly messages: Signal<Message[]> = this._messages.asReadonly();
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
-  private streamDebounceTimer?: any;
   private streamSubscription?: Subscription;
 
   constructor() {
@@ -164,9 +162,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearTimeout(this.loadingDelayTimer);
-    if (this.streamDebounceTimer) {
-      clearTimeout(this.streamDebounceTimer);
-    }
     if (this.streamSubscription) {
       this.streamSubscription.unsubscribe();
     }
@@ -320,44 +315,39 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private handleStreamingMessage(source: Message): void {
-    if (this.streamDebounceTimer) {
-      clearTimeout(this.streamDebounceTimer);
-    }
     switch (source.content.type) {
       case "REPLY_CHUNK":
         const chunk: string = source.content.text;
-        this.streamDebounceTimer = setTimeout(() => {
-          const messages: Message[] = this._messages();
-          const existingIndex = messages.findIndex(message => message.id === source.id);
-          if (existingIndex !== -1) {
-            this._messages.update(list => {
-              const updatedList: Message[] = [...list];
-              updatedList[existingIndex] = {
-                ...updatedList[existingIndex],
-                content: {
-                  type: "REPLY_CHUNK",
-                  text: chunk
-                }
-              };
-              return updatedList;
-            });
-          } else {
-            const message: Message = {
-              id: source.id,
-              role: Role.ASSISTANT,
-              chatId: source.chatId,
-              ownedBy: source.ownedBy,
-              createdAt: source.createdAt || new Date(),
+        const messages: Message[] = this._messages();
+        const existingIndex = messages.findIndex(message => message.id === source.id);
+        if (existingIndex !== -1) {
+          this._messages.update(list => {
+            const updatedList: Message[] = [...list];
+            updatedList[existingIndex] = {
+              ...updatedList[existingIndex],
               content: {
                 type: "REPLY_CHUNK",
                 text: chunk
               }
             };
-            this.isReplyStreaming.set(true);
-            this.isWaitingForReply.set(false);
-            this._messages.update(list => [...list, message]);
-          }
-        }, 50);
+            return updatedList;
+          });
+        } else {
+          const message: Message = {
+            id: source.id,
+            role: Role.ASSISTANT,
+            chatId: source.chatId,
+            ownedBy: source.ownedBy,
+            createdAt: source.createdAt || new Date(),
+            content: {
+              type: "REPLY_CHUNK",
+              text: chunk
+            }
+          };
+          this.isReplyStreaming.set(true);
+          this.isWaitingForReply.set(false);
+          this._messages.update(list => [...list, message]);
+        }
         break;
       case "REPLY_COMPLETED":
         console.log("Reply COMPLETED");
@@ -400,11 +390,13 @@ export class ChatComponent implements OnInit, OnDestroy {
         filter((message: Message) => message.role === Role.ASSISTANT),
         bufferTime(50),
         filter((messages: Message[]) => messages.length > 0),
-        map((messages: Message[]) => messages[messages.length - 1])
       )
       .subscribe({
-        next: (message: Message) => {
-          this.handleStreamingMessage(message);
+        next: (messages: Message[]) => {
+          const lastChunk = messages.filter(m => m.content.type === 'REPLY_CHUNK').pop();
+          const signals = messages.filter(m => m.content.type !== 'REPLY_CHUNK');
+          if (lastChunk) this.handleStreamingMessage(lastChunk);
+          signals.forEach(s => this.handleStreamingMessage(s));
         },
         error: (error) => {
           console.error('RSocket stream error:', error);
@@ -412,9 +404,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         },
         complete: () => {
           this.isReplyStreaming.set(false);
-          if (this.streamDebounceTimer) {
-            clearTimeout(this.streamDebounceTimer);
-          }
         }
       });
   }

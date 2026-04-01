@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, inject, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {PromptHeadlineComponent} from './components/prompt-headline/prompt-headline.component';
 import {PromptInputFormComponent} from './components/prompt-input-form/prompt-input-form.component';
@@ -9,7 +9,7 @@ import {PromptActionsMenuComponent} from './components/prompt-actions-menu/promp
 import {Router, RouterLink} from '@angular/router';
 import {ChatApiService} from '../../shared/chat-api/chat-api.service';
 import {CreateChatResponse} from '../../shared/chat-api/chat-api.models';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {catchError, EMPTY, finalize, Observable, tap, throwError} from 'rxjs';
 import {AttachmentApiService} from '../../shared/chat-api/attachment-api.service';
 import {AttachmentUploadState} from '../../shared/chat-api/attachment-api.models';
@@ -51,7 +51,13 @@ export class PromptComponent {
   private readonly error = signal<string | null>(null);
   private readonly isSubmitting = signal(false);
   private readonly isLineWrapped = signal(false);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly attachment = signal<AttachmentUploadState | null>(null);
+  readonly hasAttachment = computed(() => !!this.attachment()?.attachmentId);
+
+  private readonly attachmentSub = toObservable(this.hasAttachment)
+    .pipe(takeUntilDestroyed())
+    .subscribe(() => this.cdr.markForCheck());
 
   viewModel = computed(() => ({
     form: this.form(),

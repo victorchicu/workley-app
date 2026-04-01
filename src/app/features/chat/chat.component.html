@@ -132,9 +132,9 @@
         <app-prompt-actions-menu leftActions (fileSelected)="onFileSelected($event)"/>
         <div class="flex items-center gap-1" [class.justify-end]="chatModel.isLineWrapped">
           <app-prompt-send-button
-            aria-label="Send messageModel"
+            aria-label="Send message"
             (clicked)="onAddMessage()"
-            [deactivated]="(chatModel.form.invalid && !chatModel.attachment?.attachmentId) || chatModel.isPromptSubmitting"
+            [deactivated]="(chatModel.form.invalid && !hasAttachment()) || chatModel.isPromptSubmitting"
             [isSubmitting]="chatModel.isPromptSubmitting"
           />
         </div>

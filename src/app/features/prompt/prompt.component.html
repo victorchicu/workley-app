@@ -16,9 +16,9 @@
       >
         <app-prompt-actions-menu leftActions (fileSelected)="onFileSelected($event)"/>
         <app-prompt-send-button
-          aria-label="Create my resume"
+          aria-label="Send prompt"
           (clicked)="sendPrompt()"
-          [deactivated]="prompt.form.invalid && !prompt.attachment?.attachmentId"
+          [deactivated]="prompt.form.invalid && !hasAttachment()"
           [isSubmitting]="prompt.isSubmitting"
         />
       </app-prompt-input-form>

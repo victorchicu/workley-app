@@ -7,13 +7,13 @@ import {
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {ActivatedRoute, Navigation, Router} from '@angular/router';
 import {
-  Role, Message, ErrorCode, CreateChatResponse, AddMessageResponse, GetChatResponse
+  Role, Message, Attachment, ErrorCode, CreateChatResponse, AddMessageResponse, GetChatResponse
 } from '../../shared/chat-api/chat-api.models';
 import {ChatApiService} from '../../shared/chat-api/chat-api.service';
 import {DatePipe, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {
   bufferTime,
@@ -89,8 +89,14 @@ export class ChatComponent implements OnInit, OnDestroy {
   private readonly isPromptSubmitting = signal<boolean>(false);
 
   private readonly isWaitingForReply = signal<boolean>(false);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly attachment = signal<AttachmentUploadState | null>(null);
+  readonly hasAttachment = computed(() => !!this.attachment()?.attachmentId);
   readonly pdfPreview = signal<{filename: string; downloadUrl: string} | null>(null);
+
+  private readonly attachmentSub = toObservable(this.hasAttachment)
+    .pipe(takeUntilDestroyed())
+    .subscribe(() => this.cdr.markForCheck());
   private loadingDelayTimer?: any;
 
   private readonly loadingEffect = effect(() => {
@@ -111,6 +117,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     const isReplyStreaming = this.isReplyStreaming();
     const isPromptSubmitting = this.isPromptSubmitting();
     const isWaitingForReply = this.isWaitingForReply();
+    const attachment = this.attachment();
 
     return {
       form: this.form(),
@@ -121,7 +128,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       isReplyStreaming,
       isPromptSubmitting,
       isVisitorWaitingForReply: isWaitingForReply,
-      attachment: this.attachment(),
+      attachment,
     };
   });
 
@@ -176,13 +183,37 @@ export class ChatComponent implements OnInit, OnDestroy {
     if ((!text || text.length === 0) && !hasAttachment) {
       return;
     }
+    const pendingAttachment = this.attachment();
     this.isReplyStreaming.set(false);
     this.isWaitingForReply.set(true);
     this.addChatMessage(state.chatId, text)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response: AddMessageResponse) => {
-          this._messages.update(list => [...list, response.message]);
+          this._messages.update(list => {
+            const updated = [...list];
+            if (pendingAttachment?.attachmentId) {
+              const attachmentMessage: Message = {
+                id: response.message.id + '-att',
+                role: response.message.role,
+                chatId: response.message.chatId,
+                ownedBy: response.message.ownedBy,
+                createdAt: response.message.createdAt,
+                content: {
+                  type: 'ATTACHMENT',
+                  attachmentId: pendingAttachment.attachmentId,
+                  filename: pendingAttachment.filename,
+                  mimeType: pendingAttachment.mimeType,
+                  fileSize: pendingAttachment.fileSize,
+                } as Attachment
+              };
+              updated.push(attachmentMessage);
+            }
+            if (text && text.length > 0) {
+              updated.push(response.message);
+            }
+            return updated;
+          });
         },
         error: () => {
           this.isWaitingForReply.set(false);
@@ -262,7 +293,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private createChat(result: CreateChatResponse) {
-    this._messages.update(list => [...list, result.message]);
+    if (this.hasMessageText(result.message)) {
+      this._messages.update(list => [...list, result.message]);
+    }
     this.isWaitingForReply.set(true);
     this.loadChatHistory();
   }
@@ -281,7 +314,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (result: GetChatResponse) => {
           if (result.messages && result.messages.length > 0) {
-            this._messages.set(result.messages);
+            this._messages.set(result.messages.filter(m => m.role === Role.ASSISTANT || m.content.type === 'ATTACHMENT' || this.hasMessageText(m)));
             const lastMessage = result.messages[result.messages.length - 1];
             if (lastMessage?.role === Role.ASSISTANT) {
               this.isWaitingForReply.set(false);
@@ -292,6 +325,10 @@ export class ChatComponent implements OnInit, OnDestroy {
           }
         }
       });
+  }
+
+  private hasMessageText(message: Message): boolean {
+    return message.content.type === 'REPLY_CHUNK' && !!(message.content as any).text;
   }
 
   private scrollToBottom(behavior: ScrollBehavior = 'smooth'): void {

@@ -41,9 +41,18 @@ export class PromptActionsMenuComponent implements AfterViewChecked {
     const button = this.elementRef.nativeElement.querySelector('button:first-child') as HTMLElement;
     const dropdown = this.dropdownRef.nativeElement;
     const rect = button.getBoundingClientRect();
+    const dropdownHeight = dropdown.offsetHeight;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUpward = spaceBelow < dropdownHeight + 16;
+
     dropdown.style.left = `${rect.left}px`;
-    dropdown.style.top = `${rect.bottom + 8}px`;
-    dropdown.style.bottom = 'auto';
+    if (openUpward) {
+      dropdown.style.bottom = `${window.innerHeight - rect.top + 8}px`;
+      dropdown.style.top = 'auto';
+    } else {
+      dropdown.style.top = `${rect.bottom + 8}px`;
+      dropdown.style.bottom = 'auto';
+    }
   }
 
   @HostListener('document:click', ['$event'])

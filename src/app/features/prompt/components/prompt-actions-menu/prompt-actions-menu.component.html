@@ -2,7 +2,6 @@
   <button
     (click)="toggle()"
     class="p-1.5 ml-1 flex items-center justify-center rounded-full text-text-secondary hover:bg-surface-hover hover:text-text-primary cursor-pointer transition-transform duration-200"
-    [class.rotate-45]="menuOpen()"
     aria-label="Actions menu"
   >
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -20,7 +19,7 @@
   />
 
   @if (menuOpen()) {
-    <div class="fixed w-56 bg-surface-secondary border border-border-light rounded-xl shadow-lg z-[100] p-1.5"
+    <div class="fixed w-56 bg-surface-secondary border border-border-light rounded-xl shadow-xl z-[100] p-1.5"
          #dropdown
          role="menu">
       <!-- Upload resume -->

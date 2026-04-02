@@ -35,6 +35,7 @@ import {AttachmentApiService} from '../../shared/chat-api/attachment-api.service
 import {AttachmentUploadState} from '../../shared/chat-api/attachment-api.models';
 import {AttachmentCardComponent} from '../prompt/components/attachment-card/attachment-card.component';
 import {PdfPreviewDialogComponent} from './components/pdf-preview-dialog/pdf-preview-dialog.component';
+import {ShareModalComponent} from './components/share-modal/share-modal.component';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -60,6 +61,7 @@ export type ChatForm = FormGroup<ChatControl>;
     PromptActionsMenuComponent,
     AttachmentCardComponent,
     PdfPreviewDialogComponent,
+    ShareModalComponent,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -93,6 +95,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   private readonly attachment = signal<AttachmentUploadState | null>(null);
   readonly hasAttachment = computed(() => !!this.attachment()?.attachmentId);
   readonly pdfPreview = signal<{filename: string; downloadUrl: string} | null>(null);
+  readonly copiedMessageId = signal<string | null>(null);
+  readonly shareMessage = signal<Message | null>(null);
 
   private readonly attachmentSub = toObservable(this.hasAttachment)
     .pipe(takeUntilDestroyed())
@@ -491,6 +495,46 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   closePdfPreview(): void {
     this.pdfPreview.set(null);
+  }
+
+  onCopy(message: Message): void {
+    if (message.content.type === 'REPLY_CHUNK') {
+      const text = (message.content as any).text;
+      navigator.clipboard.writeText(text).then(() => {
+        this.copiedMessageId.set(message.id ?? null);
+        setTimeout(() => this.copiedMessageId.set(null), 1000);
+      }).catch(() => {});
+    }
+  }
+
+  onReact(message: Message, reaction: 'LIKED' | 'DISLIKED'): void {
+    const chatId = this.chatId();
+    if (!chatId || !message.id) return;
+
+    const currentReaction = message.reaction;
+    const newReaction = currentReaction === reaction ? null : reaction;
+
+    this._messages.update(list =>
+      list.map(m => m.id === message.id ? { ...m, reaction: newReaction } : m)
+    );
+
+    this.chatApi.updateReaction(chatId, message.id, newReaction)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => {
+          this._messages.update(list =>
+            list.map(m => m.id === message.id ? { ...m, reaction: currentReaction } : m)
+          );
+        }
+      });
+  }
+
+  onShare(message: Message): void {
+    this.shareMessage.set(message);
+  }
+
+  closeShareModal(): void {
+    this.shareMessage.set(null);
   }
 
   protected readonly Role = Role;

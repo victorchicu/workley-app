@@ -19,6 +19,11 @@ export const routes: Routes = [
     title: 'Workley Assistant',
   },
   {
+    path: 'shared/:messageId',
+    component: ErrorComponent,
+    title: 'Workley Assistant | Shared Message',
+  },
+  {
     path: 'terms-of-use',
     component: TermsOfUseComponent,
     title: 'Workley Assistant | Terms of Use',

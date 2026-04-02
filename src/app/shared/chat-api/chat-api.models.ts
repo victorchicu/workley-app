@@ -52,6 +52,7 @@ export interface Message {
   ownedBy?: string;
   createdAt?: Date;
   content: ContentType;
+  reaction?: string | null;
 }
 
 export interface CreateChatRequest {
@@ -75,4 +76,8 @@ export interface AddMessageResponse {
 export interface GetChatResponse {
   chatId: string;
   messages: Message[];
+}
+
+export interface ReactionResponse {
+  reaction: string;
 }

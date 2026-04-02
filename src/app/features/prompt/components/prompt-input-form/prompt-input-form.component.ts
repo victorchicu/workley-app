@@ -32,7 +32,7 @@ import {AttachmentUploadState} from '../../../../shared/chat-api/attachment-api.
 export class PromptInputFormComponent {
   readonly form = input.required<FormGroup<PromptControl>>();
   readonly error = input<string | null>(null);
-  readonly placeholder = input("Say what you want. We’ll match it.");
+  readonly placeholder = input("Describe it. We’ll match it.");
   readonly isSubmitting = input<boolean>(false);
   readonly isDeactivated = input(false);
   readonly isLineWrapped = input<boolean>(false);

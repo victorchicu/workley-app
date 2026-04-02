@@ -6,7 +6,8 @@ import {retryStrategy} from '../idempotency/retry-strategy';
 import {
   CreateChatResponse,
   AddMessageResponse,
-  GetChatResponse
+  GetChatResponse,
+  ReactionResponse
 } from './chat-api.models';
 
 @Injectable({providedIn: 'root'})
@@ -31,5 +32,13 @@ export class ChatApiService {
     return this.httpClient.get<GetChatResponse>(`${this.baseUrl}/${chatId}`, {
       withCredentials: true
     });
+  }
+
+  updateReaction(chatId: string, messageId: string, reaction: string | null): Observable<ReactionResponse> {
+    return this.httpClient.patch<ReactionResponse>(
+      `${this.baseUrl}/${chatId}/messages/${messageId}/reaction`,
+      { reaction },
+      { withCredentials: true }
+    );
   }
 }

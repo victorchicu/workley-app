@@ -264,6 +264,10 @@ export class RSocketService implements OnDestroy {
         this.streamingMessageCollector.delete(id);
         stream$.next(message);
         break;
+      case 'JOB_DESCRIPTION':
+        this.streamingMessageCollector.delete(id);
+        stream$.next(message);
+        break;
       default: {
         stream$.next(message);
         break;

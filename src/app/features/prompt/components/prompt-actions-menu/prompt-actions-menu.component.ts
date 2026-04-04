@@ -11,6 +11,7 @@ export class PromptActionsMenuComponent implements AfterViewChecked {
   protected readonly menuOpen = signal(false);
 
   readonly fileSelected = output<File>();
+  readonly postJobClicked = output<void>();
 
   @ViewChild('dropdown') dropdownRef?: ElementRef<HTMLElement>;
   @ViewChild('fileInput') fileInputRef?: ElementRef<HTMLInputElement>;
@@ -22,6 +23,11 @@ export class PromptActionsMenuComponent implements AfterViewChecked {
   onUploadResume(): void {
     this.menuOpen.set(false);
     this.fileInputRef?.nativeElement.click();
+  }
+
+  onPostJob(): void {
+    this.menuOpen.set(false);
+    this.postJobClicked.emit();
   }
 
   onFileChange(event: Event): void {

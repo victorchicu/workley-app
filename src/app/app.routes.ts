@@ -6,6 +6,7 @@ import {
 } from './shared/components/error/error.component';
 import {TermsOfUseComponent} from './features/terms-of-use/terms-of-use.component';
 import {PrivacyPolicyComponent} from './features/privacy-policy/privacy-policy.component';
+import {MyJobsComponent} from './features/my-jobs/my-jobs.component';
 
 export const routes: Routes = [
   {
@@ -42,6 +43,11 @@ export const routes: Routes = [
     path: 'not-found',
     component: ErrorComponent,
     title: 'Workley Assistant | Page not found',
+  },
+  {
+    path: 'my/jobs',
+    component: MyJobsComponent,
+    title: 'Workley | My Jobs',
   },
   {
     path: '**',

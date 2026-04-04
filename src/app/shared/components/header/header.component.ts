@@ -7,11 +7,12 @@ import { ThemeService, ThemePreference } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
+import { PostJobModalComponent } from '../post-job-modal/post-job-modal.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [NgClass, AuthModalComponent, UserAvatarComponent],
+  imports: [NgClass, AuthModalComponent, UserAvatarComponent, PostJobModalComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
@@ -24,6 +25,7 @@ export class HeaderComponent {
   protected readonly dropdownOpen = signal(false);
   protected readonly authModalOpen = signal(false);
   protected readonly isInChat = signal(false);
+  protected readonly postJobModalOpen = signal(false);
 
   constructor() {
     this.isInChat.set(this.router.url.startsWith('/chat/'));
@@ -60,6 +62,14 @@ export class HeaderComponent {
 
   closeAuthModal(): void {
     this.authModalOpen.set(false);
+  }
+
+  openPostJobModal(): void {
+    this.postJobModalOpen.set(true);
+  }
+
+  closePostJobModal(): void {
+    this.postJobModalOpen.set(false);
   }
 
   @HostListener('document:click', ['$event'])

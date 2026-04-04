@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component, computed, DestroyRef, effect, ElementRef, inject,
-  OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal
+  OnDestroy, OnInit, PLATFORM_ID, Signal, signal, ViewChild, WritableSignal
 } from '@angular/core';
 import {PromptInputFormComponent} from '../prompt/components/prompt-input-form/prompt-input-form.component';
 import {ActivatedRoute, Navigation, Router} from '@angular/router';
@@ -10,7 +10,7 @@ import {
   Role, Message, Attachment, ErrorCode, CreateChatResponse, AddMessageResponse, GetChatResponse
 } from '../../shared/chat-api/chat-api.models';
 import {ChatApiService} from '../../shared/chat-api/chat-api.service';
-import {DatePipe, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
+import {DatePipe, isPlatformBrowser, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
 import {PromptSendButtonComponent} from '../prompt/components/prompt-send-button/prompt-send-button.component';
 import {ChatDisclaimerComponent} from './components/chat-disclaimer/chat-disclaimer.component';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
@@ -36,6 +36,7 @@ import {AttachmentUploadState} from '../../shared/chat-api/attachment-api.models
 import {AttachmentCardComponent} from '../prompt/components/attachment-card/attachment-card.component';
 import {PdfPreviewDialogComponent} from './components/pdf-preview-dialog/pdf-preview-dialog.component';
 import {ShareModalComponent} from './components/share-modal/share-modal.component';
+import {PostJobModalComponent} from '../../shared/components/post-job-modal/post-job-modal.component';
 
 export interface ChatControl {
   text: FormControl<string>;
@@ -62,6 +63,7 @@ export type ChatForm = FormGroup<ChatControl>;
     AttachmentCardComponent,
     PdfPreviewDialogComponent,
     ShareModalComponent,
+    PostJobModalComponent,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -75,6 +77,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   readonly route: ActivatedRoute = inject(ActivatedRoute);
   readonly rsocketService: RSocketService = inject(RSocketService);
   readonly attachmentApi: AttachmentApiService = inject(AttachmentApiService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   private readonly form = signal<ChatForm>(
     this.builder.nonNullable.group({
@@ -84,6 +87,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   private readonly error = signal<string | null>(null);
   private readonly chatId = signal<string | null>(null);
+  private readonly jobDraftChatId = signal<string | null>(null);
   private readonly isLoading = signal<boolean>(false);
   private readonly showLoadingSpinner = signal<boolean>(false);
   private readonly isLineWrapped = signal<boolean>(false);
@@ -97,6 +101,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   readonly pdfPreview = signal<{filename: string; downloadUrl: string} | null>(null);
   readonly copiedMessageId = signal<string | null>(null);
   readonly shareMessage = signal<Message | null>(null);
+  readonly postJobModalOpen = signal(false);
 
   private readonly attachmentSub = toObservable(this.hasAttachment)
     .pipe(takeUntilDestroyed())
@@ -165,6 +170,16 @@ export class ChatComponent implements OnInit, OnDestroy {
           }
         }
       });
+
+    if (isPlatformBrowser(this.platformId)) {
+      const raw = localStorage.getItem('job_draft');
+      if (raw) {
+        try {
+          const draft = JSON.parse(raw);
+          this.jobDraftChatId.set(draft.draftChatId ?? null);
+        } catch {}
+      }
+    }
   }
 
   ngOnInit(): void {
@@ -535,6 +550,43 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   closeShareModal(): void {
     this.shareMessage.set(null);
+  }
+
+  openPostJobModal(): void {
+    this.postJobModalOpen.set(true);
+  }
+
+  closePostJobModal(): void {
+    this.postJobModalOpen.set(false);
+  }
+
+  isJobDraftChat(): boolean {
+    return this.jobDraftChatId() !== null && this.jobDraftChatId() === this.chatId();
+  }
+
+  isLastAssistantMessage(message: Message): boolean {
+    const allMessages = this.messages();
+    const assistantMessages = allMessages.filter(
+      m => m.role === Role.ASSISTANT && m.content.type === 'REPLY_CHUNK'
+    );
+    return assistantMessages.length > 0 &&
+      assistantMessages[assistantMessages.length - 1].id === message.id;
+  }
+
+  showApplyDescription(message: Message): boolean {
+    return this.isJobDraftChat() && this.isLastAssistantMessage(message);
+  }
+
+  onApplyDescription(message: Message): void {
+    const text = (message.content as any).text;
+    const chatId = message.chatId;
+    const raw = localStorage.getItem('job_draft');
+    let draft: any = raw ? JSON.parse(raw) : {};
+    draft.description = text;
+    draft.draftChatId = chatId;
+    draft.step = 'description';
+    localStorage.setItem('job_draft', JSON.stringify(draft));
+    this.router.navigate(['/']);
   }
 
   protected readonly Role = Role;

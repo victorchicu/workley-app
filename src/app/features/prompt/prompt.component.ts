@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, inject, PLATFORM_ID, signal} from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {PromptHeadlineComponent} from './components/prompt-headline/prompt-headline.component';
 import {PromptInputFormComponent} from './components/prompt-input-form/prompt-input-form.component';
@@ -13,6 +14,7 @@ import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {catchError, EMPTY, finalize, Observable, tap, throwError} from 'rxjs';
 import {AttachmentApiService} from '../../shared/chat-api/attachment-api.service';
 import {AttachmentUploadState} from '../../shared/chat-api/attachment-api.models';
+import {PostJobModalComponent} from '../../shared/components/post-job-modal/post-job-modal.component';
 
 export interface PromptControl {
   text: FormControl<string>;
@@ -30,7 +32,8 @@ export type PromptForm = FormGroup<PromptControl>;
     PromptInputFormComponent,
     PromptSendButtonComponent,
     PromptActionsMenuComponent,
-    RouterLink
+    RouterLink,
+    PostJobModalComponent
   ],
   templateUrl: './prompt.component.html',
   styleUrl: './prompt.component.css',
@@ -42,6 +45,7 @@ export class PromptComponent {
   readonly chatApi: ChatApiService = inject(ChatApiService);
   readonly destroyRef: DestroyRef = inject(DestroyRef);
   readonly attachmentApi: AttachmentApiService = inject(AttachmentApiService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   private readonly form = signal<PromptForm>(
     this.builder.nonNullable.group({
@@ -54,6 +58,21 @@ export class PromptComponent {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly attachment = signal<AttachmentUploadState | null>(null);
   readonly hasAttachment = computed(() => !!this.attachment()?.attachmentId);
+  readonly postJobModalOpen = signal(false);
+
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      const draft = localStorage.getItem('job_draft');
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft);
+          if (parsed.description && parsed.step === 'description') {
+            setTimeout(() => this.postJobModalOpen.set(true), 0);
+          }
+        } catch {}
+      }
+    }
+  }
 
   private readonly attachmentSub = toObservable(this.hasAttachment)
     .pipe(takeUntilDestroyed())
@@ -98,6 +117,14 @@ export class PromptComponent {
         .subscribe();
     }
     this.attachment.set(null);
+  }
+
+  openPostJobModal(): void {
+    this.postJobModalOpen.set(true);
+  }
+
+  closePostJobModal(): void {
+    this.postJobModalOpen.set(false);
   }
 
   sendPrompt() {

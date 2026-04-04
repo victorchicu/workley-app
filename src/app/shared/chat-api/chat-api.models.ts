@@ -39,11 +39,17 @@ export interface Attachment extends Content {
   fileSize: number;
 }
 
+export interface JobDescriptionContent extends Content {
+  type: 'JOB_DESCRIPTION';
+  text: string;
+}
+
 export type ContentType =
   | ReplyChunk
   | ReplyCompleted
   | ReplyError
-  | Attachment;
+  | Attachment
+  | JobDescriptionContent;
 
 export interface Message {
   id?: string;

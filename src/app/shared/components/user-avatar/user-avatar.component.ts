@@ -1,5 +1,6 @@
 import { Component, inject, signal, ElementRef, HostListener } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-avatar',
@@ -9,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 export class UserAvatarComponent {
   private readonly elementRef = inject(ElementRef);
   protected readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   protected readonly menuOpen = signal(false);
   protected readonly logoutDialogOpen = signal(false);
 
@@ -28,6 +30,11 @@ export class UserAvatarComponent {
 
   cancelLogout(): void {
     this.logoutDialogOpen.set(false);
+  }
+
+  onMyJobsClick(): void {
+    this.menuOpen.set(false);
+    this.router.navigate(['/my/jobs']);
   }
 
   @HostListener('document:click', ['$event'])

@@ -14,7 +14,7 @@
         [attachment]="prompt.attachment"
         (removeAttachment)="onRemoveAttachment()"
       >
-        <app-prompt-actions-menu leftActions (fileSelected)="onFileSelected($event)"/>
+        <app-prompt-actions-menu leftActions (fileSelected)="onFileSelected($event)" (postJobClicked)="openPostJobModal()"/>
         <app-prompt-send-button
           aria-label="Send prompt"
           (clicked)="sendPrompt()"
@@ -29,4 +29,7 @@
     <a routerLink="/terms-of-use" class="text-[#888] underline hover:opacity-80">Terms</a> and
     <a routerLink="/privacy-policy" class="text-[#888] underline hover:opacity-80">Privacy Policy</a>.
   </p>
+@if (postJobModalOpen()) {
+  <app-post-job-modal (close)="closePostJobModal()"/>
+}
 </div>

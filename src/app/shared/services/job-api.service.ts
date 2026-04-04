@@ -31,6 +31,14 @@ export class JobApiService {
     });
   }
 
+  getLocationHints(query: string): Observable<string[]> {
+    const params = new HttpParams().set('q', query);
+    return this.httpClient.get<string[]>(`${this.baseUrl}/location-hints`, {
+      withCredentials: true,
+      params
+    });
+  }
+
   createJob(request: CreateJobRequest): Observable<JobResponse> {
     return this.httpClient.post<JobResponse>(this.baseUrl, request, {
       withCredentials: true

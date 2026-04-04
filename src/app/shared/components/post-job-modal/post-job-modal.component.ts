@@ -12,11 +12,6 @@ import {HttpErrorResponse} from '@angular/common/http';
 
 type Step = 'title' | 'tags' | 'description';
 
-const TAG_SUGGESTIONS = [
-  'Remote', 'On-site', 'Hybrid', 'Anywhere',
-  'Moldova', 'Romania', 'Germany', 'USA', 'UK', 'Netherlands', 'Poland'
-];
-
 const STORAGE_KEY = 'job_draft';
 
 @Component({
@@ -33,6 +28,7 @@ export class PostJobModalComponent implements OnInit {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly destroyRef = inject(DestroyRef);
   private readonly titleInput$ = new Subject<string>();
+  private readonly tagSearchInput$ = new Subject<string>();
 
   readonly close = output<void>();
 
@@ -40,13 +36,16 @@ export class PostJobModalComponent implements OnInit {
   protected readonly title = signal('');
   protected readonly titleHints = signal<string[]>([]);
   protected readonly showHints = signal(false);
+  protected readonly hintIndex = signal(-1);
   protected readonly tags = signal<string[]>([]);
   protected readonly tagInput = signal('');
+  protected readonly tagHints = signal<string[]>([]);
+  protected readonly showTagHints = signal(false);
+  protected readonly tagHintIndex = signal(-1);
   protected readonly description = signal('');
   protected readonly draftChatId = signal<string | null>(null);
   protected readonly isLoading = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly suggestions = TAG_SUGGESTIONS;
 
   protected readonly isTitleValid = computed(() => this.title().trim().length > 0);
   protected readonly hasTagsValid = computed(() => this.tags().length > 0);
@@ -61,11 +60,25 @@ export class PostJobModalComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: hints => {
-        console.log('Title hints received:', hints);
         this.titleHints.set(hints);
         this.showHints.set(hints.length > 0);
+        this.hintIndex.set(-1);
       },
       error: err => console.error('Title hints error:', err)
+    });
+    this.tagSearchInput$.pipe(
+      debounceTime(150),
+      distinctUntilChanged(),
+      switchMap(q => q.length >= 2 ? this.jobApi.getLocationHints(q) : of([])),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: hints => {
+        const filtered = hints.filter(h => !this.tags().includes(h));
+        this.tagHints.set(filtered);
+        this.showTagHints.set(filtered.length > 0);
+        this.tagHintIndex.set(-1);
+      },
+      error: () => this.showTagHints.set(false)
     });
   }
 
@@ -82,14 +95,41 @@ export class PostJobModalComponent implements OnInit {
     return hint.replace(regex, '<strong>$1</strong>');
   }
 
+  onTitleKeydown(event: KeyboardEvent): void {
+    if (!this.showHints() || this.titleHints().length === 0) {
+      if (event.key === 'Enter') this.onContinueToTags();
+      return;
+    }
+    const len = this.titleHints().length;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.hintIndex.update(i => (i + 1) % len);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.hintIndex.update(i => (i - 1 + len) % len);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      if (this.hintIndex() >= 0) {
+        this.onSelectHint(this.titleHints()[this.hintIndex()]);
+      } else {
+        this.onContinueToTags();
+      }
+    } else if (event.key === 'Escape') {
+      this.showHints.set(false);
+    }
+  }
+
   onSelectHint(hint: string): void {
     this.title.set(hint);
     this.showHints.set(false);
+    this.hintIndex.set(-1);
   }
 
   onTitleBlur(): void {
-    // Delay to allow click on hint to register
-    setTimeout(() => this.showHints.set(false), 200);
+    setTimeout(() => {
+      this.showHints.set(false);
+      this.hintIndex.set(-1);
+    }, 200);
   }
 
   onContinueToTags(): void {
@@ -113,18 +153,50 @@ export class PostJobModalComponent implements OnInit {
     this.step.set('tags');
   }
 
+  onTagSearchInput(value: string): void {
+    this.tagInput.set(value);
+    this.tagSearchInput$.next(value);
+  }
+
   onAddTag(tag: string): void {
     const trimmed = tag.trim();
     if (trimmed && !this.tags().includes(trimmed)) {
       this.tags.update(t => [...t, trimmed]);
     }
     this.tagInput.set('');
+    this.showTagHints.set(false);
   }
 
   onTagInputKeydown(event: KeyboardEvent): void {
+    if (this.showTagHints() && this.tagHints().length > 0) {
+      const len = this.tagHints().length;
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.tagHintIndex.update(i => (i + 1) % len);
+        return;
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.tagHintIndex.update(i => (i - 1 + len) % len);
+        return;
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        if (this.tagHintIndex() >= 0) {
+          this.onSelectTagHint(this.tagHints()[this.tagHintIndex()]);
+        } else {
+          this.onAddTag(this.tagInput());
+        }
+        return;
+      } else if (event.key === 'Escape') {
+        this.showTagHints.set(false);
+        return;
+      }
+    }
     if (event.key === 'Enter') {
       event.preventDefault();
       this.onAddTag(this.tagInput());
+    }
+    if (event.key === 'Backspace' && !this.tagInput() && this.tags().length > 0) {
+      this.tags.update(t => t.slice(0, -1));
     }
   }
 
@@ -132,8 +204,23 @@ export class PostJobModalComponent implements OnInit {
     this.tags.update(t => t.filter(item => item !== tag));
   }
 
-  onSuggestionClick(suggestion: string): void {
-    this.onAddTag(suggestion);
+  onSelectTagHint(hint: string): void {
+    this.tagHintIndex.set(-1);
+    this.onAddTag(hint);
+  }
+
+  onTagInputBlur(): void {
+    setTimeout(() => {
+      this.showTagHints.set(false);
+      this.tagHintIndex.set(-1);
+    }, 200);
+  }
+
+  highlightTagMatch(hint: string): string {
+    const query = this.tagInput().trim();
+    if (!query) return hint;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return hint.replace(regex, '<strong>$1</strong>');
   }
 
   onDraftWithAi(): void {

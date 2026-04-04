@@ -2,7 +2,7 @@
      style="background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
 
   <div
-       class="bg-surface-primary rounded-2xl shadow-xl p-8 w-full max-w-sm border border-border-light relative">
+       class="bg-surface-primary rounded-2xl shadow-xl p-8 w-full max-w-md border border-border-light relative">
 
     <!-- Back arrow (steps 2+3) -->
     @if (step() !== 'title') {
@@ -38,86 +38,101 @@
       <h2 class="text-xl font-semibold text-text-primary mb-2">Post a job</h2>
       <p class="text-sm text-text-secondary mb-6">What's the job title?</p>
 
-      <div class="relative mb-6">
-        <input type="text"
-               [value]="title()"
-               (input)="onTitleInput($any($event.target).value)"
-               (keydown.enter)="onContinueToTags()"
-               (blur)="onTitleBlur()"
-               (focus)="titleHints().length > 0 && showHints.set(true)"
-               placeholder="e.g. Senior Java Developer"
-               class="w-full px-4 py-2.5 border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none"
-               [class.focus:border-text-secondary]="!showHints() || titleHints().length === 0"
-               [class.rounded-full]="!showHints() || titleHints().length === 0"
-               [class.rounded-t-2xl]="showHints() && titleHints().length > 0"
-               autofocus>
+      <div class="relative">
+        <div class="flex items-center border border-border-input bg-surface-input"
+             [style.border-radius]="showHints() && titleHints().length > 0 ? '1.25rem 1.25rem 0 0' : '9999px'"
+             [class.border-b-0]="showHints() && titleHints().length > 0">
+          <input type="text"
+                 [value]="title()"
+                 (input)="onTitleInput($any($event.target).value)"
+                 (keydown)="onTitleKeydown($event)"
+                 (blur)="onTitleBlur()"
+                 (focus)="titleHints().length > 0 && showHints.set(true)"
+                 placeholder="e.g. Senior Java Developer"
+                 class="flex-1 px-4 py-2.5 bg-transparent text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none"
+                 autofocus>
+          <button (click)="onContinueToTags()"
+                  [disabled]="!isTitleValid()"
+                  class="p-2 mr-1 rounded-full bg-text-primary text-bg-primary disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed hover:opacity-90"
+                  aria-label="Continue">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
         @if (showHints() && titleHints().length > 0) {
-          <div class="absolute left-0 right-0 z-10 border border-t-0 border-border-input bg-surface-input rounded-b-2xl max-h-48 overflow-y-auto shadow-lg">
-            @for (hint of titleHints(); track hint) {
+          <div class="absolute left-0 right-0 z-10 border border-t-0 border-border-input bg-surface-input rounded-b-[1.25rem] max-h-48 overflow-y-auto shadow-lg">
+            @for (hint of titleHints(); track hint; let i = $index) {
               <button (mousedown)="onSelectHint(hint)"
-                      class="w-full px-4 py-2 text-sm text-text-primary hover:bg-surface-hover text-left cursor-pointer last:rounded-b-2xl"
+                      class="w-full px-4 py-2 text-sm text-text-primary text-left cursor-pointer last:rounded-b-[1.25rem]"
+                      [class.bg-surface-hover]="i === hintIndex()"
+                      [class.hover:bg-surface-hover]="i !== hintIndex()"
                       [innerHTML]="highlightMatch(hint)">
               </button>
             }
           </div>
         }
       </div>
-
-      <button (click)="onContinueToTags()"
-              [disabled]="!isTitleValid()"
-              class="w-full px-4 py-2.5 bg-text-primary text-bg-primary rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
-        Continue
-      </button>
     }
 
     <!-- Step 2: Tags -->
     @if (step() === 'tags') {
       <h2 class="text-xl font-semibold text-text-primary mb-2">Location & work mode</h2>
-      <p class="text-sm text-text-secondary mb-4">Add location, work mode, or other tags</p>
+      <p class="text-sm text-text-secondary mb-6">Add location, work mode, or other tags</p>
 
-      @if (tags().length > 0) {
-        <div class="flex flex-wrap gap-2 mb-3">
-          @for (tag of tags(); track tag) {
-            <span class="inline-flex items-center gap-1 px-3 py-1 bg-surface-tertiary text-text-primary rounded-full text-sm">
-              {{ tag }}
-              <button (click)="onRemoveTag(tag)" class="hover:text-text-secondary cursor-pointer" aria-label="Remove tag">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-              </button>
-            </span>
-          }
+      <div class="relative">
+        <!-- Input with inline tags -->
+        <div class="flex items-end gap-1 pl-3 pr-1 py-1 border border-border-input bg-surface-input text-sm"
+             [style.border-radius]="showTagHints() && tagHints().length > 0 ? '1.25rem 1.25rem 0 0' : tags().length > 0 ? '1.25rem' : '9999px'"
+             [class.border-b-0]="showTagHints() && tagHints().length > 0">
+          <div class="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
+            @for (tag of tags(); track tag) {
+              <span class="inline-flex items-center gap-1 px-3 py-1 bg-surface-tertiary text-text-primary rounded-full text-sm whitespace-nowrap">
+                {{ tag }}
+                <button (click)="onRemoveTag(tag)" class="hover:text-text-secondary cursor-pointer" aria-label="Remove tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </span>
+            }
+            <input type="text"
+                   [value]="tagInput()"
+                   (input)="onTagSearchInput($any($event.target).value)"
+                   (keydown)="onTagInputKeydown($event)"
+                   (blur)="onTagInputBlur()"
+                   (focus)="tagHints().length > 0 && showTagHints.set(true)"
+                   [placeholder]="tags().length === 0 ? 'e.g. Remote, Germany, Berlin...' : ''"
+                   class="flex-1 min-w-[60px] py-1.5 bg-transparent text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none"
+                   autofocus>
+          </div>
+          <button (click)="onContinueToDescription()"
+                  [disabled]="!hasTagsValid()"
+                  class="p-2 rounded-full bg-text-primary text-bg-primary disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed hover:opacity-90 shrink-0"
+                  aria-label="Continue">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
         </div>
-      }
-
-      <input type="text"
-             [value]="tagInput()"
-             (input)="tagInput.set($any($event.target).value)"
-             (keydown)="onTagInputKeydown($event)"
-             placeholder="Type and press Enter"
-             class="w-full px-4 py-2.5 rounded-full border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary mb-3"
-             autofocus>
-
-      <div class="flex flex-wrap gap-1.5 mb-6">
-        @for (s of suggestions; track s) {
-          @if (!tags().includes(s)) {
-            <button (click)="onSuggestionClick(s)"
-                    class="px-3 py-1 border border-border-light text-text-secondary rounded-full text-xs hover:bg-surface-hover hover:text-text-primary cursor-pointer">
-              {{ s }}
-            </button>
-          }
+        <!-- Dropdown -->
+        @if (showTagHints() && tagHints().length > 0) {
+          <div class="absolute left-0 right-0 z-10 border border-t-0 border-border-input bg-surface-input rounded-b-[1.25rem] max-h-48 overflow-y-auto shadow-lg">
+            @for (hint of tagHints(); track hint; let i = $index) {
+              <button (mousedown)="onSelectTagHint(hint)"
+                      class="w-full px-4 py-2 text-sm text-text-primary text-left cursor-pointer last:rounded-b-[1.25rem]"
+                      [class.bg-surface-hover]="i === tagHintIndex()"
+                      [class.hover:bg-surface-hover]="i !== tagHintIndex()"
+                      [innerHTML]="highlightTagMatch(hint)">
+              </button>
+            }
+          </div>
         }
       </div>
 
       @if (error()) {
-        <p class="text-red-500 text-xs mb-4">{{ error() }}</p>
+        <p class="text-red-500 text-xs mt-2 mb-0">{{ error() }}</p>
       }
-
-      <button (click)="onContinueToDescription()"
-              [disabled]="!hasTagsValid()"
-              class="w-full px-4 py-2.5 bg-text-primary text-bg-primary rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
-        Continue
-      </button>
     }
 
     <!-- Step 3: Description -->
@@ -125,32 +140,37 @@
       <h2 class="text-xl font-semibold text-text-primary mb-2">Job description</h2>
       <p class="text-sm text-text-secondary mb-4">Describe the role or draft with AI</p>
 
-      <textarea
-        [value]="description()"
-        (input)="description.set($any($event.target).value)"
-        placeholder="Responsibilities, requirements, benefits..."
-        rows="6"
-        class="w-full px-4 py-2.5 rounded-xl border border-border-input bg-surface-input text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none focus:border-text-secondary resize-none mb-3">
-      </textarea>
-
-      <button (click)="onDraftWithAi()"
-              [disabled]="isLoading()"
-              class="w-full px-4 py-2 mb-4 border border-border-light rounded-full text-sm text-text-secondary hover:text-text-primary hover:bg-surface-hover cursor-pointer flex items-center justify-center gap-2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-        </svg>
-        Draft with AI
-      </button>
+      <div class="border border-border-input bg-surface-input rounded-2xl">
+        <textarea
+          [value]="description()"
+          (input)="description.set($any($event.target).value)"
+          placeholder="Responsibilities, requirements, benefits..."
+          rows="5"
+          class="w-full px-4 pt-3 pb-1 bg-transparent text-text-primary text-sm placeholder:text-text-tertiary focus:outline-none resize-none">
+        </textarea>
+        <div class="flex items-center justify-between px-2 pb-2">
+          <button (click)="onDraftWithAi()"
+                  [disabled]="isLoading()"
+                  class="px-3 py-1.5 text-xs text-text-secondary hover:text-text-primary hover:bg-surface-hover rounded-full cursor-pointer flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            Draft with AI
+          </button>
+          <button (click)="onPost()"
+                  [disabled]="!isDescriptionValid() || isLoading()"
+                  class="p-2 rounded-full bg-text-primary text-bg-primary disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed hover:opacity-90"
+                  aria-label="Post">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
+      </div>
 
       @if (error()) {
-        <p class="text-red-500 text-xs mb-4">{{ error() }}</p>
+        <p class="text-red-500 text-xs mt-2">{{ error() }}</p>
       }
-
-      <button (click)="onPost()"
-              [disabled]="!isDescriptionValid() || isLoading()"
-              class="w-full px-4 py-2.5 bg-text-primary text-bg-primary rounded-full text-sm font-medium hover:opacity-90 disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
-        {{ isLoading() ? 'Posting...' : 'Post' }}
-      </button>
     }
   </div>
 </div>

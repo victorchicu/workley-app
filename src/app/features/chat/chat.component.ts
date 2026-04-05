@@ -338,6 +338,14 @@ export class ChatComponent implements OnInit, OnDestroy {
           if (result.chatId) {
             this.chatId.set(result.chatId);
           }
+          // Restore autocomplete state after page refresh
+          if (result.type === 'JOB_POSTING' && result.pendingField) {
+            const mapped: 'title' | 'location' | null =
+              result.pendingField === 'title' ? 'title' :
+              result.pendingField === 'tags' ? 'location' :
+              null;
+            this.activeJobField.set(mapped);
+          }
         }
       });
   }

@@ -101,6 +101,8 @@ export interface AddMessageResponse {
 export interface GetChatResponse {
   chatId: string;
   messages: Message[];
+  type?: ChatKind;
+  pendingField?: JobField | null;
 }
 
 export interface ReactionResponse {

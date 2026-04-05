@@ -567,7 +567,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.router.navigate(['/chat', response.chatId])
+          this.router.navigate(['/chat', response.chatId], {state: response})
             .catch(err => console.error('Navigation error:', err));
         },
         error: (err) => {

@@ -118,9 +118,12 @@ export class PromptInputFormComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: hints => {
+        const currentText = (this.form().controls.text.value ?? '').trim().toLowerCase();
+        // Suppress dropdown if the input already exactly matches a hint (user just completed).
+        const exactMatch = hints.some(h => h.toLowerCase() === currentText);
         this.hints.set(hints);
-        this.showHints.set(hints.length > 0);
-        this.hintIndex.set(-1);
+        this.showHints.set(hints.length > 0 && !exactMatch);
+        this.hintIndex.set(hints.length > 0 && !exactMatch ? 0 : -1);
       },
       error: err => console.error('Hints error:', err)
     });
@@ -151,7 +154,7 @@ export class PromptInputFormComponent {
         this.scrollActiveHintIntoView();
         return;
       }
-      if (event.key === 'Enter' && this.hintIndex() >= 0) {
+      if ((event.key === 'Enter' || event.key === 'Tab') && this.hintIndex() >= 0) {
         event.preventDefault();
         this.selectHint(this.hints()[this.hintIndex()]);
         return;

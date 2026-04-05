@@ -49,6 +49,7 @@ export class PromptInputFormComponent {
   readonly attachment = input<AttachmentUploadState | null>(null);
   readonly removeAttachment = output<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('hintsList') hintsListRef?: ElementRef<HTMLElement>;
 
   private readonly jobApi = inject(JobApiService);
   private readonly destroyRef = inject(DestroyRef);
@@ -141,11 +142,13 @@ export class PromptInputFormComponent {
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         this.hintIndex.update(i => (i + 1) % count);
+        this.scrollActiveHintIntoView();
         return;
       }
       if (event.key === 'ArrowUp') {
         event.preventDefault();
         this.hintIndex.update(i => (i <= 0 ? count - 1 : i - 1));
+        this.scrollActiveHintIntoView();
         return;
       }
       if (event.key === 'Enter' && this.hintIndex() >= 0) {
@@ -231,16 +234,34 @@ export class PromptInputFormComponent {
     this.focusInput();
   }
 
-  protected highlight(hint: string): { before: string; match: string; after: string } {
+  protected highlightHtml(hint: string): string {
     const query = (this.form().controls.text.value ?? '').trim();
-    if (!query) return { before: hint, match: '', after: '' };
+    if (!query) return this.escapeHtml(hint);
     const idx = hint.toLowerCase().indexOf(query.toLowerCase());
-    if (idx < 0) return { before: hint, match: '', after: '' };
-    return {
-      before: hint.substring(0, idx),
-      match: hint.substring(idx, idx + query.length),
-      after: hint.substring(idx + query.length)
+    if (idx < 0) return this.escapeHtml(hint);
+    const before = this.escapeHtml(hint.substring(0, idx));
+    const match = this.escapeHtml(hint.substring(idx, idx + query.length));
+    const after = this.escapeHtml(hint.substring(idx + query.length));
+    return `${before}<strong class="font-semibold">${match}</strong>${after}`;
+  }
+
+  private escapeHtml(s: string): string {
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
     };
+    return s.replace(/[&<>"']/g, c => map[c]);
+  }
+
+  private scrollActiveHintIntoView(): void {
+    setTimeout(() => {
+      if (!this.hintsListRef) return;
+      const active = this.hintsListRef.nativeElement.querySelector('[data-active="true"]') as HTMLElement | null;
+      active?.scrollIntoView({ block: 'nearest' });
+    });
   }
 
   @HostListener('document:click', ['$event'])

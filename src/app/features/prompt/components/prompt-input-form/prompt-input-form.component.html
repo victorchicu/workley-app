@@ -2,14 +2,14 @@
 @let hintsOpen = showHints() && hints().length > 0;
 <div class="relative w-full mx-auto">
   @if (hintsOpen) {
-    <ul class="absolute bottom-full left-0 right-0 bg-surface-input border-[0.5px] border-border-input border-b-0 shadow-[0_-10px_15px_-3px_rgb(0_0_0_/_0.1),0_-4px_6px_-4px_rgb(0_0_0_/_0.1)] rounded-t-3xl max-h-48 overflow-y-auto z-10 overflow-x-hidden">
+    <ul #hintsList class="absolute bottom-full left-0 right-0 bg-surface-input border-[0.5px] border-border-input border-b-0 shadow-[0_-10px_15px_-3px_rgb(0_0_0_/_0.1),0_-4px_6px_-4px_rgb(0_0_0_/_0.1)] rounded-t-3xl max-h-48 overflow-y-auto z-10 overflow-x-hidden">
       @for (hint of hints(); track hint; let i = $index) {
-        @let parts = highlight(hint);
         <li
           class="min-h-[57px] flex items-center px-5 cursor-pointer hover:bg-surface-hover text-text-primary"
           [class.bg-surface-hover]="i === hintIndex()"
+          [attr.data-active]="i === hintIndex() ? 'true' : null"
           (mousedown)="selectHint(hint); $event.preventDefault()">
-          <span>{{ parts.before }}</span><strong class="font-semibold">{{ parts.match }}</strong><span>{{ parts.after }}</span>
+          <span [innerHTML]="highlightHtml(hint)"></span>
         </li>
       }
     </ul>

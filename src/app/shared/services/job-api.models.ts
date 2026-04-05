@@ -14,11 +14,3 @@ export interface JobResponse {
   status: string;
   createdAt: string;
 }
-
-export interface JobDraft {
-  title: string;
-  tags: string[];
-  description: string;
-  draftChatId: string | null;
-  step: 'title' | 'tags' | 'description';
-}

@@ -123,6 +123,17 @@ export class AuthService {
   private readonly _oauthProfileName = signal<string | null>(null);
   private readonly _showProfileModal = signal(false);
   private readonly _oauthError = signal(false);
+  private readonly _authRequired = signal(false);
+
+  readonly authRequired = this._authRequired.asReadonly();
+
+  requireAuth(): void {
+    this._authRequired.set(true);
+  }
+
+  clearAuthRequired(): void {
+    this._authRequired.set(false);
+  }
 
   private handleOAuthCallback(): boolean {
     if (!this.isBrowser) return false;

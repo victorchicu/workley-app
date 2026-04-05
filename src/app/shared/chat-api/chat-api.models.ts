@@ -12,6 +12,9 @@ export enum ErrorCode {
   UNKNOWN = "UNKNOWN"
 }
 
+export type ChatKind = 'GENERAL' | 'JOB_POSTING';
+export type JobField = 'title' | 'tags' | 'description';
+
 export interface Content {
   type: string;
 }
@@ -39,9 +42,22 @@ export interface Attachment extends Content {
   fileSize: number;
 }
 
-export interface JobDescriptionContent extends Content {
-  type: 'JOB_DESCRIPTION';
-  text: string;
+export interface JobFieldRequestContent extends Content {
+  type: 'JOB_FIELD_REQUEST';
+  field: JobField;
+}
+
+export interface JobSummaryContent extends Content {
+  type: 'JOB_SUMMARY';
+  title: string;
+  tags: string[];
+  description: string;
+}
+
+export interface JobPostedContent extends Content {
+  type: 'JOB_POSTED';
+  jobId: string;
+  title: string;
 }
 
 export type ContentType =
@@ -49,7 +65,9 @@ export type ContentType =
   | ReplyCompleted
   | ReplyError
   | Attachment
-  | JobDescriptionContent;
+  | JobFieldRequestContent
+  | JobSummaryContent
+  | JobPostedContent;
 
 export interface Message {
   id?: string;
@@ -63,6 +81,7 @@ export interface Message {
 
 export interface CreateChatRequest {
   prompt: string;
+  type?: ChatKind;
 }
 
 export interface AddMessageRequest {

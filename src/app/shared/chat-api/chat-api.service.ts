@@ -16,8 +16,11 @@ export class ChatApiService {
 
   constructor(private readonly httpClient: HttpClient) {}
 
-  createChat(prompt: string, attachmentId?: string): Observable<CreateChatResponse> {
-    return this.httpClient.post<CreateChatResponse>(this.baseUrl, {prompt, attachmentId}, {
+  createChat(prompt: string, attachmentId?: string, type?: 'GENERAL' | 'JOB_POSTING'): Observable<CreateChatResponse> {
+    const body: {prompt: string; attachmentId?: string; type?: string} = {prompt};
+    if (attachmentId) body.attachmentId = attachmentId;
+    if (type) body.type = type;
+    return this.httpClient.post<CreateChatResponse>(this.baseUrl, body, {
       withCredentials: true
     }).pipe(retry(retryStrategy()));
   }

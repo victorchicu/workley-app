@@ -14,7 +14,6 @@ import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {catchError, EMPTY, finalize, Observable, tap, throwError} from 'rxjs';
 import {AttachmentApiService} from '../../shared/chat-api/attachment-api.service';
 import {AttachmentUploadState} from '../../shared/chat-api/attachment-api.models';
-import {PostJobModalComponent} from '../../shared/components/post-job-modal/post-job-modal.component';
 
 export interface PromptControl {
   text: FormControl<string>;
@@ -32,8 +31,7 @@ export type PromptForm = FormGroup<PromptControl>;
     PromptInputFormComponent,
     PromptSendButtonComponent,
     PromptActionsMenuComponent,
-    RouterLink,
-    PostJobModalComponent
+    RouterLink
   ],
   templateUrl: './prompt.component.html',
   styleUrl: './prompt.component.css',
@@ -58,21 +56,6 @@ export class PromptComponent {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly attachment = signal<AttachmentUploadState | null>(null);
   readonly hasAttachment = computed(() => !!this.attachment()?.attachmentId);
-  readonly postJobModalOpen = signal(false);
-
-  constructor() {
-    if (isPlatformBrowser(this.platformId)) {
-      const draft = localStorage.getItem('job_draft');
-      if (draft) {
-        try {
-          const parsed = JSON.parse(draft);
-          if (parsed.description && parsed.step === 'description') {
-            setTimeout(() => this.postJobModalOpen.set(true), 0);
-          }
-        } catch {}
-      }
-    }
-  }
 
   private readonly attachmentSub = toObservable(this.hasAttachment)
     .pipe(takeUntilDestroyed())
@@ -119,12 +102,19 @@ export class PromptComponent {
     this.attachment.set(null);
   }
 
-  openPostJobModal(): void {
-    this.postJobModalOpen.set(true);
-  }
-
-  closePostJobModal(): void {
-    this.postJobModalOpen.set(false);
+  onPostJobClicked(): void {
+    this.chatApi.createChat('', undefined, 'JOB_POSTING')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.router.navigate(['/chat', response.chatId])
+            .catch(err => console.error('Navigation error:', err));
+        },
+        error: (err) => {
+          console.error('Failed to create job posting chat', err);
+          this.error.set("Oops! Something went wrong, please try again.");
+        }
+      });
   }
 
   sendPrompt() {

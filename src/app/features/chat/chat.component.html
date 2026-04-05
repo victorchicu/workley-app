@@ -60,6 +60,31 @@
                     {{ (messageModel.content | asReplyError).reason }}
                   </div>
                 </ng-container>
+                <!-- JOB_SUMMARY -->
+                <ng-container *ngSwitchCase="'JOB_SUMMARY'">
+                  <div class="rounded-lg border border-border-primary bg-surface-secondary p-4 space-y-3">
+                    <div class="text-xs text-text-secondary uppercase tracking-wide">Job Summary</div>
+                    <div class="text-base font-semibold text-text-primary">{{ $any(messageModel.content).title }}</div>
+                    <div class="flex flex-wrap gap-2">
+                      <span *ngFor="let tag of $any(messageModel.content).tags"
+                            class="px-2 py-1 bg-surface-tertiary rounded text-xs">{{ tag }}</span>
+                    </div>
+                    <div class="text-sm text-text-secondary whitespace-pre-wrap">{{ $any(messageModel.content).description }}</div>
+                    <button type="button"
+                            class="px-4 py-2 bg-text-primary text-bg-primary rounded-full text-sm font-medium cursor-pointer"
+                            (click)="onPostJobFromSummary($any(messageModel.content))">
+                      Post Job
+                    </button>
+                  </div>
+                </ng-container>
+                <!-- JOB_POSTED -->
+                <ng-container *ngSwitchCase="'JOB_POSTED'">
+                  <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 space-y-2">
+                    <div class="text-sm font-medium text-text-primary">Job posted</div>
+                    <div class="text-base text-text-primary">{{ $any(messageModel.content).title }}</div>
+                    <a [routerLink]="['/my/jobs']" class="text-sm text-text-primary underline">View in My Jobs</a>
+                  </div>
+                </ng-container>
                 <!-- Fallback -->
                 <ng-container *ngSwitchDefault>
                   <div class="text-text-tertiary">
@@ -125,16 +150,6 @@
                 </svg>
               </button>
             </div>
-            @if (showApplyDescription(messageModel)) {
-              <button (click)="onApplyDescription(messageModel)"
-                      class="mt-2 w-full px-4 py-2 bg-surface-secondary border border-border-light text-text-primary rounded-full text-sm font-medium hover:bg-surface-hover cursor-pointer flex items-center justify-center gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
-                  <line x1="4" y1="22" x2="4" y2="15"/>
-                </svg>
-                Apply description
-              </button>
-            }
           </div>
         </div>
       </div>
@@ -163,8 +178,9 @@
         (onPressEnter)="onAddMessage()"
         (lineWrapDetected)="handleLineWrapChange($event)"
         [attachment]="chatModel.attachment"
+        [autocompleteSource]="activeJobField()"
         (removeAttachment)="onRemoveAttachment()">
-        <app-prompt-actions-menu leftActions (fileSelected)="onFileSelected($event)" (postJobClicked)="openPostJobModal()"/>
+        <app-prompt-actions-menu leftActions (fileSelected)="onFileSelected($event)" (postJobClicked)="onPostJobClicked()"/>
         <div class="flex items-center gap-1" [class.justify-end]="chatModel.isLineWrapped">
           <app-prompt-send-button
             aria-label="Send message"
@@ -190,8 +206,5 @@
       [messageText]="$any(share.content).text || ''"
       (close)="closeShareModal()"
     />
-  }
-  @if (postJobModalOpen()) {
-    <app-post-job-modal (close)="closePostJobModal()"/>
   }
 </div>

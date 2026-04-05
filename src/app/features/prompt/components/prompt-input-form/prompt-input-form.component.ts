@@ -2,10 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   ElementRef,
+  HostListener,
+  inject,
   input,
   output,
+  signal,
   ViewChild
 } from '@angular/core';
 import {
@@ -16,6 +20,9 @@ import {
 import {PromptControl} from '../../prompt.component';
 import {AttachmentCardComponent} from '../attachment-card/attachment-card.component';
 import {AttachmentUploadState} from '../../../../shared/chat-api/attachment-api.models';
+import {JobApiService} from '../../../../shared/services/job-api.service';
+import {debounceTime, distinctUntilChanged, of, Subject, switchMap} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-prompt-input-form',
@@ -36,13 +43,22 @@ export class PromptInputFormComponent {
   readonly isSubmitting = input<boolean>(false);
   readonly isDeactivated = input(false);
   readonly isLineWrapped = input<boolean>(false);
+  readonly autocompleteSource = input<'title' | 'location' | null>(null);
   readonly onPressEnter = output<void>()
   readonly lineWrapDetected = output<boolean>()
   readonly attachment = input<AttachmentUploadState | null>(null);
   readonly removeAttachment = output<void>();
   @ViewChild('promptRef') promptRef!: ElementRef<HTMLTextAreaElement>;
 
+  private readonly jobApi = inject(JobApiService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly elementRef = inject(ElementRef);
   private singleLineWidth = 0;
+
+  protected readonly hints = signal<string[]>([]);
+  protected readonly showHints = signal(false);
+  protected readonly hintIndex = signal(-1);
+  private readonly hintInput$ = new Subject<string>();
 
   viewModel = computed(() => ({
     form: this.form(),
@@ -83,6 +99,30 @@ export class PromptInputFormComponent {
         }
       }
     });
+    effect(() => {
+      if (!this.autocompleteSource()) {
+        this.hints.set([]);
+        this.showHints.set(false);
+      }
+    });
+
+    this.hintInput$.pipe(
+      debounceTime(80),
+      distinctUntilChanged(),
+      switchMap(q => {
+        const source = this.autocompleteSource();
+        if (!source || q.length < 2) return of([]);
+        return this.jobApi.getHints(q, source);
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: hints => {
+        this.hints.set(hints);
+        this.showHints.set(hints.length > 0);
+        this.hintIndex.set(-1);
+      },
+      error: err => console.error('Hints error:', err)
+    });
   }
 
   focusInput(): void {
@@ -95,8 +135,34 @@ export class PromptInputFormComponent {
 
   handlePressEnter(event: KeyboardEvent): void {
     const state = this.viewModel();
+
+    if (this.showHints() && this.hints().length > 0) {
+      const count = this.hints().length;
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.hintIndex.update(i => (i + 1) % count);
+        return;
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.hintIndex.update(i => (i <= 0 ? count - 1 : i - 1));
+        return;
+      }
+      if (event.key === 'Enter' && this.hintIndex() >= 0) {
+        event.preventDefault();
+        this.selectHint(this.hints()[this.hintIndex()]);
+        return;
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.showHints.set(false);
+        return;
+      }
+    }
+
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
+      this.showHints.set(false);
       this.onPressEnter.emit();
       return;
     }
@@ -112,6 +178,10 @@ export class PromptInputFormComponent {
 
     if (state.isSubmitting)
       return;
+
+    if (this.autocompleteSource()) {
+      this.hintInput$.next(this.form().controls.text.value ?? '');
+    }
 
     const textarea: HTMLTextAreaElement = this.promptRef.nativeElement;
     const content: string = textarea.value;
@@ -150,6 +220,33 @@ export class PromptInputFormComponent {
     } else {
       textarea.style.height = '24px';
       textarea.style.overflowY = 'hidden';
+    }
+  }
+
+  protected selectHint(hint: string): void {
+    this.form().controls.text.setValue(hint);
+    this.showHints.set(false);
+    this.hints.set([]);
+    this.hintIndex.set(-1);
+    this.focusInput();
+  }
+
+  protected highlight(hint: string): { before: string; match: string; after: string } {
+    const query = (this.form().controls.text.value ?? '').trim();
+    if (!query) return { before: hint, match: '', after: '' };
+    const idx = hint.toLowerCase().indexOf(query.toLowerCase());
+    if (idx < 0) return { before: hint, match: '', after: '' };
+    return {
+      before: hint.substring(0, idx),
+      match: hint.substring(idx, idx + query.length),
+      after: hint.substring(idx + query.length)
+    };
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.showHints.set(false);
     }
   }
 

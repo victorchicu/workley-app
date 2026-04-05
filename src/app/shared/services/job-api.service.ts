@@ -23,17 +23,9 @@ export class JobApiService {
     });
   }
 
-  getHints(query: string): Observable<string[]> {
-    const params = new HttpParams().set('q', query);
+  getHints(query: string, field: 'title' | 'location' = 'title'): Observable<string[]> {
+    const params = new HttpParams().set('q', query).set('field', field);
     return this.httpClient.get<string[]>(`${this.baseUrl}/hints`, {
-      withCredentials: true,
-      params
-    });
-  }
-
-  getLocationHints(query: string): Observable<string[]> {
-    const params = new HttpParams().set('q', query);
-    return this.httpClient.get<string[]>(`${this.baseUrl}/location-hints`, {
       withCredentials: true,
       params
     });

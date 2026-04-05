@@ -92,7 +92,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   private readonly error = signal<string | null>(null);
   private readonly chatId = signal<string | null>(null);
-  readonly activeJobField = signal<'title' | 'location' | null>(null);
+  readonly activeJobField = signal<'title' | 'location' | 'work_mode' | null>(null);
   private readonly isLoading = signal<boolean>(false);
   private readonly showLoadingSpinner = signal<boolean>(false);
   private readonly isLineWrapped = signal<boolean>(false);
@@ -340,9 +340,10 @@ export class ChatComponent implements OnInit, OnDestroy {
           }
           // Restore autocomplete state after page refresh
           if (result.type === 'JOB_POSTING' && result.pendingField) {
-            const mapped: 'title' | 'location' | null =
+            const mapped: 'title' | 'location' | 'work_mode' | null =
               result.pendingField === 'title' ? 'title' :
-              result.pendingField === 'tags' ? 'location' :
+              result.pendingField === 'location' ? 'location' :
+              result.pendingField === 'work_mode' ? 'work_mode' :
               null;
             this.activeJobField.set(mapped);
           }
@@ -439,9 +440,10 @@ export class ChatComponent implements OnInit, OnDestroy {
         break;
       case "JOB_FIELD_REQUEST": {
         const req = source.content as JobFieldRequestContent;
-        const mapped: 'title' | 'location' | null =
+        const mapped: 'title' | 'location' | 'work_mode' | null =
           req.field === 'title' ? 'title' :
-          req.field === 'tags' ? 'location' :
+          req.field === 'location' ? 'location' :
+          req.field === 'work_mode' ? 'work_mode' :
           null;
         this.activeJobField.set(mapped);
         break;
@@ -593,7 +595,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     const chatId = this.chatId();
     this.jobApi.createJob({
       title: summary.title,
-      tags: summary.tags,
+      location: summary.location,
+      workMode: summary.workMode,
       description: summary.description,
       draftChatId: chatId ?? undefined
     })

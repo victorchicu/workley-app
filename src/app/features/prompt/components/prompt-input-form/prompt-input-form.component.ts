@@ -43,7 +43,7 @@ export class PromptInputFormComponent {
   readonly isSubmitting = input<boolean>(false);
   readonly isDeactivated = input(false);
   readonly isLineWrapped = input<boolean>(false);
-  readonly autocompleteSource = input<'title' | 'location' | null>(null);
+  readonly autocompleteSource = input<'title' | 'location' | 'work_mode' | null>(null);
   readonly onPressEnter = output<void>()
   readonly lineWrapDetected = output<boolean>()
   readonly attachment = input<AttachmentUploadState | null>(null);

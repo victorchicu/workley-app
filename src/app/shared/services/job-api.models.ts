@@ -1,6 +1,7 @@
 export interface CreateJobRequest {
   title: string;
-  tags: string[];
+  location?: string | null;
+  workMode: string;
   description: string;
   draftChatId?: string;
 }
@@ -8,7 +9,8 @@ export interface CreateJobRequest {
 export interface JobResponse {
   id: string;
   title: string;
-  tags: string[];
+  location?: string | null;
+  workMode: string;
   description: string;
   draftChatId?: string;
   status: string;

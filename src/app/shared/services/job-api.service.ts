@@ -23,7 +23,7 @@ export class JobApiService {
     });
   }
 
-  getHints(query: string, field: 'title' | 'location' = 'title'): Observable<string[]> {
+  getHints(query: string, field: 'title' | 'location' | 'work_mode' = 'title'): Observable<string[]> {
     const params = new HttpParams().set('q', query).set('field', field);
     return this.httpClient.get<string[]>(`${this.baseUrl}/hints`, {
       withCredentials: true,

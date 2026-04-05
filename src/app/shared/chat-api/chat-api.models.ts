@@ -13,7 +13,7 @@ export enum ErrorCode {
 }
 
 export type ChatKind = 'GENERAL' | 'JOB_POSTING';
-export type JobField = 'title' | 'tags' | 'description';
+export type JobField = 'title' | 'location' | 'work_mode' | 'description';
 
 export interface Content {
   type: string;
@@ -50,7 +50,8 @@ export interface JobFieldRequestContent extends Content {
 export interface JobSummaryContent extends Content {
   type: 'JOB_SUMMARY';
   title: string;
-  tags: string[];
+  location: string | null;
+  workMode: string;
   description: string;
 }
 

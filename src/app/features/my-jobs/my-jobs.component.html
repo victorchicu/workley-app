@@ -30,9 +30,10 @@
               </span>
             </div>
             <div class="flex flex-wrap gap-1.5 mb-2">
-              @for (tag of job.tags; track tag) {
-                <span class="px-2 py-0.5 bg-surface-tertiary text-text-secondary rounded-full text-xs">{{ tag }}</span>
+              @if (job.location) {
+                <span class="px-2 py-0.5 bg-surface-tertiary text-text-secondary rounded-full text-xs">{{ job.location }}</span>
               }
+              <span class="px-2 py-0.5 bg-surface-tertiary text-text-secondary rounded-full text-xs">{{ job.workMode }}</span>
             </div>
             <p class="text-xs text-text-tertiary">{{ job.createdAt | date:'mediumDate' }}</p>
 
